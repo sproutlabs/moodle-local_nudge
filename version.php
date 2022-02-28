@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2022022801;
-// Requires 4.0
-$plugin->requires  = 2021091700;
+// Requires 3.9.0
+$plugin->requires  = 2020061500;
 $plugin->component = 'local_nudge';
 $plugin->release   = 'Development Edition';
 $plugin->maturity  = MATURITY_ALPHA;
