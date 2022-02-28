@@ -33,7 +33,6 @@ $capabilities = [
             'teacher' => CAP_PREVENT,
             'editingteacher' => CAP_PREVENT,
             'manager' => CAP_PREVENT,
-            'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],
 ];
