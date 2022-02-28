@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/nudge/db" VERSION="20220301" COMMENT="XMLDB file for Moodle local/nudge"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_nudge" COMMENT="Stores instances of Nudge that indicate and provide metadata for Courses who want Nudge reminders">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course that this nudge instance is linked to"/>
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge instance was modified"/>
+        <FIELD NAME="remindertype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum representing this nudge's method of determining the appropriate date to remind on"/>
+        <FIELD NAME="fixedreminderdate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The fixed reminder date for this Nudge instance if needed"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="true" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
