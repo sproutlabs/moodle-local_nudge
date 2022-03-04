@@ -24,35 +24,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
-    'local/nudge:trackcourse' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-    'local/nudge:configurenudgenotifications' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-    'local/nudge:configurenudgenotificationcontents' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-];
+$messageproviders = [];

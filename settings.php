@@ -15,44 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Adds a link to edit nudge notifications from the courses and categories sidebar for the root course.
+ * 
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
+ * 
+ * @var \core_config        $CFG
+ * @var \admin_root         $ADMIN
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
-    'local/nudge:trackcourse' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-    'local/nudge:configurenudgenotifications' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-    'local/nudge:configurenudgenotificationcontents' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-];
+$ADMIN->add(
+    'courses',
+    new admin_category('nudge', 'Nudge'),
+    // TODO doesn't exist in moodle.
+    (isset($CFG->totara_version)) ? 'configurecatalog' : 'TODOFIXME'
+);
+
+$ADMIN->add(
+    'nudge',
+    new \admin_externalpage(
+        'configurenudgenotifications',
+        new \lang_string('configurenudgenotifications', 'local_nudge'),
+        new \moodle_url('/local/nudge/edit_notifications.php'),
+        'local/nudge:configurenudgenotifications'
+    )
+);
+
+$ADMIN->add(
+    'nudge',
+    new \admin_externalpage(
+        'configurenudgenotificationcontents',
+        new \lang_string('configurenudgenotificationcontents', 'local_nudge'),
+        new \moodle_url('/local/nudge/edit_notification_contents.php'),
+        'local/nudge:configurenudgenotificationcontents'
+    )
+);

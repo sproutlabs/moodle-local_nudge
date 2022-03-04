@@ -16,7 +16,7 @@
 
 /**
  * @package     local_nudge
- * @author      Liam Kearney
+ * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
@@ -27,22 +27,21 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-#region BEGIN: Evil extensible code using function names.
-
 /**
  * Adds the link to start tracking a course for completion reminders.
  *
  * @access public
- * @param \navigation_node $parentnode
- * @param \stdClass $course
- * @param \context_course $context
+ * 
+ * @param \navigation_node  $parentnode
+ * @param \stdClass         $course
+ * @param \context_course   $context
  * @return void
  */
 function local_nudge_extend_navigation_course(\navigation_node $parentnode, \stdClass $course, \context_course $context)
 {
     if (!\has_capability('local/nudge:trackcourse', $context)) return;
 
-    $url = new moodle_url('/local/nudge/track_course_form.php', [
+    $url = new moodle_url('/local/nudge/edit_nudge.php', [
         'courseid' => $course->id
     ]);
 
@@ -56,4 +55,35 @@ function local_nudge_extend_navigation_course(\navigation_node $parentnode, \std
     );
 }
 
-#endregion
+/**
+ * Scaffolds an autocomplete form from class constant enums.
+ * 
+ * @access public
+ * 
+ * @param class-string $class Class to lookup consts on via reflection
+ * @param string $filter Filter string the constant group of enums contain.
+ *
+ * @return array<string, string>
+ */
+function scaffold_select_from_constants($class, $filter)
+{
+    $rclass = new \ReflectionClass($class);
+    $constants = $rclass->getConstants();
+
+    // Filter for constants containing: `REMINDER_DATE`
+    $constants = \array_filter($constants, function ($value, $name) use ($filter) {
+        $match = (\strpos($name, $filter) !== false);
+        return $match;
+    }, \ARRAY_FILTER_USE_BOTH);
+
+    // Convert constants to a sane reference to language strings.
+    $constant_fields = [];
+    foreach ($constants as $name => $value) {
+        // EXAMPLE: `REMINDER_DATE_RELATIVE_ENROLLMENT` -> `reminderdaterelativeenrollment`
+        $lang_name = \strtolower(\str_replace('_', '', $name));
+        $sane_name = \get_string($lang_name, 'local_nudge');
+        $constant_fields[$value] = $sane_name;
+    }
+
+    return $constant_fields;
+}

@@ -16,7 +16,7 @@
 
 /**
  * @package     local_nudge\local
- * @author      Liam Kearney
+ * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
@@ -28,6 +28,7 @@
 namespace local_nudge\local;
 
 use coding_exception;
+use local_nudge\form\nudge\nudge_nudge_notification;
 use UnexpectedValueException;
 
 /**
@@ -36,7 +37,7 @@ use UnexpectedValueException;
  * The (not quite single) responsiblity of this entity is to store metadata about this courses reminders.
  * 
  * @package     local_nudge\local
- * @author      Liam Kearney
+ * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @copyright   GNU GPL v3 or later
  */
@@ -61,6 +62,32 @@ class nudge
     const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
 
     /**
+     * This Nudge instance's recipient will be only the learner.
+     */
+    const REMINDER_RECIPIENT_LEARNER = 'learner';
+
+    /**
+     * This Nudge instance's recipient will be only the learner's managers.
+     */
+    const REMINDER_RECIPIENT_MANAGERS = 'managers';
+
+    /**
+     * This Nudge instance's will have both the learner and their managers as the recipients.
+     */
+    const REMINDER_RECIPIENT_BOTH = 'both';
+
+    const DEFAULTS = [
+        'isenabled' => 0,
+        'reminderrecipient' => self::REMINDER_RECIPIENT_LEARNER,
+        'remindertype' => self::REMINDER_DATE_RELATIVE_COURSE_END
+    ];
+
+    /**
+     * @todo Specific users.
+     */
+    // const REMINDER_RECIPIENT_SPECIFIC = 'specific';
+
+    /**
      * @var int|null The autoincrement index of this entity.
      */
     public $id = null;
@@ -68,7 +95,24 @@ class nudge
     /**
      * @var int|null The id of the Course linked to this nudge entity.
      */
-    public $course = null;
+    public $courseid = null;
+
+    /**
+     * @var int|null The has one for a {@see nudge_notification} that will be sent to the Learner.
+     * 0 (no foreign reference) will use the default language string.
+     */
+    public $linkedlearnernotificationid = null;
+
+    /**
+     * @var int|null The has one for a {@see nudge_notification} that will be sent to the Manager.
+     * 0 (no foreign reference) will use the default language string.
+     */
+    public $linkedmanagernotificationid = null;
+
+    /**
+     * @var bool|null Is this instance of nudge enabled (Is nudge enabled for this course)?
+     */
+    public $isenabled = null;
 
     /**
      * @var int|null The timestamp this nudge instance was last modified at.
@@ -76,15 +120,40 @@ class nudge
     public $lastmodified = null;
 
     /**
+     * @var string|null The the reminder recipients of this nudge.
+     */
+    public $reminderrecipient = null;
+
+    /**
      * @var string|null The the reminder type of this nudge.
      */
     public $remindertype = null;
 
     /**
-     * @todo Make this less redundant if another option is selected.
-     * @var string|null The fixed reminder date if needed.
+     * The fixed reminder date to nudge at if {@see self::$remindertype} == {@see self::REMINDER_DATE_INPUT_FIXED}.
+     * 
+     * @var string|null Timestamp.
      */
-    public $fixedreminderdate = null;
+    public $remindertypefixeddate = null;
+
+    /**
+     * Time in seconds representing either:
+     * ---
+     * the duration prior to course end date to nudge at if
+     * ```
+     * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_COURSE_END}
+     * ```
+     * OR
+     * the period of time post learner enrollment to repeat nudges if
+     * ```
+     * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT}.
+     * ```
+     * 
+     * @todo Validate that the the duration field cannot exceed MYSQL bigint on the form and below constructor.
+     * 
+     * @var int|null Time in seconds.
+     */
+    public $remindertypeperiod = null;
 
     /**
      * @param stdClass|array|null $data The data to wrap with a nudge entity/instance.
@@ -100,7 +169,7 @@ class nudge
         }
 
         foreach ($data as $key => $value) {
-            $setter = "set{$key}";
+            $setter = "set_{$key}";
             if (\method_exists($this, $setter)) {
                 $this->$setter($key);
                 continue;
@@ -131,5 +200,7 @@ class nudge
     private function cast_fields()
     {
         // TODO.
+
+        $this->isenabled = (bool) $this->isenabled;
     }
 }

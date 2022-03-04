@@ -15,18 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     local_nudge\task
+ * DML for {@see nudge_notification_content}
+ *
+ * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
  */
 
+namespace local_nudge\dml;
+
+use local_nudge\local\nudge_notification_content;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022022802;
-// Requires 3.9.0
-$plugin->requires  = 2020061500;
-$plugin->component = 'local_nudge';
-$plugin->release   = 'Development Edition';
-$plugin->maturity  = MATURITY_ALPHA;
+/**
+ * {@inheritDoc}
+ * @extends abstract_nudge_db<nudge_notification_content>
+ */
+class nudge_notification_content_db extends abstract_nudge_db
+{
+    /** {@inheritdoc} */
+    protected static $table = 'nudge_notification_content';
+
+    /** {@inheritdoc} */
+    protected static $entity_class = nudge_notification_content::class;
+}

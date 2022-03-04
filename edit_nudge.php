@@ -16,7 +16,7 @@
 
 /**
  * @package     local_nudge
- * @author      Liam Kearney
+ * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
@@ -27,18 +27,16 @@
  * @var \core_renderer      $OUTPUT
  */
 
+use local_nudge\dml\nudge_db;
+use local_nudge\form\nudge\edit;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-//                          name        default  filter
-$courseid = \required_param('courseid',         \PARAM_INT);
-$ruleid   = \optional_param('ruleid',   0,      \PARAM_INT);
-$action   = \optional_param('action',   '',     \PARAM_ALPHA);
-$confirm  = \optional_param('confirm',  false,  \PARAM_BOOL);
-$status   = \optional_param('status',   0,      \PARAM_BOOL);
+$course_id = \required_param('courseid', \PARAM_INT);
 
 // Require a login for this course for this course.
-$course = \get_course($courseid);
+$course = \get_course($course_id);
 \require_login($course);
 $context = \context_course::instance($course->id);
 
@@ -46,21 +44,24 @@ $context = \context_course::instance($course->id);
 \require_capability('local/nudge:trackcourse', $context);
 
 // Set up the page.
-$manageurl = new \moodle_url("/local/nudge/track_course_form.php", ['courseid' => $courseid]);
-$PAGE->set_url($manageurl);
-$PAGE->set_pagelayout('base');
-$coursename = \format_string(
-    $course->fullname,
-    true,
-    ['context' => $context]
-);
-$PAGE->set_title($coursename);
-$PAGE->set_heading($coursename);
+$base_url = new \moodle_url("/local/nudge/edit_nudge.php", ['courseid' => $course_id]);
+$PAGE->set_url($base_url);
+
+$mform = new edit(new \moodle_url('/local/nudge/edit_nudge.php', ['courseid' => $course_id]));
+
+// Edit form submision handling.
+if ($mform->is_cancelled()) {
+    \redirect(new \moodle_url('/course/view.php', ['id' => $course_id]));
+} else if ($nudge = $mform->get_data()) {
+    $id = nudge_db::save($nudge);
+    \redirect(new \moodle_url('/course/view.php', ['id' => $course_id]));
+}
+
+// Create an instance for this course if it doesn't exist yet and this page has been visited.
+$nudge = nudge_db::find_or_create($course_id);
 
 // Render the form.
 echo $OUTPUT->header();
-echo $OUTPUT->heading(\get_string('managetracking', 'local_nudge'));
-
-// echo $OUTPUT->confirm($strconfirm, $confirmurl, $cancelurl);
+$mform->set_data($nudge);
+$mform->display();
 echo $OUTPUT->footer();
-return;
