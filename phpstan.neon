@@ -1,7 +1,8 @@
 parameters:
   level: 5
   bootstrapFiles:
-    - phpstan/bootstrap.php
+    - tests/phpstan/bootstrap.php
+    - ../../lib/init.php
     - ../../lib/moodlelib.php
     - ../../lib/accesslib.php
   paths:
