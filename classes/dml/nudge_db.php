@@ -35,7 +35,7 @@ use local_nudge\local\nudge;
 class nudge_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    public static $table = 'nudge';
+    public static $table = 'local_nudge';
 
     /** {@inheritdoc} */
     public static $entityclass = nudge::class;
