@@ -59,6 +59,7 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+          IGNORE_PATHS: 'tests/phpstan/bootstrap.php'
 
       - name: PHP Lint
         if: ${{ always() }}
@@ -77,8 +78,6 @@ jobs:
       - name: Moodle Code Checker
         if: ${{ always() }}
         run: moodle-plugin-ci codechecker --max-warnings 0
-        env:
-          IGNORE_PATHS: 'tests/phpstan/bootstrap.php'
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
