@@ -103,6 +103,7 @@ class nudge_task extends scheduled_task {
             switch ($enabledinstance->remindertype):
                 // Manually defined time to reminder incomplete users.
                 case (nudge::REMINDER_DATE_INPUT_FIXED):
+                    \debugging('fixed');
                     // NO-OP
                     if ($enabledinstance->remindertypefixeddate < time()) {
                         break;
@@ -116,6 +117,7 @@ class nudge_task extends scheduled_task {
                     break;
                 // If we want to reminder people of an upcoming end of course.
                 case (nudge::REMINDER_DATE_RELATIVE_COURSE_END):
+                    \debugging('end');
                     /** @var \core\entity\course */
                     $nudgescourse = $enabledinstance->get_course();
                     $timetoremindofendofcourse = $nudgescourse->enddate - $enabledinstance->remindertypeperiod;
@@ -135,6 +137,7 @@ class nudge_task extends scheduled_task {
                 case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT):
                     // This one is more expensive and complicated. It will need a load of optimisation before production
                     // but for a some wireframing now its fine.
+                    \debugging('recurring');
                     $this->handle_recurring($enabledinstance);
                     break;
 
@@ -153,7 +156,7 @@ class nudge_task extends scheduled_task {
         // TODO handle: \enrol_get_enrolment_end()
 
         // No more need to recurr the course has ended.
-        if ($nudgescourse->enddate > \time()) {
+        if ($nudgescourse->enddate < \time()) {
             $nudge->isenabled = false;
             nudge_db::save($nudge);
 
@@ -168,33 +171,40 @@ class nudge_task extends scheduled_task {
             ]);
 
             if ($previoustiming === null) {
+                $userstartdate = $this->get_user_enroltime_in_course(
+                    $incompleteuser->id,
+                    $nudgescourse->id
+                );
+
                 // Save a record for the future.
                 $previoustiming = new nudge_user([
                     'nudgeid' => $nudge->id,
                     'userid' => $incompleteuser->id,
-                    'recurrancetime' => $this->get_user_enroltime_in_course(
-                        $incompleteuser->id,
-                        $nudgescourse->id
-                    )
+                    'recurrancetime' => ($userstartdate + $nudge->remindertypeperiod)
                 ]);
 
                 nudge_user_db::save($previoustiming);
             }
 
-            $timetorecurrat = $previoustiming->recurrancetime + $nudge->remindertypeperiod;
-
             // NO-OP for this user.
-            if ($timetorecurrat < \time()) {
+            if ($previoustiming->recurrancetime > \time()) {
                 continue;
             }
 
-            $learneremailresult = $nudge->send_email_for_learner($incompleteuser);
-            $manageremailresult = $nudge->send_email_for_manager($incompleteuser);
+            \debugging(
+                \sprintf(
+                    'Sent email to user with ID: %s.',
+                    $incompleteuser->id
+                ),
+                \DEBUG_DEVELOPER,
+                ''
+            );
+            // $learneremailresult = $nudge->send_email_for_learner($incompleteuser);
+            // $manageremailresult = $nudge->send_email_for_manager($incompleteuser);
             // Handle results - maybe don't update next recurr time if it fails.
 
             // Setup the next period for this user.
-            // TODO          rename recurrance time to lastsenttime.
-            $previoustiming->recurrancetime = time();
+            $previoustiming->recurrancetime = \time() + $nudge->remindertypeperiod;
             nudge_user_db::save($previoustiming);
         }
     }

@@ -91,6 +91,10 @@ class edit extends moodleform {
     public function get_data() {
         $data = parent::get_data();
 
+        if ($data == null) {
+            return null;
+        }
+
         return new nudge_notification([
             'id' => $data->id,
             'userfromid' => $data->userfromid,

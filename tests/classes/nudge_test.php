@@ -22,17 +22,30 @@
  * @license     GNU GPL v3 or later
  */
 
-// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+namespace local_nudge\classes;
 
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+// phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
+
+/**
+ * @testdox When using a nudge entity
+ */
 class nudge_test extends \advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void
+    {
         parent::setUp();
     }
+
+    /**
+     * @testdox I can assert that 1 equals 1.
+     */
     public function test_stuff_equals_stuff() {
         $this->assertEquals(1, 1);
     }
-    public function tearDown() {
+
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 }

@@ -32,6 +32,8 @@ use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once("$CFG->libdir/formslib.php");
 require_once(__DIR__ . '/../../../lib.php');
 
 /**
@@ -142,6 +144,10 @@ class edit extends moodleform {
      */
     public function get_data() {
         $data = parent::get_data();
+
+        if ($data == null) {
+            return null;
+        }
 
         $instancedata = [
             'id' => $data->id,

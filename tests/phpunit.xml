@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="../../../../../lib/phpunit/phpunit.xsd"
-        bootstrap="../../../../lib/phpunit/bootstrap.php"
+        xsi:noNamespaceSchemaLocation="../../../../lib/phpunit/phpunit.xsd"
+        bootstrap="../../../lib/phpunit/bootstrap.php"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
@@ -13,8 +13,7 @@
         stopOnFailure="false"
         stopOnIncomplete="false"
         stopOnSkipped="false"
-        printerClass="Hint_ResultPrinter"
-        testSuiteLoaderClass="phpunit_autoloader"
+        testdox="true"
 >
 
     <testsuites>

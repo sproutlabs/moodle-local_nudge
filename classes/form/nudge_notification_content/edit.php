@@ -71,7 +71,10 @@ class edit extends moodleform {
         $mform->addElement('text', 'subject', 'Add a Subject');
         $mform->setType('subject', \PARAM_RAW);
 
-        $mform->addElement('htmleditor', 'body', 'Add a body');
+        /** @var \core_config $CFG */
+        global $CFG;
+        $editor = (isset($CFG->totara_version)) ? 'htmleditor' : 'editor';
+        $mform->addElement($editor, 'body', 'Add a body');
         $mform->setType('body', \PARAM_RAW);
 
         $this->add_action_buttons();
