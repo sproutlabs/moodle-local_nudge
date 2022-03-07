@@ -35,7 +35,7 @@ use local_nudge\local\nudge_notification_content;
 class nudge_notification_content_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    public static $table = 'nudge_notification_content';
+    public static $table = 'local_nudge_notif_content';
 
     /** {@inheritdoc} */
     public static $entityclass = nudge_notification_content::class;
