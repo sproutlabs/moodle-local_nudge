@@ -24,6 +24,8 @@
 
 namespace local_nudge\form\nudge;
 
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
+
 use coding_exception;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge;
