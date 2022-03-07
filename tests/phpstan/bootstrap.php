@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState
 // phpcs:disable
 
 /** Used by library scripts to check they are being called by Moodle */

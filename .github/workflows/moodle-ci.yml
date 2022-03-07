@@ -77,6 +77,8 @@ jobs:
       - name: Moodle Code Checker
         if: ${{ always() }}
         run: moodle-plugin-ci codechecker --max-warnings 0
+        env:
+          IGNORE_PATHS: 'tests/phpstan/bootstrap.php'
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
