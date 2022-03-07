@@ -15,37 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * A nudge entity represents a course that wants to use completion reminders.
+ *
  * @package     local_nudge\local
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- * 
- * @var \core_config        $CFG
- * @var \moodle_database    $DB
  */
 
 namespace local_nudge\local;
 
-use coding_exception;
-use local_nudge\form\nudge\nudge_nudge_notification;
-use UnexpectedValueException;
+// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
+// phpcs:disable moodle.Commenting.InlineComment.DocBlock
+// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar
+
+use local_nudge\dml\nudge_notification_db;
+use local_nudge\local\nudge_notification;
 
 /**
- * A nudge entity represents a course that wants to use completion reminders.
- * 
- * The (not quite single) responsiblity of this entity is to store metadata about this courses reminders.
- * 
  * @package     local_nudge\local
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @copyright   GNU GPL v3 or later
  */
-class nudge
-{
-    // TODO: SORT.
-    const SORT_RELATIVE_NOW = '';
+class nudge extends abstract_nudge_entity {
 
+    // BEGIN ENUM - REMINDER DATE    ////////////////////
     /**
      * This Nudge instance's reminder timing is a fixed date selected when setting up the reminder.
      */
@@ -60,7 +57,9 @@ class nudge
      * This Nudge instance's reminder timing is infered from the course's end date.
      */
     const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
+    // END ENUM - REMINDER DATE    ////////////////////
 
+    // BEGIN ENUM - REMINDER RECIPIENT    ////////////////////
     /**
      * This Nudge instance's recipient will be only the learner.
      */
@@ -75,22 +74,14 @@ class nudge
      * This Nudge instance's will have both the learner and their managers as the recipients.
      */
     const REMINDER_RECIPIENT_BOTH = 'both';
+    // END ENUM - REMINDER RECIPIENT    ////////////////////
 
+    /** {@inheritDoc} */
     const DEFAULTS = [
         'isenabled' => 0,
         'reminderrecipient' => self::REMINDER_RECIPIENT_LEARNER,
         'remindertype' => self::REMINDER_DATE_RELATIVE_COURSE_END
     ];
-
-    /**
-     * @todo Specific users.
-     */
-    // const REMINDER_RECIPIENT_SPECIFIC = 'specific';
-
-    /**
-     * @var int|null The autoincrement index of this entity.
-     */
-    public $id = null;
 
     /**
      * @var int|null The id of the Course linked to this nudge entity.
@@ -131,7 +122,7 @@ class nudge
 
     /**
      * The fixed reminder date to nudge at if {@see self::$remindertype} == {@see self::REMINDER_DATE_INPUT_FIXED}.
-     * 
+     *
      * @var string|null Timestamp.
      */
     public $remindertypefixeddate = null;
@@ -148,59 +139,36 @@ class nudge
      * ```
      * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT}.
      * ```
-     * 
+     *
      * @todo Validate that the the duration field cannot exceed MYSQL bigint on the form and below constructor.
-     * 
+     *
      * @var int|null Time in seconds.
      */
     public $remindertypeperiod = null;
 
     /**
-     * @param stdClass|array|null $data The data to wrap with a nudge entity/instance.
-     * @throws UnexpectedValueException Passed a field that doesn't exist.
-     * @throws coding_exception
+     * @return nudge_notification|null
      */
-    public function __construct($data = null)
-    {
-        if ($data == null) return;
-        if (\is_object($data)) $data = (array)$data;
-        if (!\is_array($data)) {
-            throw new coding_exception(\sprintf('You must provide valid data to %s to wrap a instance of %s', __METHOD__, __CLASS__));
-        }
-
-        foreach ($data as $key => $value) {
-            $setter = "set_{$key}";
-            if (\method_exists($this, $setter)) {
-                $this->$setter($key);
-                continue;
-            }
-
-            if (\property_exists($this, $key)) {
-                $this->$key = $value;
-                continue;
-            }
-
-            throw new UnexpectedValueException(\sprintf(
-                '%s\'s %s method was passed a property/field that doesn\'t exist on %s. Property name was: %s',
-                __CLASS__,
-                __METHOD__,
-                __CLASS__,
-                $key
-            ));
-        }
-
-        $this->cast_fields();
+    public function get_learner_notification() {
+        return nudge_notification_db::get_by_id($this->linkedlearnernotificationid);
     }
 
     /**
-     * Casts the fields populated by {@see self::__construct()} to some sane defaults.
-     * 
-     * @return void
+     * @return nudge_notification|null
      */
-    private function cast_fields()
-    {
-        // TODO.
+    public function get_manager_notification() {
+        return nudge_notification_db::get_by_id($this->linkedmanagernotificationid);
+    }
 
+    /**
+     * @return \core\entity\course|\stdClass
+     */
+    public function get_course() {
+        return \get_course($this->courseid);
+    }
+
+    /** {@inheritDoc} */
+    protected function cast_fields() {
         $this->isenabled = (bool) $this->isenabled;
     }
 }

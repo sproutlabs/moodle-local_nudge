@@ -28,17 +28,15 @@ namespace local_nudge\dml;
 
 use local_nudge\local\nudge_notification_content;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge_notification_content>
  */
-class nudge_notification_content_db extends abstract_nudge_db
-{
-    /** {@inheritdoc} */
-    protected static $table = 'nudge_notification_content';
+class nudge_notification_content_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    protected static $entity_class = nudge_notification_content::class;
+    public static $table = 'nudge_notification_content';
+
+    /** {@inheritdoc} */
+    public static $entityclass = nudge_notification_content::class;
 }

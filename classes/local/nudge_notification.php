@@ -24,26 +24,16 @@
 
 namespace local_nudge\local;
 
-use coding_exception;
 use local_nudge\dml\nudge_notification_content_db;
+use local_nudge\local\abstract_nudge_entity;
 use local_nudge\local\nudge_notification_content;
-use UnexpectedValueException;
 
-defined('MOODLE_INTERNAL') || die();
+class nudge_notification extends abstract_nudge_entity {
 
-class nudge_notification
-{
-    /**
-     * @var array<string, mixed> Field defaults.
-     */
+    /** {@inheritDoc} */
     const DEFAULTS = [
         'title' => 'Untitled Notification'
     ];
-
-    /**
-     * @var int|null Primary key for {@see nudge_notification}.
-     */
-    public $id = null;
 
     /**
      * @var string|null Title for this {@see nudge_notification}
@@ -61,63 +51,25 @@ class nudge_notification
     public $userfromid = null;
 
     /**
-     * @param stdClass|array|null $data The data to wrap with a nudge entity/instance.
-     * @throws UnexpectedValueException Passed a field that doesn't exist.
-     * @throws coding_exception
-     */
-    public function __construct($data = null)
-    {
-        if ($data == null) return;
-        if (\is_object($data)) $data = (array)$data;
-        if (!\is_array($data)) {
-            throw new coding_exception(\sprintf('You must provide valid data to %s to wrap a instance of %s', __METHOD__, __CLASS__));
-        }
-
-        foreach ($data as $key => $value) {
-            $setter = "set_{$key}";
-            if (\method_exists($this, $setter)) {
-                $this->$setter($key);
-                continue;
-            }
-
-            if (\property_exists($this, $key)) {
-                $this->$key = $value;
-                continue;
-            }
-
-            throw new UnexpectedValueException(\sprintf(
-                '%s\'s %s method was passed a property/field that doesn\'t exist on %s. Property name was: %s',
-                __CLASS__,
-                __METHOD__,
-                __CLASS__,
-                $key
-            ));
-        }
-
-        $this->cast_fields();
-    }
-
-    /**
      * Returns the content for a language code.
      *
-     * @param string $lang_code
+     * @param string $langcode
      * @return nudge_notification_content|null
      */
-    public function get_content_for_lang($lang_code = 'en')
-    {
+    public function get_content_for_lang($langcode = 'en') {
         return nudge_notification_content_db::get_filtered([
             'nudgenotificationid' => $this->id,
-            'lang' => $lang_code
+            'lang' => $langcode
         ]);
     }
 
     /**
-     * Casts the fields populated by {@see self::__construct()} to some sane defaults.
-     * 
-     * @return void
+     * @return array<mixed>
      */
-    private function cast_fields()
-    {
-        // TODO.
+    public function get_summary_fields() {
+        return [
+            $this->id,
+            $this->title
+        ];
     }
 }

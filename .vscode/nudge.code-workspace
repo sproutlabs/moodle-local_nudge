@@ -1,0 +1,44 @@
+{
+	"folders": [
+		{
+			"name": "Nudge",
+			"path": "..",
+		},
+		{
+			"name": "MOODLE / Totara",
+			// Will be /server in totara.
+			"path": "../../..",
+		},
+	],
+	"settings": {
+		// MOODLE/TOTARA LOCAL NUDGE DEVELOPMENT QUICKSTART.
+		"[php]": {
+			"editor.defaultFormatter": "wongjn.php-sniffer",
+		},
+		"intelephense.environment.phpVersion": "7.4", // We will try to support whatever the minium active version of PHP is.
+		"phpSniffer.autoDetect": false,
+		// TODO CHANGEME you'll need to manually input your home directory here VSCODE has no support for this in solutions
+		// only in launch and tasks can you use `${env:HOME}` or `${userHome}`
+		"phpSniffer.executablesFolder": "/home/liam/.config/composer/vendor/bin",
+		"phpSniffer.standard": "moodle",
+		"phpSniffer.run": "onType",
+		"phpSniffer.onTypeDelay": 250,
+		"phpSniffer.snippetExcludeSniffs": [
+			"moodle.Commenting.InlineComment.DocBlock"
+		],
+		"phpstan.enabled": true,
+		"phpstan.fileWatcher": true,
+		"phpstan.path": "vendor/bin/phpstan",
+		"phpstan.memoryLimit": "-1",
+	},
+	"extensions": {
+		"recommendations": [
+			"bmewburn.vscode-intelephense-client", // Best PHP LSP outside of jetbrains at the moment.
+			"wongjn.php-sniffer", // For passing CI
+			"PhilHindle.errorlens", // Handling Code Sniffer opinions.
+			"swordev.phpstan", // For template generics and shaped arrays.
+			"MehediDracula.php-namespace-resolver", // For handling namespaces.
+			"hbenl.vscode-test-explorer", // Test runner is always nice.
+		]
+	}
+}

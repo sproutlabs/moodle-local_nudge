@@ -24,15 +24,15 @@
 
 namespace local_nudge\form\nudge;
 
-require_once(__DIR__ . '/../../../lib.php');
-
 use coding_exception;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge;
-use local_nudge\local\nudge_notification;
+use moodle_exception;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../../../lib.php');
 
 /**
  * @package     local_nudge\form\nudge
@@ -41,42 +41,41 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
  */
-class edit extends moodleform
-{
+class edit extends moodleform {
+
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
      */
-    protected function definition()
-    {
+    protected function definition() {
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', \PARAM_INT);
-        
+
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', \PARAM_INT);
-        
+
         $mform->addElement('checkbox', 'isenabled', \get_string('isenabled', 'local_nudge'));
         $mform->addHelpButton('isenabled', 'isenabled', 'local_nudge');
 
-        $reminder_recipient_enum = scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
+        $reminderrecipientenum = scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
         $mform->addElement(
             'select',
             'reminderrecipient',
             \get_string('reminderrecipient', 'local_nudge'),
-            $reminder_recipient_enum,
+            $reminderrecipientenum,
         );
         $mform->addHelpButton('reminderrecipient', 'reminderrecipient', 'local_nudge');
 
-        $notification_array = $this->get_notification_options();
+        $notificationarray = $this->get_notification_options();
 
         // Show unless the value is only managers.
         $mform->addElement(
             'autocomplete',
             'linkedlearnernotificationid',
             'Notification for the Learner',
-            $notification_array
+            $notificationarray
         );
         $mform->hideIf('linkedlearnernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_MANAGERS]);
 
@@ -85,16 +84,16 @@ class edit extends moodleform
             'autocomplete',
             'linkedmanagernotificationid',
             'Notification for the Managers',
-            $notification_array
+            $notificationarray
         );
         $mform->hideIf('linkedmanagernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_LEARNER]);
 
-        $reminder_type_enum = scaffold_select_from_constants(nudge::class, 'REMINDER_DATE');
+        $remindertypeenum = scaffold_select_from_constants(nudge::class, 'REMINDER_DATE');
         $mform->addElement(
             'select',
             'remindertype',
             \get_string('remindertype', 'local_nudge'),
-            $reminder_type_enum,
+            $remindertypeenum,
         );
         $mform->addHelpButton('remindertype', 'remindertype', 'local_nudge');
 
@@ -110,14 +109,14 @@ class edit extends moodleform
             ]
         );
         $mform->hideIf('remindertypefixeddate', 'remindertype', 'neq', nudge::REMINDER_DATE_INPUT_FIXED);
-        
+
         $mform->addElement(
             'duration',
             'reminderdaterelativeenrollment',
-            'Repeat every',
+            'Repeat every x after enrollment',
             [
-                // Default to days
-                'defaultunit' => 86400
+                // Default to days.
+                'defaultunit' => \DAYSECS
             ]
         );
         $mform->setDefault('reminderdaterelativeenrollment', 86400);
@@ -128,8 +127,8 @@ class edit extends moodleform
             'reminderdaterelativecourseend',
             'Reminder x before course ends',
             [
-                // Default to days
-                'defaultunit' => 86400
+                // Default to days.
+                'defaultunit' => \DAYSECS
             ]
         );
         $mform->hideIf('reminderdaterelativecourseend', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_COURSE_END);
@@ -141,12 +140,10 @@ class edit extends moodleform
      * {@inheritDoc}
      * @return nudge|null
      */
-    public function get_data()
-    {
+    public function get_data() {
         $data = parent::get_data();
-        if ($data === null) return null;
 
-        $instance_data = [
+        $instancedata = [
             'id' => $data->id,
             'courseid' => $data->courseid,
             'linkedlearnernotificationid' => (isset($data->linkedlearnernotificationid)) ? $data->linkedlearnernotificationid : 0,
@@ -158,21 +155,24 @@ class edit extends moodleform
         ];
 
         switch ($data->remindertype) {
-            case(nudge::REMINDER_DATE_INPUT_FIXED):
-                $instance_data['remindertypefixeddate'] = $data->remindertypefixeddate;
+            case (nudge::REMINDER_DATE_INPUT_FIXED):
+                $instancedata['remindertypefixeddate'] = $data->remindertypefixeddate;
                 break;
-            case(nudge::REMINDER_DATE_RELATIVE_ENROLLMENT):
-                $instance_data['remindertypeperiod'] = $data->reminderdaterelativeenrollment;
+            case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT):
+                $instancedata['remindertypeperiod'] = $data->reminderdaterelativeenrollment;
                 break;
-            case(nudge::REMINDER_DATE_RELATIVE_COURSE_END):
-                $instance_data['remindertypeperiod'] = $data->reminderdaterelativecourseend;
+            case (nudge::REMINDER_DATE_RELATIVE_COURSE_END):
+                $instancedata['remindertypeperiod'] = $data->reminderdaterelativecourseend;
                 break;
             default:
-                // UNREACHABLE!()
-                \print_error('invaliddata');
+                // UNREACHABLE!.
+                throw new moodle_exception(
+                    'expectedunreachable',
+                    'local_nudge'
+                );
         }
 
-        return new nudge($instance_data);
+        return new nudge($instancedata);
     }
 
     /**
@@ -180,33 +180,35 @@ class edit extends moodleform
      * @param nudge $nudge
      * @return void
      */
-    public function set_data($nudge)
-    {
+    public function set_data($nudge) {
         if (!$nudge instanceof nudge) {
             throw new coding_exception(\sprintf('You must provide a instance of %s to this form %s.', nudge::class, __CLASS__));
         }
 
+        $reltime = ($nudge->remindertypeperiod === null || $nudge->remindertypeperiod === 0)
+            ? \DAYSECS
+            : $nudge->remindertypeperiod;
+
         $this->_form->setDefaults([
             'id' => $nudge->id,
             'courseid' => $nudge->courseid,
-            'linkedmanagernotificationid' => $nudge->linkedlearnernotificationid,
+            'linkedlearnernotificationid' => $nudge->linkedlearnernotificationid,
             'linkedmanagernotificationid' => $nudge->linkedmanagernotificationid,
             'isenabled' => $nudge->isenabled,
             'reminderrecipient' => $nudge->reminderrecipient,
             'remindertype' => $nudge->remindertype,
             'remindertypefixeddate' => $nudge->remindertypefixeddate,
-            'reminderdaterelativeenrollment' => $nudge->remindertypeperiod,
-            'reminderdaterelativecourseend' => $nudge->remindertypeperiod
+            'reminderdaterelativeenrollment' => $reltime,
+            'reminderdaterelativecourseend' => $reltime
         ]);
     }
 
     /**
-     * Gets an array of available {@see nudge_notification}s to choose from with a select.
-     * 
+     * Gets an array of available {@see \local_nudge\local\nudge_notification}s to choose from with a select.
+     *
      * @return array<string, string>
      */
-    private function get_notification_options()
-    {
+    private function get_notification_options() {
         $notifications = nudge_notification_db::get_all();
         return \array_merge(
             // TODO: Default will come from lang strings.

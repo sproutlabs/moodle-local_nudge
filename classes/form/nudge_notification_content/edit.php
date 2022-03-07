@@ -24,14 +24,14 @@
 
 namespace local_nudge\form\nudge_notification_content;
 
-require_once(__DIR__ . '/../../../lib.php');
-
 use coding_exception;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge_notification_content;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../../../lib.php');
 
 /**
  * @package     local_nudge\form\nudge_notification
@@ -40,35 +40,34 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
  */
-class edit extends moodleform
-{
+class edit extends moodleform {
+
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
      */
-    protected function definition()
-    {
+    protected function definition() {
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', \PARAM_INT);
 
-        $notification_options = $this->get_notification_options();
+        $notificationoptions = $this->get_notification_options();
         $mform->addElement(
             'autocomplete',
             'nudgenotificationid',
             'Select a notification',
-            $notification_options
+            $notificationoptions
         );
 
-        $language_options = \get_string_manager()->get_list_of_languages();
+        $languageoptions = \get_string_manager()->get_list_of_languages();
         $mform->addElement(
             'autocomplete',
             'lang',
             'Select a language',
-            $language_options
+            $languageoptions
         );
-        
+
         $mform->addElement('text', 'subject', 'Add a Subject');
         $mform->setType('subject', \PARAM_RAW);
 
@@ -79,12 +78,14 @@ class edit extends moodleform
     }
 
     /**
-     * @return nudge_notification|null
+     * @return nudge_notification_content|null
      */
-    public function get_data()
-    {
+    public function get_data() {
         $data = parent::get_data();
-        if ($data === null) return null;
+
+        if ($data == null) {
+            return null;
+        }
 
         return new nudge_notification_content([
             'id' => $data->id,
@@ -96,33 +97,35 @@ class edit extends moodleform
     }
 
     /**
-     * @param nudge_notification $nudge_notification_content
+     * @param nudge_notification_content $nudgenotificationcontent
      * @return void
      */
-    public function set_data($nudge_notification_content)
-    {
-        if (!$nudge_notification_content instanceof nudge_notification_content) {
-            throw new coding_exception(\sprintf('You must provide a instance of %s to this form %s.', nudge_notification_content::class, __CLASS__));
+    public function set_data($nudgenotificationcontent) {
+        if (!$nudgenotificationcontent instanceof nudge_notification_content) {
+            throw new coding_exception(\sprintf(
+                'You must provide a instance of %s to this form %s.',
+                nudge_notification_content::class,
+                __CLASS__
+            ));
         }
 
         $this->_form->setDefaults([
-            'id' => $nudge_notification_content->id,
-            'nudgenotificationid' => $nudge_notification_content->nudgenotificationid,
-            'lang' => $nudge_notification_content->lang,
-            'subject' => $nudge_notification_content->subject,
-            'body' => $nudge_notification_content->body
+            'id' => $nudgenotificationcontent->id,
+            'nudgenotificationid' => $nudgenotificationcontent->nudgenotificationid,
+            'lang' => $nudgenotificationcontent->lang,
+            'subject' => $nudgenotificationcontent->subject,
+            'body' => $nudgenotificationcontent->body
         ]);
     }
 
     /**
-     * Gets an array of available {@see nudge_notification}s to choose from with a select.
-     * 
-     * @return array<string, string>
+     * Gets an array of available {@see nudge_notification_content}s to choose from with a select.
+     *
+     * @return array<string|int|null, string|int|null>
      */
-    private function get_notification_options()
-    {
+    private function get_notification_options() {
         $notifications = nudge_notification_db::get_all();
-        
+
         return \array_combine(
             \array_column($notifications, 'id'),
             \array_column($notifications, 'title')

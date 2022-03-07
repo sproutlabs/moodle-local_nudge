@@ -27,37 +27,34 @@ namespace local_nudge\dml;
 
 use local_nudge\local\nudge_notification;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge_notification>
  */
-class nudge_notification_db extends abstract_nudge_db
-{
-    /** {@inheritdoc} */
-    protected static $table = 'nudge_notification';
+class nudge_notification_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    protected static $entity_class = nudge_notification::class;
-    
+    public static $table = 'nudge_notification';
+
+    /** {@inheritdoc} */
+    public static $entityclass = nudge_notification::class;
+
     /**
      * Override to unset relations.
      * {@inheritDoc}
      */
-    public static function delete($id = null)
-    {
+    public static function delete($id = null) {
         parent::delete($id);
 
-        $l_removes = nudge_db::get_all_filtered(['linkedlearnernotificationid' => $id]);
-        $m_removes = nudge_db::get_all_filtered(['linkedmanagernotificationid' => $id]);
+        $lremoves = nudge_db::get_all_filtered(['linkedlearnernotificationid' => $id]);
+        $mremoves = nudge_db::get_all_filtered(['linkedmanagernotificationid' => $id]);
 
-        foreach ($l_removes as $remove) {
+        foreach ($lremoves as $remove) {
             $remove->linkedlearnernotificationid = 0;
             nudge_db::save($remove);
         }
 
-        foreach ($m_removes as $remove) {
+        foreach ($mremoves as $remove) {
             $remove->linkedmanagernotificationid = 0;
             nudge_db::save($remove);
         }

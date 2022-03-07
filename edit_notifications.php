@@ -15,46 +15,118 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @todo SESS key shouldn't show in browser omnibar I'm doing something wrong.
- * Base page to manipulate {@see nudge_notification}s.
- * Don't know what moodle calls this but its sort of CRUD controller without routing :D!
- * 
+ * Abstract sort of CRUD controller but a more transaction script approach.
+ * This is by no means readable, sorry!
+ *
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- * 
+ *
+ * Since we have no class scope we can make these known to VSCODE.
  * @var \core_config        $CFG
  * @var \moodle_database    $DB
  * @var \moodle_page        $PAGE
  * @var \core_renderer      $OUTPUT
  */
 
+// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
+// phpcs:disable moodle.Commenting.InlineComment.DocBlock
+
 use core\output\notification;
+use local_nudge\dml\nudge_notification_content_db;
 use local_nudge\dml\nudge_notification_db;
-use local_nudge\form\nudge_notification\edit;
+use local_nudge\form\nudge_notification\edit as notification_edit_form;
+use local_nudge\form\nudge_notification_content\edit as notification_content_edit_form;
 use local_nudge\local\nudge_notification;
+use local_nudge\local\nudge_notification_content;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+/**
+ * @var array{
+ *      'notifications': array{
+ *          'model': class-string<nudge_notification>,
+ *          'dml': class-string<nudge_notification_db>,
+ *          'editform': class-string<notification_edit_form>,
+ *          'columns': array{
+ *              'data': array<string>,
+ *              'headers': array<string>
+ *          }
+ *      },
+ *      'notificationcontents': array{
+ *          'model': class-string<nudge_notification_content>,
+ *          'dml': class-string<nudge_notification_content_db>,
+ *          'editform': class-string<notification_content_edit_form>,
+ *          'columns': array{
+ *              'data': array<string>,
+ *              'headers': array<string>
+ *          }
+ *      }
+ * }
+ */
+$paramtomodel = [
+    'notifications' => [
+        'model' => nudge_notification::class,
+        'dml' => nudge_notification_db::class,
+        'editform' => notification_edit_form::class,
+        'columns' => [
+            'data' => ['id', 'title', 'actions'],
+            'headers' => ['ID', 'Title', 'Actions']
+        ]
+    ],
+    'notificationcontents' => [
+        'model' => nudge_notification_content::class,
+        'dml' => nudge_notification_content_db::class,
+        'editform' => notification_content_edit_form::class,
+        'columns' => [
+            'data' => ['notificationtitle', 'lang', 'subject', 'body', 'actions'],
+            'headers' => ['Linked Notification', 'Language', 'Subject', 'Body', 'Actions']
+        ]
+    ]
+];
+
+$model = required_param('model', \PARAM_ALPHA);
+
+/** @var int $confirm */
 $confirm    = optional_param('confirm', 0,  \PARAM_INT);
+/** @var int $delete */
 $delete     = optional_param('delete',  0,  \PARAM_INT);
+/** @var int $edited */
 $edited     = optional_param('edited',  0,  \PARAM_INT);
+/** @var int $edit */
 $edit       = optional_param('edit',    0,  \PARAM_INT);
+/** @var int $add */
 $add        = optional_param('add',     0,  \PARAM_INT);
 
+// TODO Forbidden / Unknown model.
+if (!\in_array($model, array_keys($paramtomodel))) {
+    die('Unknown Model');
+}
+
+/**
+ * Type is now narrowed to:
+ * @var 'notifications'|'notificationcontents' $model
+ * This offers errors when a call like $paramtomodel[$model]['dml']::xyz() doesn't exist on either model.
+ *
+ * Shorthand alias.
+ */
+$currentmodel = $paramtomodel[$model];
+
+$baseediturl = new moodle_url('/local/nudge/edit_notifications.php', [
+    'sesskey' => \sesskey(),
+    'model' => $model
+]);
+
 // Require a login for this course for the system.
-\admin_externalpage_setup('configurenudgenotifications');
+\admin_externalpage_setup("configurenudge{$model}");
 
 // Require the permissions to edit nudge notifications.
 $systemcontext = \context_system::instance();
-\require_capability('local/nudge:configurenudgenotifications', $systemcontext);
-
-$base_edit_url = new moodle_url('/local/nudge/edit_notifications.php', [
-    'sesskey' => \sesskey()
-]);
+\require_capability("local/nudge:configurenudge{$model}", $systemcontext);
 
 $manageurl = new \moodle_url('/local/nudge/edit_notifications.php');
 $PAGE->set_url($manageurl);
@@ -65,81 +137,89 @@ if (
     !\confirm_sesskey()
 ) {
     print_error('confirmsesskeybad', 'error');
+    die();
 }
 
 // We want to delete a notification.
 if ($delete) {
     $delete = \intval($delete);
 
-    $notification_to_delete = nudge_notification_db::get_by_id($delete);
+    $notificationtodelete = $currentmodel['dml']::get_by_id($delete);
 
-    if (!$notification_to_delete) {
+    if (!$notificationtodelete) {
         print_error('error:nudgenotificationdoesntexist');
     }
 
     // If we haven't confirmed yet.
     if (!$confirm) {
-        $confirm_url = clone $base_edit_url;
-        $confirm_url->params([
+        $confirmurl = clone $baseediturl;
+        $confirmurl->params([
             'delete' => $delete,
             'confirm' => 1,
         ]);
-        $cancel_url = clone $base_edit_url;
-        $cancel_url->remove_all_params();
+        $cancelurl = clone $baseediturl;
+        $cancelurl->remove_all_params();
 
         echo $OUTPUT->header();
         echo $OUTPUT->confirm(
             get_string(
                 'deletenudgenotificationconfirm',
                 'local_nudge',
-                format_string($notification_to_delete->title)
+                format_string($notificationtodelete->title)
             ),
-            $confirm_url->out(),
-            $cancel_url
+            $confirmurl->out(),
+            $cancelurl
         );
         echo $OUTPUT->footer();
         die;
     }
 
-    nudge_notification_db::delete($delete);
+    $currentmodel['dml']::delete($delete);
 
-    // TODO totara / moodle cleanup:
+    // TODO totara / moodle cleanup.
     if (isset($CFG->totara_version)) {
-        \core\notification::success(sprintf('Deleted nudge notification with ID: %s', $delete));
+        \core\notification::success(sprintf('Deleted %s with ID: %s', $currentmodel['model']::SINGULAR_NAME, $delete));
     } else {
-        $OUTPUT->notification(sprintf('Deleted nudge notification with ID: %s', $delete), notification::NOTIFY_SUCCESS);
+        $OUTPUT->notification(
+            sprintf(
+                'Deleted %s with ID: %s',
+                $currentmodel['model']::SINGULAR_NAME,
+                $delete
+            ),
+            notification::NOTIFY_SUCCESS
+        );
     }
 
-    redirect($base_edit_url);
+    redirect($baseediturl);
 }
 
-// We want to edit a notification.
+// We want to edit a model.
 if ($edit) {
     $edit = intval($edit);
 
-    $nudge_notification = nudge_notification_db::get_by_id($edit);
+    $nudgenotification = $currentmodel['dml']::get_by_id($edit);
 
-    $nudge_edit_form_url = clone $base_edit_url;
-    $nudge_edit_form_url->params([
-        'edited' => $nudge_notification->id,
-        'edit' => $nudge_notification->id
+    $nudgeeditformurl = clone $baseediturl;
+    $nudgeeditformurl->params([
+        'edited' => $nudgenotification->id,
+        'edit' => $nudgenotification->id
     ]);
 
-    $mform = new edit($nudge_edit_form_url);
+    $mform = new $currentmodel['editform']($nudgeeditformurl);
 
     if (!$edited) {
         echo $OUTPUT->header();
-        $mform->set_data($nudge_notification);
+        $mform->set_data($nudgenotification);
         $mform->display();
         echo $OUTPUT->footer();
         die;
     }
 
     if ($mform->is_cancelled()) {
-        \redirect($base_edit_url);
-    } else if ($nudge_notification = $mform->get_data()) {
-        nudge_notification_db::save($nudge_notification);
-        \redirect($base_edit_url);
+        \redirect($baseediturl);
+    } else if ($nudgenotification = $mform->get_data()) {
+        $currentmodel['dml']::save($nudgenotification);
+        \redirect($baseediturl);
     }
 }
 
@@ -148,82 +228,76 @@ if ($edit) {
 if ($add) {
     $add = \intval($add);
 
-    $new_notification = new nudge_notification();
-    $new_notification_id = nudge_notification_db::save($new_notification);
+    $newnotification = new $currentmodel['model']();
+    $newnotificationid = $currentmodel['dml']::save($newnotification);
 
-    $nudge_add_form_url = clone $base_edit_url;
-    $nudge_add_form_url->param('edit', $new_notification_id);
+    $nudgeaddformurl = clone $baseediturl;
+    $nudgeaddformurl->param('edit', $newnotificationid);
 
-    redirect($nudge_add_form_url);
+    redirect($nudgeaddformurl);
 }
-
 
 // We want to manage the notifications, no actions have been taken.
 echo $OUTPUT->header();
 
-/// ========= BEGIN NUDGE_NOTIFICATION ========= ///
-$add_new_url = clone $base_edit_url;
-$add_new_url->param('add', 1);
-echo $OUTPUT->single_button($add_new_url, 'Add a notification', 'get');
+$addnewurl = clone $baseediturl;
+$addnewurl->param('add', '1');
+// TODO lang string "add a notification".
+echo $OUTPUT->single_button($addnewurl, 'Add a notification', 'get');
 
-$table = new \flexible_table('Testing');
+$table = new \flexible_table('GridFieldOnABudget');
 $table->define_baseurl(new \moodle_url('/local/nudge/edit_notifications'));
-$table->define_columns(['id', 'title', 'actions']);
-$table->define_headers(['ID', 'Title', 'Actions']);
+$table->define_columns($currentmodel['columns']['data']);
+$table->define_headers($currentmodel['columns']['headers']);
 $table->sortable(false);
 $table->setup();
 
-$select_nudgenotifications_sql = <<<SQL
+$selectsql = <<<SQL
     SELECT
         *
     FROM
-        {nudge_notification}
+        {{$currentmodel['dml']::$table}}
 SQL;
 
-/**
- * @var array<int, nudge_notification>
- */
-$notifications = $DB->get_records_sql($select_nudgenotifications_sql);
+$modelstodisplay = $currentmodel['dml']::get_all_sql($selectsql);
 
-foreach ($notifications as $notification) {
+foreach ($modelstodisplay as $modeltodisplay) {
 
-    $row_fields = [
-        $notification->id,
-        $notification->title
-    ];
+    $rowfields = $modeltodisplay->get_summary_fields();
 
-    \array_walk($row_fields, 'format_string');
+    /** @var callable */
+    $formatstring = '\format_string';
+    \array_walk($rowfields, $formatstring);
 
     // Actions.
-    $edit_url = clone $base_edit_url;
-    $edit_url->param('edit', $notification->id);
+    $editurl = clone $baseediturl;
+    $editurl->param('edit', (string)$modeltodisplay->id);
 
-    $delete_url = clone $base_edit_url;
-    $delete_url->param('delete', $notification->id);
+    $deleteurl = clone $baseediturl;
+    $deleteurl->param('delete', (string)$modeltodisplay->id);
 
-    $rowActions = [
+    $rowactions = [
         \implode('', [
             $OUTPUT->action_icon(
-                $edit_url,
-                // TODO Totara icon only fix for moodle and get_string for 'edit'
+                $editurl,
+                // TODO Totara icon only fix for moodle and get_string for 'edit'.
                 new \pix_icon('t/edit', 'Edit')
             ),
             $OUTPUT->action_icon(
-                $delete_url,
+                $deleteurl,
                 new \pix_icon('t/delete', 'Delete')
             )
         ])
     ];
 
     $row = array_merge(
-        $row_fields,
-        $rowActions
+        $rowfields,
+        $rowactions
     );
 
     $table->add_data($row);
 }
 
 $table->finish_html();
-/// ========= END NUDGE_NOTIFICATION ========= ///
 
 echo $OUTPUT->footer();

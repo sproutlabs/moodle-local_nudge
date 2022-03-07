@@ -28,17 +28,15 @@ namespace local_nudge\dml;
 
 use local_nudge\local\nudge_user;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge_user>
  */
-class nudge_user_db extends abstract_nudge_db
-{
-    /** {@inheritdoc} */
-    protected static $table = 'nudge_user';
+class nudge_user_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    protected static $entity_class = nudge_user::class;
+    public static $table = 'nudge_user';
+
+    /** {@inheritdoc} */
+    public static $entityclass = nudge_user::class;
 }

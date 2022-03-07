@@ -22,21 +22,17 @@
  * @license     GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
-class nudge_test extends \advanced_testcase
-{
-    public function setUp()
-    {
+class nudge_test extends \advanced_testcase {
+
+    public function setUp() {
         parent::setUp();
     }
-    public function test_stuff_equals_stuff()
-    {
+    public function test_stuff_equals_stuff() {
         $this->assertEquals(1, 1);
     }
-    public function tearDown()
-    {
+    public function tearDown() {
         parent::tearDown();
     }
 }
-

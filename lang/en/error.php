@@ -22,11 +22,4 @@
  * @license     GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-// Requires 3.9.0.
-$plugin->version   = 2022022802;
-$plugin->requires  = 2020061500;
-$plugin->component = 'local_nudge';
-$plugin->release   = 'Development Edition';
-$plugin->maturity  = MATURITY_ALPHA;
+$string['expectedunreachable'] = 'Expected unreachable, It\'s possible a malformed database value was returned.';

@@ -1,0 +1,25 @@
+parameters:
+  level: 5
+  bootstrapFiles:
+    - phpstan/bootstrap.php
+    - ../../lib/moodlelib.php
+    - ../../lib/accesslib.php
+  paths:
+    - .
+  scanDirectories:
+    - ../../..
+  excludePaths:
+    - vendor
+  ignoreErrors:
+    -
+      message: '#Variable \$plugin might not be defined.#'
+      path: version.php
+    -
+      message: '#(.*)should be compatible with parameter \$default_values \(array\|stdClass\) of method moodleform::set_data\(\)#'
+      paths:
+        - classes/form/*
+    - '#Parameter \#2 \$paramtype of method MoodleQuickForm::setType\(\) expects int, string given.#'
+  parallel:
+    jobSize: 20
+    maximumNumberOfProcesses: 32
+    minimumNumberOfJobsPerProcess: 2

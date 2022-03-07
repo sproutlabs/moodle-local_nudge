@@ -16,7 +16,7 @@
 
 /**
  * This class provides some abstract methods that local_nudge uses to manage its entities.
- * 
+ *
  * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
@@ -26,63 +26,46 @@
 
 namespace local_nudge\dml;
 
+// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
+
 use coding_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
+ *
+ * Coding exception used throughout and are not documented with @\throws since they should not occur at runtime.
+ *
  * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- * 
+ *
  * @template T
  */
-abstract class abstract_nudge_db
-{
+abstract class abstract_nudge_db {
+
     /**
      * @var string|null Table for this entity manager.
      */
-    protected static $table = null;
+    public static $table = null;
 
     /**
      * @var class-string|null Managed entity's class.
      */
-    protected static $entity_class = null;
+    public static $entityclass = null;
 
     /**
      * See the static methods of {@see static} instead.
-     * 
+     *
      * Some IDEs/editors (mine) make __construct public regardless of actual visibility so just call it public.
      * Runtime will fail with the actual visibility if really needed.
-     * 
+     *
      * @deprecated Don't use this see comments above.
      * @access public
      */
-    private function __construct()
-    {
+    private function __construct() {
         throw new coding_exception('Read the doc-blocks for this method.');
-    }
-
-    /**
-     * Returns all registered entities
-     * @todo sort param.
-     * 
-     * @return array<T>
-     */
-    public static function get_all()
-    {
-        /** @var \moodle_database $DB */
-        global $DB;
-
-        /** @var array<T> $entities */
-        $entities = [];
-        foreach ($set = $DB->get_recordset(static::$table) as $record) {
-            $entities[] = new static::$entity_class($record);
-        }
-        $set->close();
-
-        return $entities;
     }
 
     /**
@@ -90,8 +73,7 @@ abstract class abstract_nudge_db
      * @throws coding_exception
      * @return T|null
      */
-    public static function get_by_id($id)
-    {
+    public static function get_by_id($id) {
         if (!\is_int($id) || ($id <= 0)) {
             throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
         }
@@ -101,16 +83,35 @@ abstract class abstract_nudge_db
 
         $record = $DB->get_record(static::$table, ['id' => $id]);
 
-        return ($record instanceof stdClass) ? new static::$entity_class($record) : null;
+        return ($record instanceof stdClass) ? new static::$entityclass($record) : null;
     }
 
     /**
-     * Gets an entity instance using a filter
+     * Returns all registered entities
+     *
+     * @return array<T>
+     */
+    public static function get_all() {
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        /** @var array<T> $entities */
+        $entities = [];
+        foreach ($set = $DB->get_recordset(static::$table) as $record) {
+            $entities[] = new static::$entityclass($record);
+        }
+        $set->close();
+
+        return $entities;
+    }
+
+    /**
+     * Gets an {@see T} instance using a filter
+     *
      * @param array $filter A {@see moodle_database::get_record()} filter.
      * @return T|null
      */
-    public static function get_filtered($filter)
-    {
+    public static function get_filtered($filter) {
         if (!\is_array($filter)) {
             throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
         }
@@ -120,16 +121,16 @@ abstract class abstract_nudge_db
 
         $record = $DB->get_record(static::$table, $filter);
 
-        return ($record instanceof stdClass) ? new static::$entity_class($record) : null;
+        return ($record instanceof stdClass) ? new static::$entityclass($record) : null;
     }
 
     /**
-     * Gets multiple entity instances using a filter. (AND aggregated)
+     * Gets multiple {@see T} instances using a filter. (AND aggregated)
+     *
      * @param array $filter A {@see moodle_database::get_record()} filter.
      * @return array<T>
      */
-    public static function get_all_filtered($filter)
-    {
+    public static function get_all_filtered($filter) {
         if (!\is_array($filter)) {
             throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
         }
@@ -140,7 +141,7 @@ abstract class abstract_nudge_db
         /** @var array<T> $entities */
         $entities = [];
         foreach ($set = $DB->get_recordset(static::$table, $filter) as $record) {
-            $entities[] = new static::$entity_class($record);
+            $entities[] = new static::$entityclass($record);
         }
         $set->close();
 
@@ -148,12 +149,64 @@ abstract class abstract_nudge_db
     }
 
     /**
-     * Persists or create a database row from a {@see nudge} instance.
+     * Gets an instance of {@see T} filtered by SQL.
+     *
+     * Be careful to ensure your SQL returns all the fields required to be wrapped in
+     * an {@see T} or you will encounter a {@throws \UnexpectedValueException}.
+     *
+     * @param string $sql MUST return a single instance. {@see static::get_all_sql()} for multiple.
+     * @return T|null Returns a single wrapped instance of {@see T}.
+     */
+    public static function get_sql($sql) {
+        if (!\is_string($sql)) {
+            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
+        }
+
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        $record = $DB->get_record_sql($sql);
+
+        return ($record instanceof stdClass)
+            ? new static::$entityclass($record)
+            : null;
+    }
+
+    /**
+     * Gets instances of {@see T} filtered by SQL.
+     *
+     * Be careful to ensure your SQL returns all the fields required to be wrapped in
+     * an {@see T} or you will encounter a {@throws UnexpectedValueException}.
+     *
+     * @param string $sql Will return multiple. {@see static::get_sql} for a non array wrapped return.
+     * @return array<T>
+     */
+    public static function get_all_sql($sql) {
+        if (!\is_string($sql)) {
+            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
+        }
+
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        /** @var array<T> $entities */
+        $entities = [];
+        foreach ($set = $DB->get_recordset_sql($sql) as $record) {
+            $entities[] = new static::$entityclass($record);
+        }
+        $set->close();
+
+        return $entities;
+    }
+
+    /**
+     * Persists or create a database row from a {@see T} instance.
+     *
      * @todo Flesh out with events etc.
+     *
      * @param T $instance
      */
-    public static function save($instance)
-    {
+    public static function save($instance) {
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -162,14 +215,24 @@ abstract class abstract_nudge_db
         $instance->lastmodified = \time();
 
         if ($instance->id === null) {
-            // Add defaults in if unset.
-            foreach (static::$entity_class::DEFAULTS as $default_field => $value) {
-                if ($instance->$default_field === null) {
-                    $instance->$default_field = $value;
+            // Add defaults they exist and are null in the current record.
+            foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
+                if ($instance->$defaultfield === null) {
+                    $instance->$defaultfield = $value;
                 }
             }
 
             $instance->id = $DB->insert_record(static::$table, $instance);
+        }
+
+        // TODO: Remove if this is unused.
+        // Pass to possible hooks via reference.
+        if (\method_exists(static::class, 'on_before_save')) {
+            \call_user_func_array([static::class , 'on_before_save'], [$instance]);
+        }
+
+        if (\method_exists(static::$entityclass, 'on_before_save')) {
+            \call_user_func_array([static::$entityclass , 'on_before_save'], [$instance]);
         }
 
         $DB->update_record(static::$table, $instance);
@@ -177,17 +240,19 @@ abstract class abstract_nudge_db
         return $instance->id;
     }
 
+    // These delete functions don't actually wrap an entity so they are a pretty much pointless wrapper around $DB->delete etc.
+    // But it is nice to have everything consistant.
+
     /**
-     * Removes an entity instance from the database.
-     * 
-     * WARNING: Will delete all entity instances if `id` is not the primary key.
-     * 
+     * Removes an {@see T} instance from the database.
+     *
+     * WARNING: May delete all {@see T} instances that use `id` as something other than the primary key.
+     *
      * @param int|null $id
      * @throws coding_exception
      * @return void
      */
-    public static function delete($id = null)
-    {
+    public static function delete($id = null) {
         if (!\is_int($id) || ($id <= 0)) {
             throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
         }
@@ -198,5 +263,40 @@ abstract class abstract_nudge_db
         // TODO: see auth_outage for logging events here.
 
         $DB->delete_records(static::$table, ['id' => $id]);
+    }
+
+    /**
+     * Removes all instances of {@see T} matching the filter.
+     *
+     * @param array $filter
+     * @return void
+     */
+    public static function delete_all($filter) {
+        if (!\is_array($filter)) {
+            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
+        }
+
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        $DB->delete_records(static::$table, $filter);
+    }
+
+    /**
+     * Removes all instances of {@see T} filtered by SQL.
+     *
+     * @param string $sql
+     * @param array|null $params
+     * @return void
+     */
+    public static function delete_all_select($sql, $params = null) {
+        if (!\is_string($sql)) {
+            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
+        }
+
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        $DB->delete_records_select(static::$table, $sql, $params);
     }
 }

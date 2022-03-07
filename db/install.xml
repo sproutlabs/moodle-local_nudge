@@ -7,13 +7,13 @@
     <TABLE NAME="nudge" COMMENT="Stores instances of Nudge that indicate and provide metadata for Courses who want Nudge reminders">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course that this nudge instance is linked to"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course that this nudge instance is linked to."/>
         <FIELD NAME="linkedlearnernotificationid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The has one for a nudge_notification that will be sent to the Learner on nudge trigger."/>
         <FIELD NAME="linkedmanagernotificationid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The has one for a nudge_notification that will be sent to the Manager on nudge trigger."/>
         <FIELD NAME="isenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates that this nudge instance is enabled and ready to send messages."/>
-        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge instance was modified"/>
-        <FIELD NAME="reminderrecipient" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="The Reminder Recipient field indicates who should receive reminders from this Nudge instance."/>
-        <FIELD NAME="remindertype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum representing this nudge's method of determining the appropriate date to remind on"/>
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge instance was modified."/>
+        <FIELD NAME="reminderrecipient" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum indicating who should receive reminders from this Nudge instance. See the local_nudge\\local\\nudge for details."/>
+        <FIELD NAME="remindertype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum representing this nudge's method of determining the appropriate date to nudge on."/>
         <FIELD NAME="remindertypefixeddate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="See entity comment on local_nudge\\local\\nudge"/>
         <FIELD NAME="remindertypeperiod" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="See entity comment on local_nudge\\local\\nudge"/>
       </FIELDS>
@@ -26,11 +26,11 @@
         <INDEX NAME="courseid" UNIQUE="true" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="nudge_notification" COMMENT="Stores instances of a Nudge Notification linked via the nudge_nudge_notification many many through table.">
+    <TABLE NAME="nudge_notification" COMMENT="Stores instances of a Nudge Notification. A nudge notification has many 'nudge_notification_content's to store translation for each language.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Title for this notification template."/>
-        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp this entity was last modified at."/>
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp this notification was last modified at."/>
         <FIELD NAME="userfromid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="A has one to an instance of user that this notification can be sent from. Will use core's no-reply user if null."/>
       </FIELDS>
       <KEYS>
@@ -38,7 +38,7 @@
         <KEY NAME="userfromkey" TYPE="foreign-unique" FIELDS="userfromid" REFTABLE="user" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="Foreign key constraint for has one to user."/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="nudge_notification_content" COMMENT="One nudge_notification can have many nudge_notification_content so that multiple languages can be supported for a single template.">
+    <TABLE NAME="nudge_notification_content" COMMENT="'nudge_notification_content's have one nudge_notification and provide translations/content for it.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="nudgenotificationid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has one to a nudge_notification"/>
@@ -51,7 +51,7 @@
         <KEY NAME="nudgenotificationkey" TYPE="foreign" FIELDS="nudgenotificationid" REFTABLE="nudge_notification" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="has one for nudge_notification"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="nudge_user" COMMENT="This table joins between a nudge instance and a user to keep track of the recurrence time.">
+    <TABLE NAME="nudge_user" COMMENT="This table joins between a nudge instance and a user to keep track of the recurrence time if relative to the users enrollment date.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has_one to user."/>

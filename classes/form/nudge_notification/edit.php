@@ -24,13 +24,17 @@
 
 namespace local_nudge\form\nudge_notification;
 
-require_once(__DIR__ . '/../../../lib.php');
+// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
+// phpcs:disable moodle.Commenting.InlineComment.DocBlock
 
 use coding_exception;
 use local_nudge\local\nudge_notification;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/../../../lib.php');
 
 /**
  * @package     local_nudge\form\nudge_notification
@@ -39,14 +43,13 @@ defined('MOODLE_INTERNAL') || die();
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
  */
-class edit extends moodleform
-{
+class edit extends moodleform {
+
     /**
      * {@inheritDoc}
      * @see moodleform::definition()
      */
-    protected function definition()
-    {
+    protected function definition() {
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -54,12 +57,12 @@ class edit extends moodleform
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', \PARAM_INT);
-        
+
         $mform->addElement('text', 'title', 'Add a title');
         $mform->setType('title', \PARAM_RAW);
 
         // TODO fix double loop.
-        $user_query = $DB->get_records_sql(<<<SQL
+        $userquery = $DB->get_records_sql(<<<SQL
             SELECT
                 id,
                 CONCAT(firstname, ' ', lastname) as fullname
@@ -67,16 +70,16 @@ class edit extends moodleform
                 {user}
         SQL);
 
-        $user_options = [];
-        foreach ($user_query as $user) {
-            $user_options[$user->id] = $user->fullname;
+        $useroptions = [];
+        foreach ($userquery as $user) {
+            $useroptions[$user->id] = $user->fullname;
         }
-        
+
         $mform->addElement(
             'autocomplete',
             'userfromid',
             'Select a user as the from for this email',
-            $user_options
+            $useroptions
         );
 
         $this->add_action_buttons();
@@ -85,10 +88,8 @@ class edit extends moodleform
     /**
      * @return nudge_notification|null
      */
-    public function get_data()
-    {
+    public function get_data() {
         $data = parent::get_data();
-        if ($data === null) return null;
 
         return new nudge_notification([
             'id' => $data->id,
@@ -98,19 +99,22 @@ class edit extends moodleform
     }
 
     /**
-     * @param nudge_notification $nudge_notification
+     * @param nudge_notification $nudgenotification
      * @return void
      */
-    public function set_data($nudge_notification)
-    {
-        if (!$nudge_notification instanceof nudge_notification) {
-            throw new coding_exception(\sprintf('You must provide a instance of %s to this form %s.', nudge_notification::class, __CLASS__));
+    public function set_data($nudgenotification) {
+        if (!$nudgenotification instanceof nudge_notification) {
+            throw new coding_exception(\sprintf(
+                'You must provide a instance of %s to this form %s.',
+                nudge_notification::class,
+                __CLASS__
+            ));
         }
 
         $this->_form->setDefaults([
-            'id' => $nudge_notification->id,
-            'userfromid' => $nudge_notification->userfromid,
-            'title' => $nudge_notification->title
+            'id' => $nudgenotification->id,
+            'userfromid' => $nudgenotification->userfromid,
+            'title' => $nudgenotification->title
         ]);
     }
 }

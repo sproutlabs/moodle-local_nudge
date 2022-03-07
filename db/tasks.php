@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => 'local_nudge\task\cron_task',
+        'classname' => 'local_nudge\task\nudge_task',
         'blocking' => 0,
         'minute' => '*/5',
         'hour' => '*',

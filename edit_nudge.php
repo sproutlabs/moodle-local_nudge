@@ -20,7 +20,7 @@
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- * 
+ *
  * @var \core_config        $CFG
  * @var \moodle_database    $DB
  * @var \moodle_page        $PAGE
@@ -33,10 +33,10 @@ use local_nudge\form\nudge\edit;
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$course_id = \required_param('courseid', \PARAM_INT);
+$courseid = \required_param('courseid', \PARAM_INT);
 
 // Require a login for this course for this course.
-$course = \get_course($course_id);
+$course = \get_course($courseid);
 \require_login($course);
 $context = \context_course::instance($course->id);
 
@@ -44,21 +44,21 @@ $context = \context_course::instance($course->id);
 \require_capability('local/nudge:trackcourse', $context);
 
 // Set up the page.
-$base_url = new \moodle_url("/local/nudge/edit_nudge.php", ['courseid' => $course_id]);
-$PAGE->set_url($base_url);
+$baseurl = new \moodle_url("/local/nudge/edit_nudge.php", ['courseid' => $courseid]);
+$PAGE->set_url($baseurl);
 
-$mform = new edit(new \moodle_url('/local/nudge/edit_nudge.php', ['courseid' => $course_id]));
+$mform = new edit(new \moodle_url('/local/nudge/edit_nudge.php', ['courseid' => $courseid]));
 
 // Edit form submision handling.
 if ($mform->is_cancelled()) {
-    \redirect(new \moodle_url('/course/view.php', ['id' => $course_id]));
+    \redirect(new \moodle_url('/course/view.php', ['id' => $courseid]));
 } else if ($nudge = $mform->get_data()) {
     $id = nudge_db::save($nudge);
-    \redirect(new \moodle_url('/course/view.php', ['id' => $course_id]));
+    \redirect(new \moodle_url('/course/view.php', ['id' => $courseid]));
 }
 
 // Create an instance for this course if it doesn't exist yet and this page has been visited.
-$nudge = nudge_db::find_or_create($course_id);
+$nudge = nudge_db::find_or_create($courseid);
 
 // Render the form.
 echo $OUTPUT->header();

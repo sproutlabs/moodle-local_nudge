@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,7 +22,10 @@
  * @license     GNU GPL v3 or later
  */
 
-//  META
+// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar
+// phpcs:disable Squiz.WhiteSpace.OperatorSpacing.SpacingAfter
+
+// META
 $string['pluginname']                               =       'Nudge';
 $string['crontask']                                 =       'Nudge Cron';
 $string['trackcourse']                              =       'Adjust Nudging Completions';

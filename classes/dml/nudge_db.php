@@ -28,48 +28,46 @@ namespace local_nudge\dml;
 
 use local_nudge\local\nudge;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge>
  */
-class nudge_db extends abstract_nudge_db
-{
-    /** {@inheritdoc} */
-    protected static $table = 'nudge';
+class nudge_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
-    protected static $entity_class = nudge::class;
+    public static $table = 'nudge';
+
+    /** {@inheritdoc} */
+    public static $entityclass = nudge::class;
 
     /**
      * Finds a {@see nudge} instance for this course or creates one.
      * @param int $courseid
      * @return nudge
      */
-    public static function find_or_create($courseid)
-    {
-        $existing_nudge = static::get_filtered([
+    public static function find_or_create($courseid) {
+        $existingnudge = static::get_filtered([
             'courseid' => $courseid
         ]);
 
-        if ($existing_nudge !== null) return $existing_nudge;
+        if ($existingnudge !== null) {
+            return $existingnudge;
+        }
 
-        $new_nudge = new static::$entity_class([
+        $newnudge = new static::$entityclass([
             'courseid' => $courseid
         ]);
 
-        static::save($new_nudge);
+        static::save($newnudge);
 
-        return $new_nudge;
+        return $newnudge;
     }
 
     /**
      * Returns an array of active instances.
      * @return array<nudge>
      */
-    public static function get_enabled()
-    {
+    public static function get_enabled() {
         return static::get_all_filtered([
             'isenabled' => 1
         ]);
