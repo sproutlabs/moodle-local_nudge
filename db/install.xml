@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="nudge" COMMENT="Stores instances of Nudge that indicate and provide metadata for Courses who want Nudge reminders">
+    <TABLE NAME="local_nudge" COMMENT="Stores instances of Nudge that indicate and provide metadata for Courses who want Nudge reminders">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course that this nudge instance is linked to."/>
@@ -26,7 +26,7 @@
         <INDEX NAME="courseid" UNIQUE="true" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="nudge_notification" COMMENT="Stores instances of a Nudge Notification. A nudge notification has many 'nudge_notification_content's to store translation for each language.">
+    <TABLE NAME="local_nudge_notification" COMMENT="Stores instances of a Nudge Notification. A nudge notification has many 'nudge_notification_content's to store translation for each language.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Title for this notification template."/>
@@ -38,7 +38,7 @@
         <KEY NAME="userfromkey" TYPE="foreign-unique" FIELDS="userfromid" REFTABLE="user" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="Foreign key constraint for has one to user."/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="nudge_notification_content" COMMENT="'nudge_notification_content's have one nudge_notification and provide translations/content for it.">
+    <TABLE NAME="local_nudge_notification_content" COMMENT="'nudge_notification_content's have one nudge_notification and provide translations/content for it.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="nudgenotificationid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has one to a nudge_notification"/>
@@ -51,7 +51,7 @@
         <KEY NAME="nudgenotificationkey" TYPE="foreign" FIELDS="nudgenotificationid" REFTABLE="nudge_notification" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="has one for nudge_notification"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="nudge_user" COMMENT="This table joins between a nudge instance and a user to keep track of the recurrence time if relative to the users enrollment date.">
+    <TABLE NAME="local_nudge_user" COMMENT="This table joins between a nudge instance and a user to keep track of the recurrence time if relative to the users enrollment date.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has_one to user."/>
