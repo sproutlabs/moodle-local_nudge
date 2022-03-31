@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/nudge/db" VERSION="20220304" COMMENT="XMLDB file for Moodle local/nudge"
+<XMLDB PATH="local/nudge/db" VERSION="20220331" COMMENT="XMLDB file for Moodle local/nudge"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -23,7 +23,7 @@
         <KEY NAME="linkedmanagernotificationkey" TYPE="foreign" FIELDS="linkedmanagernotificationid" REFTABLE="nudge_notification" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="Foreign key constraint for a nudge_notification for the manager."/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="courseid" UNIQUE="true" FIELDS="courseid"/>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_nudge_notification" COMMENT="Stores instances of a Nudge Notification. A nudge notification has many 'nudge_notification_content's to store translation for each language.">

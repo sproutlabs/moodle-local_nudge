@@ -25,6 +25,7 @@
 namespace local_nudge\local;
 
 use local_nudge\dml\nudge_notification_content_db;
+use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\abstract_nudge_entity;
 use local_nudge\local\nudge_notification_content;
 
@@ -54,13 +55,32 @@ class nudge_notification extends abstract_nudge_entity {
      * Returns the content for a language code.
      *
      * @param string $langcode
-     * @return nudge_notification_content|null
+     * @return array<nudge_notification_content|null>
      */
-    public function get_content_for_lang($langcode = 'en') {
-        return nudge_notification_content_db::get_filtered([
+    public function get_contents($langcode = null) {
+        $filter = [
             'nudgenotificationid' => $this->id,
-            'lang' => $langcode
-        ]);
+        ];
+
+        if ($langcode) {
+            $filter['lang'] = $langcode;
+        }
+
+        return nudge_notification_content_db::get_all_filtered($filter);
+    }
+
+    /**
+     * Returns $this wrapped in a {@link nudge_notification_form_data} with it's linked {@link nudge_notification_content}s.
+     *
+     * @return nudge_notification_form_data
+     */
+    public function as_notification_form(): nudge_notification_form_data {
+        $contents = $this->get_contents();
+
+        return new nudge_notification_form_data(
+            $this,
+            $contents
+        );
     }
 
     /**
@@ -69,7 +89,9 @@ class nudge_notification extends abstract_nudge_entity {
     public function get_summary_fields() {
         return [
             $this->id,
-            $this->title
+            // TODO: Should this be a link?
+            $this->title,
+            count($this->get_contents())
         ];
     }
 }

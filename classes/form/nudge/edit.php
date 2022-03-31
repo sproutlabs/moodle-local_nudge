@@ -115,7 +115,7 @@ class edit extends moodleform {
         $mform->addElement(
             'duration',
             'reminderdaterelativeenrollment',
-            'Repeat every x after enrollment',
+            'Repeat every x after enrollment, TODO make this minium 5 minutes to make it align with cron',
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS

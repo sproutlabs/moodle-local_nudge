@@ -40,7 +40,7 @@ function local_nudge_extend_navigation_course(\navigation_node $parentnode, \std
         return;
     }
 
-    $url = new moodle_url('/local/nudge/edit_nudge.php', [
+    $url = new moodle_url('/local/nudge/manage_nudges.php', [
         'courseid' => $course->id
     ]);
 

@@ -28,14 +28,13 @@
  */
 
 use local_nudge\dml\nudge_db;
-use local_nudge\form\nudge\edit;
-use local_nudge\local\nudge;
+use local_nudge\form\nudge\delete;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$nudgeid = \required_param('id', \PARAM_INT);
-$courseid = \required_param('courseid', \PARAM_INT);
+$id = \required_param('id', \PARAM_INT);
+$courseid = \optional_param('courseid', null, \PARAM_INT);
 
 \require_login($courseid);
 $context = \context_course::instance($courseid);
@@ -44,31 +43,24 @@ $context = \context_course::instance($courseid);
 $manageurl = new \moodle_url('/local/nudge/manage_nudges.php', ['courseid' => $courseid]);
 $PAGE->set_url($manageurl);
 
-$mform = new edit();
-
+$mform = new delete();
 if ($mform->is_cancelled()) {
-    \redirect($manageurl);
-} else if ($editdata = $mform->get_data()) {
-    if ($editdata === null) {
-        \redirect($manageurl);
-    }
-
-    nudge_db::save($editdata);
+    \redirect(new \moodle_url($manageurl));
+} else if ($deletedata = $mform->get_data()) {
+    nudge_db::delete(\intval($deletedata->id));
     \redirect($manageurl);
 }
 
-// We do this so cancelations of unsaved nudge forms know which course to return to.
-$newnudge = new nudge();
-$newnudge->courseid = $courseid;
-
-if ($nudgeid === 0) {
-    $nudge = $newnudge;
-} else {
-    // TODO: Maybe exception and not new here.
-    $nudge = nudge_db::get_by_id($nudgeid) ?? $newnudge;
+$nudgenotification = nudge_db::get_by_id($id);
+if ($nudgenotification === null) {
+    throw new \invalid_parameter_exception(sprintf('Nudge Notification with id: %s was not found.'));
 }
 
-$mform->set_data($nudge);
+$idholder = new stdClass();
+$idholder->id = $nudgenotification->id;
+$idholder->courseid = $courseid;
+
+$mform->set_data($idholder);
 
 echo $OUTPUT->header();
 

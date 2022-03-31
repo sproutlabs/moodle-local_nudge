@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This class is the base entity representation.
- *
+// phpcs:disable moodle.Commenting
+
+/*
  * @package     local_nudge\local
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
@@ -26,16 +26,14 @@
 
 namespace local_nudge\local;
 
-// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
-// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
-// phpcs:disable moodle.Commenting.InlineComment.DocBlock
-
 use coding_exception;
 use UnexpectedValueException;
 use stdClass;
 
 /**
- * @package     local_nudge\dml
+ * This class is the base entity representation.
+ *
+ * @package     local_nudge\local
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  */
@@ -61,6 +59,8 @@ abstract class abstract_nudge_entity {
      * @var int|null Primary key for {@see static}.
      */
     public $id = null;
+
+    // TODO created date & last user/time-modifed.
 
     /**
      * Constructs an instance of this record from an array or stdClass (preferably returned from the a {@see $DB} recordset).

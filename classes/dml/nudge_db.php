@@ -20,8 +20,6 @@
  * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- * @license     http://www.gnu.org/copyleft/gpl.html
- * @license     GNU GPL v3 or later
  */
 
 namespace local_nudge\dml;

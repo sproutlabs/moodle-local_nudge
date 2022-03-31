@@ -27,48 +27,50 @@
  * @var \core_renderer      $OUTPUT
  */
 
-use local_nudge\dml\nudge_db;
-use local_nudge\form\nudge\edit;
-use local_nudge\local\nudge;
+use local_nudge\dml\nudge_notification_content_db;
+use local_nudge\dml\nudge_notification_db;
+use local_nudge\form\nudge_notification\edit;
+use local_nudge\local\nudge_notification;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-$nudgeid = \required_param('id', \PARAM_INT);
-$courseid = \required_param('courseid', \PARAM_INT);
+\admin_externalpage_setup('configurenudgenotifications');
 
-\require_login($courseid);
-$context = \context_course::instance($courseid);
-\require_capability('local/nudge:trackcourse', $context);
+$notificationid = \required_param('id', \PARAM_INT);
 
-$manageurl = new \moodle_url('/local/nudge/manage_nudges.php', ['courseid' => $courseid]);
+$manageurl = new \moodle_url('/local/nudge/manage_notifications.php');
 $PAGE->set_url($manageurl);
 
-$mform = new edit();
+// Using this isn't great.
+$mform = new edit($notificationid);
 
 if ($mform->is_cancelled()) {
     \redirect($manageurl);
 } else if ($editdata = $mform->get_data()) {
     if ($editdata === null) {
+        // TODO: something went wrong.
         \redirect($manageurl);
     }
 
-    nudge_db::save($editdata);
+    $notificationid = nudge_notification_db::save($editdata->notification);
+
+    foreach ($editdata->notificationcontents as $notificationcontent) {
+        $notificationcontent->nudgenotificationid = $notificationid;
+        nudge_notification_content_db::save($notificationcontent);
+    }
+
     \redirect($manageurl);
 }
 
-// We do this so cancelations of unsaved nudge forms know which course to return to.
-$newnudge = new nudge();
-$newnudge->courseid = $courseid;
-
-if ($nudgeid === 0) {
-    $nudge = $newnudge;
+if ($notificationid === 0) {
+    $nudgenotification = new nudge_notification();
 } else {
     // TODO: Maybe exception and not new here.
-    $nudge = nudge_db::get_by_id($nudgeid) ?? $newnudge;
+    $nudgenotification = nudge_notification_db::get_by_id($notificationid) ?? new nudge_notification();
 }
 
-$mform->set_data($nudge);
+$mform->set_data($nudgenotification->as_notification_form());
 
 echo $OUTPUT->header();
 

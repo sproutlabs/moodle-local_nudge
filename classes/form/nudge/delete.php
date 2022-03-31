@@ -15,30 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adds a link to edit nudge notifications from the courses and categories sidebar for the root course.
- *
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- *
- * @var \core_config        $CFG
- * @var \admin_root         $ADMIN
  */
+
+namespace local_nudge\form\nudge;
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add(
-    'courses',
-    new \admin_externalpage(
-        'configurenudgenotifications',
-        new \lang_string('configurenudgenotifications', 'local_nudge'),
-        new \moodle_url('/local/nudge/manage_notifications.php'),
-        'local/nudge:configurenudgenotifications'
-    ),
-    (isset($CFG->totara_version))
-        ? 'configurecatalog'
-        : 'restorecourse'
-);
+require_once($CFG->libdir . '/formslib.php');
 
+class delete extends \moodleform {
+    public function definition() {
+        $mform = $this->_form;
+
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
+
+        $this->add_action_buttons(true, get_string('delete'));
+    }
+}

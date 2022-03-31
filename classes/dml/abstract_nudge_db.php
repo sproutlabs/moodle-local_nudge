@@ -14,20 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This class provides some abstract methods that local_nudge uses to manage its entities.
- *
- * @package     local_nudge\dml
- * @author      Liam Kearney <liam@sproutlabs.com.au>
- * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- * @license     http://www.gnu.org/copyleft/gpl.html
- * @license     GNU GPL v3 or later
- */
+// phpcs:disable moodle.Commenting
 
 namespace local_nudge\dml;
-
-// VSCODE's current pluginset doesn't support typehinted global so we have to type hint them in the local scope.
-// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 
 use coding_exception;
 use stdClass;
@@ -214,7 +203,7 @@ abstract class abstract_nudge_db {
 
         $instance->lastmodified = \time();
 
-        if ($instance->id === null) {
+        if ($instance->id === null || $instance->id === 0) {
             // Add defaults they exist and are null in the current record.
             foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
                 if ($instance->$defaultfield === null) {
@@ -229,10 +218,6 @@ abstract class abstract_nudge_db {
         // Pass to possible hooks via reference.
         if (\method_exists(static::class, 'on_before_save')) {
             \call_user_func_array([static::class , 'on_before_save'], [$instance]);
-        }
-
-        if (\method_exists(static::$entityclass, 'on_before_save')) {
-            \call_user_func_array([static::$entityclass , 'on_before_save'], [$instance]);
         }
 
         $DB->update_record(static::$table, $instance);
@@ -261,6 +246,10 @@ abstract class abstract_nudge_db {
         global $DB;
 
         // TODO: see auth_outage for logging events here.
+
+        if (\method_exists(static::class, 'on_before_delete')) {
+            \call_user_func_array([static::class , 'on_before_delete'], [$id]);
+        }
 
         $DB->delete_records(static::$table, ['id' => $id]);
     }

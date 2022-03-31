@@ -22,6 +22,21 @@
  * @license     GNU GPL v3 or later
  */
 
+namespace local_nudge\form\nudge_notification;
+
 defined('MOODLE_INTERNAL') || die();
 
-$messageproviders = [];
+require_once($CFG->libdir . '/formslib.php');
+
+class delete extends \moodleform {
+    public function definition() {
+        $mform = $this->_form;
+
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
+
+	// TODO: Add checkbox here to also delete notification translations that is checked by default. 
+
+        $this->add_action_buttons(true, get_string('delete'));
+    }
+}

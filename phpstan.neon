@@ -27,3 +27,24 @@ parameters:
     jobSize: 20
     maximumNumberOfProcesses: 32
     minimumNumberOfJobsPerProcess: 2
+  typeAliases:
+    # Expanded looks like:
+    # array{
+    #     'learneremail': array{
+    #         'capability': string,
+    #         'defaults': array{
+    #             'email': int,
+    #             'popup': int
+    #         }
+    #     },
+    #     'manageremail': array{
+    #         'capability': string,
+    #         'defaults': array{
+    #             'email': int,
+    #             'popup': int
+    #         }
+    #     }
+    # }
+    NudgeMessageProviders: "array{'learneremail': array{'capability': int,'defaults': array{'email': int,'popup': int}},'manageremail': array{'capability': string,'defaults': array{'email': int,'popup': int}}}"
+  universalObjectCratesClasses:
+    - core\message\message

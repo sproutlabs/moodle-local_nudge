@@ -14,31 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting.InlineComment.DocBlock
+
 /**
- * Adds a link to edit nudge notifications from the courses and categories sidebar for the root course.
- *
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- *
- * @var \core_config        $CFG
- * @var \admin_root         $ADMIN
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add(
-    'courses',
-    new \admin_externalpage(
-        'configurenudgenotifications',
-        new \lang_string('configurenudgenotifications', 'local_nudge'),
-        new \moodle_url('/local/nudge/manage_notifications.php'),
-        'local/nudge:configurenudgenotifications'
-    ),
-    (isset($CFG->totara_version))
-        ? 'configurecatalog'
-        : 'restorecourse'
-);
-
+/**
+ * @var NudgeMessageProviders See PHPStan neon file for definition.
+*/
+$messageproviders = [
+    'learneremail' => [
+        'capability' => 'local/nudge:receivelearneremail',
+        'defaults' => [
+            'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
+            'popup' => \MESSAGE_DISALLOWED,
+        ]
+    ],
+    'manageremail' => [
+        'capability' => 'local/nudge:receivemanageremail',
+        'defaults' => [
+            'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
+            'popup' => \MESSAGE_DISALLOWED,
+        ]
+    ]
+];
