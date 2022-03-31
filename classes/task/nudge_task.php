@@ -21,13 +21,11 @@ namespace local_nudge\task;
 use stdClass;
 use completion_info;
 use context_course;
-use context_system;
 use core\task\scheduled_task;
 use local_nudge\dml\nudge_db;
 use local_nudge\dml\nudge_user_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_user;
-use totara_core\relationship\relationship;
 
 defined('MOODLE_INTERNAL') || die();
 
