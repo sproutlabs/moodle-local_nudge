@@ -192,3 +192,10 @@ $string['expectedunreachable']                      =       'Expected unreachabl
 $string['nudgenotificationdoesntexist']             =       'Can\'t find Nudge Notification with the ID: {$a}';
 $string['nudgedoesntexist']                         =       'Can\'t find Nudge with the ID: {$a}';
 $string['cantmatchmanager']                         =       'The option to match on manager custom fields is on but no field is selected';
+
+// ---------------------------------------
+//               VALIDATION
+// ---------------------------------------
+
+// Nudge
+$string['validation_nudge_neednotifications']       =       'The selected recipient type was: "{$a}" but there wasn\'t wasn\'t enough notifications to cover the recipients.';

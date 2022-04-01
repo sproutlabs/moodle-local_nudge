@@ -79,7 +79,7 @@ function local_nudge_extend_navigation_course(
  *
  * @return array<string, string>
  */
-function nudge_scaffold_select_from_constants($class, $filter) {
+function nudge_scaffold_select_from_constants($class, $filter): array {
     $rclass = new \ReflectionClass($class);
     $constants = $rclass->getConstants();
 
@@ -92,13 +92,24 @@ function nudge_scaffold_select_from_constants($class, $filter) {
     // Convert constants to a sane reference to language strings.
     $constantfields = [];
     foreach ($constants as $name => $value) {
-        // EXAMPLE: `REMINDER_DATE_RELATIVE_ENROLLMENT` -> `reminderdaterelativeenrollment`
-        $langname = \strtolower(\str_replace('_', '', $name));
-        $sanename = \get_string($langname, 'local_nudge');
+        $sanename = nudge_get_enum_string($name);
         $constantfields[$value] = $sanename;
     }
 
     return $constantfields;
+}
+
+/**
+ * Gets a language string for an enum.
+ *
+ * EXAMPLE: `REMINDER_DATE_RELATIVE_ENROLLMENT` -> `reminderdaterelativeenrollment` then lookup that in the lang strings.
+ *
+ * @param string $enumstring
+ * @return string
+ */
+function nudge_get_enum_string($enumstring): string {
+    $langname = \strtolower(\str_replace('_', '', $enumstring));
+    return \get_string($langname, 'local_nudge');
 }
 
 /**

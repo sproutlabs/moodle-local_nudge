@@ -218,19 +218,68 @@ class edit extends moodleform {
     }
 
     /**
+     * Validates this form on the serverside for more complex valdiation than `->addRule()`.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, string> $files
+     * @return array<string, string>
+     */
+    public function validation($data, $files) {
+        $errors = [];
+
+        // Validate it: Has notifications linked for the selected REMINDER_RECIPIENT type.
+        if (!empty($data['reminderrecipient'])) {
+            switch ($data['reminderrecipient']) {
+                case(nudge::REMINDER_RECIPIENT_BOTH):
+                    if (empty($data['linkedlearnernotificationid'])) {
+                        $errors['linkedlearnernotificationid'] = get_string(
+                            'validation_nudge_neednotifications',
+                            'local_nudge',
+                            \nudge_get_enum_string('REMINDER_RECIPIENT_BOTH')
+                        );
+                    }
+                    if (empty($data['linkedmanagernotificationid'])) {
+                        $errors['linkedmanagernotificationid'] = get_string(
+                            'validation_nudge_neednotifications',
+                            'local_nudge',
+                            \nudge_get_enum_string('REMINDER_RECIPIENT_MANAGERS')
+                        );
+                    }
+                    break;
+                case(nudge::REMINDER_RECIPIENT_LEARNER):
+                    if (empty($data['linkedlearnernotificationid'])) {
+                        $errors['linkedlearnernotificationid'] = get_string(
+                            'validation_nudge_neednotifications',
+                            'local_nudge',
+                            \nudge_get_enum_string('REMINDER_RECIPIENT_LEARNER')
+                        );
+                    }
+                    break;
+                case(nudge::REMINDER_RECIPIENT_MANAGERS):
+                    if (empty($data['linkedmanagernotificationid'])) {
+                        $errors['linkedmanagernotificationid'] = get_string(
+                            'validation_nudge_neednotifications',
+                            'local_nudge',
+                            \nudge_get_enum_string('REMINDER_RECIPIENT_MANAGERS')
+                        );
+                    }
+                    break;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * Gets an array of available {@see \local_nudge\local\nudge_notification}s to choose from with a select.
      *
      * @return array<string, string>
      */
     private function get_notification_options() {
         $notifications = nudge_notification_db::get_all();
-        return \array_merge(
-            // TODO: Default will come from lang strings.
-            ['0' => 'Default'],
-            \array_combine(
-                \array_column($notifications, 'id'),
-                \array_column($notifications, 'title')
-            )
+        return \array_combine(
+            \array_column($notifications, 'id'),
+            \array_column($notifications, 'title')
         );
     }
 }
