@@ -87,11 +87,14 @@ class nudge_notification extends abstract_nudge_entity {
      * @return array<mixed>
      */
     public function get_summary_fields() {
+        $notificationcount = count($this->get_contents());
         return [
             $this->id,
             // TODO: Should this be a link?
             $this->title,
-            count($this->get_contents())
+            <<<HTML
+                <p class="badge badge-primary">There are {$notificationcount} linked translations</p>
+            HTML
         ];
     }
 }
