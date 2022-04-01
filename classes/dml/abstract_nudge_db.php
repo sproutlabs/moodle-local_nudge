@@ -191,8 +191,6 @@ abstract class abstract_nudge_db {
     /**
      * Persists or create a database row from a {@see T} instance.
      *
-     * @todo Flesh out with events etc.
-     *
      * @param T $instance
      */
     public static function save($instance) {
@@ -211,16 +209,20 @@ abstract class abstract_nudge_db {
                 }
             }
 
-            $instance->id = $DB->insert_record(static::$table, $instance);
+            self::call_hook('on_before_create', $instance);
+
+            $createdid = $DB->insert_record(static::$table, $instance);
+
+            self::call_hook('on_after_create', $createdid);
+
+            return $createdid;
         }
 
-        // TODO: Remove if this is unused.
-        // Pass to possible hooks via reference.
-        if (\method_exists(static::class, 'on_before_save')) {
-            \call_user_func_array([static::class , 'on_before_save'], [$instance]);
-        }
+        self::call_hook('on_before_save', $instance);
 
-        $DB->update_record(static::$table, $instance);
+        $updatedid = $DB->update_record(static::$table, $instance);
+
+        self::call_hook('on_after_save', $updatedid);
 
         return $instance->id;
     }
@@ -245,18 +247,17 @@ abstract class abstract_nudge_db {
         /** @var \moodle_database $DB */
         global $DB;
 
-        // TODO: see auth_outage for logging events here.
-
-        if (\method_exists(static::class, 'on_before_delete')) {
-            \call_user_func_array([static::class , 'on_before_delete'], [$id]);
-        }
+        self::call_hook('on_before_delete', $id);
 
         $DB->delete_records(static::$table, ['id' => $id]);
+
+        self::call_hook('on_after_delete', $id);
     }
 
     /**
      * Removes all instances of {@see T} matching the filter.
      *
+     * @todo Bulk events.
      * @param array $filter
      * @return void
      */
@@ -274,6 +275,7 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} filtered by SQL.
      *
+     * @todo Bulk events.
      * @param string $sql
      * @param array|null $params
      * @return void
@@ -287,5 +289,18 @@ abstract class abstract_nudge_db {
         global $DB;
 
         $DB->delete_records_select(static::$table, $sql, $params);
+    }
+
+    /**
+     * Calls a very simple hook.
+     *
+     * @param string $methodname
+     * @param mixed|T $data
+     * @return void
+     */
+    private static function call_hook(string $methodname, $data): void {
+        if (\method_exists(static::class, $methodname)) {
+            \call_user_func_array([static::class , $methodname], [$data]);
+        }
     }
 }

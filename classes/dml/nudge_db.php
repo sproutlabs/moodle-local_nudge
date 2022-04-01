@@ -24,6 +24,9 @@
 
 namespace local_nudge\dml;
 
+use local_nudge\event\nudge_created;
+use local_nudge\event\nudge_deleted;
+use local_nudge\event\nudge_updated;
 use local_nudge\local\nudge;
 
 /**
@@ -39,29 +42,6 @@ class nudge_db extends abstract_nudge_db {
     public static $entityclass = nudge::class;
 
     /**
-     * Finds a {@see nudge} instance for this course or creates one.
-     * @param int $courseid
-     * @return nudge
-     */
-    public static function find_or_create($courseid) {
-        $existingnudge = static::get_filtered([
-            'courseid' => $courseid
-        ]);
-
-        if ($existingnudge !== null) {
-            return $existingnudge;
-        }
-
-        $newnudge = new static::$entityclass([
-            'courseid' => $courseid
-        ]);
-
-        static::save($newnudge);
-
-        return $newnudge;
-    }
-
-    /**
      * Returns an array of active instances.
      * @return array<nudge>
      */
@@ -69,5 +49,39 @@ class nudge_db extends abstract_nudge_db {
         return static::get_all_filtered([
             'isenabled' => 1
         ]);
+    }
+
+    public static function on_after_create($id): void {
+        $creatednudge = (array) self::get_by_id($id);
+        $event = nudge_created::create([
+            'objectid' => $id,
+            'other' => $creatednudge,
+        ]);
+
+        $event->add_record_snapshot(self::$table, (object)(array) $creatednudge);
+        $event->trigger();
+    }
+
+    public static function on_after_save($id): void {
+        $updatednudge = (array) self::get_by_id($id);
+        $event = nudge_updated::create([
+            'objectid' => $id,
+            'other' => $updatednudge
+        ]);
+
+        $event->add_record_snapshot(self::$table, (object)(array) $updatednudge);
+        $event->trigger();
+    }
+
+    // Ideally this would be after it succeeds.
+    public static function on_before_delete($id): void {
+        $nudgetobedeleted = (array) self::get_by_id($id);
+        $event = nudge_deleted::create([
+            'objectid' => $id,
+            'other' => $nudgetobedeleted
+        ]);
+
+        $event->add_record_snapshot(self::$table, (object)(array) $nudgetobedeleted);
+        $event->trigger();
     }
 }
