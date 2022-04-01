@@ -39,7 +39,6 @@ use admin_setting_configselect;
 use admin_setting_configtext;
 use admin_setting_heading;
 
-use function get_string;
 use function profile_get_custom_fields;
 
 use const PARAM_INT;
