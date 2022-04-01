@@ -31,14 +31,12 @@ defined('MOODLE_INTERNAL') || die();
 */
 $messageproviders = [
     'learneremail' => [
-        'capability' => 'local/nudge:receivelearneremail',
         'defaults' => [
             'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
             'popup' => \MESSAGE_DISALLOWED,
         ]
     ],
     'manageremail' => [
-        'capability' => 'local/nudge:receivemanageremail',
         'defaults' => [
             'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
             'popup' => \MESSAGE_DISALLOWED,
