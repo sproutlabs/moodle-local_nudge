@@ -35,7 +35,9 @@ class delete extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-	// TODO: Add checkbox here to also delete notification translations that is checked by default. 
+        $mform->addElement('html', '<div class="alert alert-danger">Are you sure you want delete this notification?<div><br/>');
+
+        // TODO: Add checkbox here to also delete notification translations that is checked by default.
 
         $this->add_action_buttons(true, get_string('delete'));
     }

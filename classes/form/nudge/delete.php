@@ -38,6 +38,8 @@ class delete extends \moodleform {
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
 
+        $mform->addElement('html', '<div class="alert alert-danger">Are you sure you want delete this nudge?<div><br/>');
+
         $this->add_action_buttons(true, get_string('delete'));
     }
 }
