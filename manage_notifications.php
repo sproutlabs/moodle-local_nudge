@@ -31,6 +31,8 @@
 
 use local_nudge\dml\nudge_notification_db;
 
+use function get_string as gs;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
@@ -43,7 +45,6 @@ $systemcontext = \context_system::instance();
 
 echo $OUTPUT->header();
 
-// TODO lang string "add a notification".
 echo $OUTPUT->single_button(
     new moodle_url(
         '/local/nudge/edit_notification.php',
@@ -51,7 +52,7 @@ echo $OUTPUT->single_button(
             'id' => 0
         ]
     ),
-    'Add a notification',
+    gs('manage_notification_add', 'local_nudge'),
     'get'
 );
 

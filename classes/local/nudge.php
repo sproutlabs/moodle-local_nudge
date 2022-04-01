@@ -18,12 +18,15 @@
 
 namespace local_nudge\local;
 
-use core\message\message;
-use core_user;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge_notification;
+use moodle_exception;
 use stdClass;
-use totara_core\relationship\relationship;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once(__DIR__ . '/../../lib.php');
 
 /**
  * @package     local_nudge\local
@@ -84,6 +87,7 @@ class nudge extends abstract_nudge_entity {
         '{user_lastname}',
         '{course_fullname}',
         '{course_shortname}',
+        '{course_link}',
         '{sender_firstname}',
         '{sender_lastname}',
         '{notification_name}',
@@ -181,157 +185,6 @@ class nudge extends abstract_nudge_entity {
         return \get_course($this->courseid);
     }
 
-    // TODO these next few functions don't belong here.
-
-    /**
-     * @param \core\entity\user $user
-     */
-    public function trigger($user): void {
-        /** @var \core_config */
-        global $CFG;
-        switch ($this->reminderrecipient) {
-            case (self::REMINDER_RECIPIENT_BOTH):
-                \message_send($this->get_email_message($user));
-
-                foreach (self::totara_get_managers_for_user($user) as $manager) {
-                    \message_send($this->get_email_message($user, $manager));
-                }
-
-                break;
-
-            case (self::REMINDER_RECIPIENT_LEARNER):
-                \message_send($this->get_email_message($user));
-                break;
-
-            case (self::REMINDER_RECIPIENT_MANAGERS):
-                // TODO: manager on moodle
-                if (!isset($CFG->totara_version)) {
-                    throw new \moodle_exception('manageronmoodle', 'local_nudge');
-
-                    \message_send($this->get_email_message($user, null));
-                    break;
-                }
-
-                foreach (self::totara_get_managers_for_user($user) as $manager) {
-                    \message_send($this->get_email_message($user, $manager));
-                }
-
-                break;
-            default:
-                // Weird.
-                break;
-        }
-    }
-
-    /**
-     * @param \core\entity\user $user
-     * @return array<\core\entity\user>
-     */
-    public static function totara_get_managers_for_user($user): array {
-        /**
-         * @var array<\core\entity\user> $allmanagers
-         */
-        $allmanagers = [];
-
-        $managerrelation = relationship::load_by_idnumber('manager');
-        $usermanagerrelations = $managerrelation->get_users(['user_id' => $user->id], \context_system::instance());
-
-        foreach ($usermanagerrelations as $managerdto) {
-            $allmanagers[] = core_user::get_user($managerdto->get_user_id());
-        }
-
-        return $allmanagers;
-    }
-
-    /**
-     * Gets a templated {@see message} for this instance of nudge.
-     *
-     * @param \core\entity\user $user The user or a manager.
-     */
-    public function get_email_message($user, $manager = null): message {
-        /** @var \moodle_database $DB */
-        global $DB;
-
-        // Grab some context for the template.
-        if ($manager === null) {
-            $notification = $this->get_learner_notification();
-        } else {
-            $notification = $this->get_manager_notification();
-        }
-
-        $notificationcontents = $notification->get_contents($user->lang);
-        $notificationcontent = array_pop($notificationcontents);
-        /** @var \core\entity\user|false */
-        $userfrom = $DB->get_record('user', ['id' => $notification->userfromid]);
-        $course = $this->get_course();
-
-        // Passing a whole bunch of values through to avoid new queries.
-        $subject = $this->hydrate_notification_template(
-            $notificationcontent->subject,
-            $user,
-            $course,
-            $userfrom,
-            $notification
-        );
-
-        $body = $this->hydrate_notification_template(
-            $notificationcontent->body,
-            $user,
-            $course,
-            $userfrom,
-            $notification
-        );
-
-        $message = new message();
-        $message->component = 'local_nudge';
-        $message->name = ($manager) ? 'manageremail' : 'learneremail';
-        $message->userfrom = $userfrom;
-        $message->userto = ($manager === null) ? $user : $manager;
-        $message->subject = $subject;
-        $message->fullmessageformat = \FORMAT_HTML;
-        $message->fullmessagehtml = $body;
-        $message->notification = 1;
-        $message->courseid = $course->id;
-        $message->contexturl = new \moodle_url('/course/view.php', ['id' => $course->id]);
-        $message->contexturlname = 'Course Link';
-
-        $content = ['*' => [
-            'header' => <<<HTML
-                <h1>{$notification->title}</h1>
-            HTML,
-        ]];
-        $message->set_additional_content('email', $content);
-
-        return $message;
-    }
-
-    /**
-     * @param \core\entity\user $user
-     * @param \core\entity\course $course
-     * @param \core\entity\user $userfrom
-     */
-    public function hydrate_notification_template(
-        string $contenttotemplate,
-        $user,
-        $course,
-        $userfrom,
-        nudge_notification $notification
-    ): string {
-        $templatevars = self::TEMPLATE_VARIABLES;
-
-        $templatevars['{user_firstname}'] = $user->firstname;
-        $templatevars['{user_lastname}'] = $user->lastname;
-        $templatevars['{course_fullname}'] = $course->fullname;
-        $templatevars['{course_shortname}'] = $course->shortname;
-        $templatevars['{sender_firstname}'] = $userfrom->firstname;
-        $templatevars['{sender_lastname}'] = $userfrom->lastname;
-        $templatevars['{notification_name}'] = $notification->title;
-
-        $result = \strtr($contenttotemplate, $templatevars);
-
-        return $result;
-    }
-
     /**
      * @return array<mixed>
      */
@@ -339,10 +192,52 @@ class nudge extends abstract_nudge_entity {
         return [
             $this->id,
             // TODO: Should this be a link?
-            $this->get_learner_notification()->title ?? '',
-            $this->get_manager_notification()->title ?? '',
+            // TODO: If it has both notifications but the type is still only one -
+            // show only one.
+            $this->get_learner_notification()->title ?? 'None',
+            $this->get_manager_notification()->title ?? 'None',
             \ucfirst($this->remindertype)
         ];
+    }
+
+    /**
+     * @param \core\entity\user|stdClass $user
+     */
+    public function trigger($user): void {
+        switch ($this->reminderrecipient) {
+            case (self::REMINDER_RECIPIENT_BOTH):
+                \message_send(nudge_get_email_message($this, $user));
+
+                foreach (nudge_get_managers_for_user($user) as $manager) {
+                    if ($manager === null) {
+                        continue;
+                    }
+                    \message_send(nudge_get_email_message($this, $user, $manager));
+                }
+
+                break;
+
+            case (self::REMINDER_RECIPIENT_LEARNER):
+                \message_send(nudge_get_email_message($this, $user));
+                break;
+
+            case (self::REMINDER_RECIPIENT_MANAGERS):
+                foreach (nudge_get_managers_for_user($user) as $manager) {
+                    if ($manager === null) {
+                        continue;
+                    }
+                    \message_send(nudge_get_email_message($this, $user, $manager));
+                }
+
+                break;
+            default:
+                // Weird.
+                throw new moodle_exception(
+                    'expectedunreachable',
+                    'local_nudge'
+                );
+                break;
+        }
     }
 
     /** {@inheritDoc} */

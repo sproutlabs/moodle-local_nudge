@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting
+// phpcs:disable Squiz.WhiteSpace
+
 /**
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
@@ -22,45 +25,165 @@
  * @license     GNU GPL v3 or later
  */
 
-// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar
-// phpcs:disable Squiz.WhiteSpace.OperatorSpacing.SpacingAfter
-
 // META
 $string['pluginname']                               =       'Nudge';
-$string['crontask']                                 =       'Nudge Cron';
-$string['trackcourse']                              =       'Adjust Nudging Completions';
-$string['managetracking']                           =       'Manage Nudge tracking and reminders';
+$string['crontask']                                 =       'Nudge Cron Task';
+$string['trackcourse']                              =       'Adjust Nudge Reminders';
+$string['managetracking']                           =       'Manage Nudge Reminders';
+$string['configurenudgenotifications']              =       'Configure Site Nudge Notifications';
 
-// NUDGE EDIT FORM
-$string['isenabled']                                =       'Is Enabled?';
-$string['remindertype']                             =       'Reminder Timing';
-$string['reminderdateinputfixed']                   =       'Reminder Date Input Fixed';
-$string['reminderdaterelativeenrollment']           =       'Reminder Date Relative Enrollment';
-$string['reminderdaterelativecourseend']            =       'Reminder Date Relative Course End';
-$string['reminderrecipient']                        =       'Reminder Recipient';
-$string['reminderrecipientlearner']                 =       'The Learner';
-$string['reminderrecipientmanagers']                =       'The Learner\'s Managers';
-$string['reminderrecipientboth']                    =       'Both the Learner and their Managers';
-$string['remindertypefixeddate']                    =       'Choose a fixed reminder date';
-$string['remindertypeperiod']                       =       'Choose a period reminder date';
 
-// EDIT FORM HELP
-$string['isenabled_help'] = <<<EOF
-You can toggle nudge reminders for this course here.
+// ---------------------------------------
+//             MANAGE PAGES
+// ---------------------------------------
+// Nudge
+$string['manage_nudge_add']                         =       'Add a Nudge';
 
-Simply enable the checkbox and save this form for more options.
+// Nudge Notification
+$string['manage_notification_add']                  =       'Add a Nudge Notification';
+// ---------------------------------------
+//              EDIT FORMS
+// ---------------------------------------
+// Nudge
+$string['form_nudge_isenabled']                     =       'Is Enabled?';
+$string['form_nudge_isenabled_help']                =       <<<EOF
+<p>You can enable or disable this notification here.</p>
+<p>A notification may disable itself once certain conditions have been met:</p>
+<ol>
+    <li>Relative date: When the course has ended.</li>
+    <li>Course end date: When the notification prior to course end has been sent.</li>
+    <li>Fixed date: When the notification has been sent.</li>
+</ol>
 EOF;
-$string['remindertype_help'] = <<<EOF
-Select a timing method to base sent nudges on.
-EOF;
-$string['reminderrecipient_help'] = <<<EOF
+
+$string['form_nudge_reminderrecipient']             =       'Reminder Recipient';
+$string['form_nudge_reminderrecipient_help']        =       <<<EOF
 Select recipients of this nudge reminder.
 EOF;
 
-// NOTIFICATION FORM
-$string['configurenudgenotifications']              =       'Configure nudge notifications';
-$string['deletenudgenotificationconfirm']           =       'Are you sure you want to delete the Nudge notification: <strong>"{$a}"</strong>:';
+$string['form_nudge_learnernotification']           =       'Notification for the Learner';
+$string['form_nudge_learnernotification_help']      =       <<<EOF
+TODO
+EOF;
 
-// NOTIFICATION CONTENT FORM
-$string['configurenudgenotificationcontents']       =       'Configure nudge notification contents';
-$string['deletenudgenotificationcontentconfirm']    =       'Are you sure you want to delete the Nudge notification contents: <strong>"{$a}"</strong>:';
+$string['form_nudge_managernotification']           =       'Notification for the Managers';
+$string['form_nudge_managernotification_help']      =       <<<EOF
+TODO
+EOF;
+
+$string['form_nudge_remindertype']                  =       'Reminder Timing';
+$string['form_nudge_remindertype_help']             =       <<<EOF
+Select a timing method to base sent nudges on.
+EOF;
+
+$string['form_nudge_remindertypefixeddate']         =       'Choose a fixed reminder date';
+$string['form_nudge_remindertypefixeddate_help']    =       <<<EOF
+TODO
+EOF;
+
+$string['form_nudge_remindertyperelativedate']      =       'Repeat every x after a user\'s enrollment';
+$string['form_nudge_remindertyperelativedate_help'] =       <<<EOF
+TODO make this minium 5 minutes to make it align with cron
+EOF;
+
+$string['form_nudge_reminderdatecoruseend']         =       'Reminder x before course ends';
+$string['form_nudge_reminderdatecoruseend_help']    =       <<<EOF
+TODO
+EOF;
+
+// Notification
+$string['form_notification_title']                  =       'Add a title';
+
+$string['form_notification_userfrom']               =       'Select a user as the sender for this email';
+
+$string['form_notification_templatevar_title']      =       'Template Infomation';
+$string['form_notification_templatevar_help']       =       'You can use the following properties in a translation:';
+
+$string['form_notification_translation_header']     =       'Unsaved Translation';
+$string['form_notification_translation_template']   =       'Translation - {$a->language}: {$a->subject}';
+
+$string['form_notification_selectlang']             =       'Select a language';
+$string['form_notification_addsubject']             =       'Add a subject';
+$string['form_notification_addbody']                =       'Add a body';
+
+$string['form_notification_addprompt']              =       'Add {no} more translation{possible_s}';
+
+// ---------------------------------------
+//              ENUM TITLES
+// See: local/nudge/lib.php::nudge_scaffold_select_from_constants()
+// ---------------------------------------
+// Reminder Date
+$string['reminderdateinputfixed']                   =       'Reminder Date Input Fixed';
+$string['reminderdaterelativeenrollment']           =       'Reminder Date Relative Enrollment';
+$string['reminderdaterelativecourseend']            =       'Reminder Date Relative Course End';
+
+// Reminder Recipient
+$string['reminderrecipientlearner']                 =       'The Learner';
+$string['reminderrecipientmanagers']                =       'The Learner\'s Managers';
+$string['reminderrecipientboth']                    =       'Both the Learner and their Managers';
+
+// ---------------------------------------
+//                  ADMIN
+// ---------------------------------------
+// General
+$string['configurenudge']                           =       'Configure Nudge';
+$string['manage_settings']                          =       'Configure Nudge Settings';
+
+// Managers settings
+$string['admin_manager_heading']                    =       'Manager Settings';
+$string['admin_manager_heading_desc']               =       <<<EOF
+These are just for emulation on MOODLE, Totara already has a system for this.
+EOF;
+
+$string['admin_custom_managerresolution']           =       'Custom manager resolution enabled';
+$string['admin_custom_managerresolution_desc']      =       <<<EOF
+If this is enabled the below two fields will be used for custom manager resolution.
+In Totara this is generally not a good idea however this is <em><strong>needed</strong> for MOODLE solutions</em>.
+EOF;
+
+$string['admin_manager_matchwith_field']            =       'Manager match with field';
+$string['admin_manager_matchwith_field_desc']       =       <<<EOF
+This field will be used to match managers with.
+This will be the field on a user's profile that matches the match on field on the Manager's profile
+EOF;
+
+$string['admin_manager_matchon_field']              =       'Manager match on field';
+$string['admin_manager_matchon_field_desc']         =       <<<EOF
+This field will be used to match managers on.
+This is the "unique" identifier for a manager
+EOF;
+
+// UX Settings
+$string['admin_ux_heading']                         =       'User Experience Settings';
+$string['admin_ux_heading_desc']                    =       <<<EOF
+You can configure some settings to make Nudge easier to work with here.
+EOF;
+
+$string['admin_ux_addtranslationcount']             =       'Notification add count';
+$string['admin_ux_addtranslationcount_desc']        =       <<<EOF
+The amount of translations to add each time when creating a Nudge Notification.
+EOF;
+
+$string['admin_ux_startdate']                       =       'Start date';
+$string['admin_ux_startdate_desc']                  =       <<<EOF
+You can select a start date here to limit date pickers.
+EOF;
+
+// Performance Settings
+// TODO: Implement me
+$string['admin_performance_nolog']                  =       'Performance mode';
+$string['admin_performance_nolog_desc']             =       <<<EOF
+Enabling this will disable the creation of events, reducing queries required on the cron worker.
+However this is usually a bad idea since it makes it almost impossible to track changes.
+EOF;
+
+// TODO: convert some of the DML called from the cron to SQL.
+
+// ---------------------------------------
+//                 ERRORS
+// ---------------------------------------
+
+$string['expectedunreachable']                      =       'Expected unreachable, It\'s possible a malformed database value was encountered.';
+$string['nudgenotificationdoesntexist']             =       'Can\'t find Nudge Notification with the ID: {$a}';
+$string['nudgedoesntexist']                         =       'Can\'t find Nudge with the ID: {$a}';
+$string['cantmatchmanager']                         =       'The option to match on manager custom fields is on but no field is selected';

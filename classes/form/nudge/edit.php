@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting
+
 /**
  * @package     local_nudge\form\nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
@@ -30,8 +32,11 @@ use local_nudge\local\nudge;
 use moodle_exception;
 use moodleform;
 
+use function get_string as gs;
+
 defined('MOODLE_INTERNAL') || die();
 
+/** @var \core_config $CFG */
 global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once(__DIR__ . '/../../../lib.php');
@@ -58,17 +63,17 @@ class edit extends moodleform {
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', \PARAM_INT);
 
-        $mform->addElement('checkbox', 'isenabled', \get_string('isenabled', 'local_nudge'));
-        $mform->addHelpButton('isenabled', 'isenabled', 'local_nudge');
+        $mform->addElement('checkbox', 'isenabled', gs('form_nudge_isenabled', 'local_nudge'));
+        $mform->addHelpButton('isenabled', 'form_nudge_isenabled', 'local_nudge');
 
-        $reminderrecipientenum = scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
+        $reminderrecipientenum = nudge_scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
         $mform->addElement(
             'select',
             'reminderrecipient',
-            \get_string('reminderrecipient', 'local_nudge'),
+            gs('form_nudge_reminderrecipient', 'local_nudge'),
             $reminderrecipientenum,
         );
-        $mform->addHelpButton('reminderrecipient', 'reminderrecipient', 'local_nudge');
+        $mform->addHelpButton('reminderrecipient', 'form_nudge_reminderrecipient', 'local_nudge');
 
         $notificationarray = $this->get_notification_options();
 
@@ -76,46 +81,48 @@ class edit extends moodleform {
         $mform->addElement(
             'autocomplete',
             'linkedlearnernotificationid',
-            'Notification for the Learner',
+            gs('form_nudge_learnernotification', 'local_nudge'),
             $notificationarray
         );
         $mform->hideIf('linkedlearnernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_MANAGERS]);
+        $mform->addHelpButton('linkedlearnernotificationid', 'form_nudge_learnernotification', 'local_nudge');
 
         // Show unless the value is only learners.
         $mform->addElement(
             'autocomplete',
             'linkedmanagernotificationid',
-            'Notification for the Managers',
+            gs('form_nudge_managernotification', 'local_nudge'),
             $notificationarray
         );
         $mform->hideIf('linkedmanagernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_LEARNER]);
+        $mform->addHelpButton('linkedmanagernotificationid', 'form_nudge_managernotification', 'local_nudge');
 
-        $remindertypeenum = scaffold_select_from_constants(nudge::class, 'REMINDER_DATE');
+        $remindertypeenum = nudge_scaffold_select_from_constants(nudge::class, 'REMINDER_DATE');
         $mform->addElement(
             'select',
             'remindertype',
-            \get_string('remindertype', 'local_nudge'),
+            gs('form_nudge_remindertype', 'local_nudge'),
             $remindertypeenum,
         );
-        $mform->addHelpButton('remindertype', 'remindertype', 'local_nudge');
+        $mform->addHelpButton('remindertype', 'form_nudge_remindertype', 'local_nudge');
 
         // Show if the reminder type is fixed.
         $mform->addElement(
             'date_selector',
             'remindertypefixeddate',
-            \get_string('remindertypefixeddate', 'local_nudge'),
+            gs('form_nudge_remindertypefixeddate', 'local_nudge'),
             [
-                // TODO dynamic startyear.
-                'startyear' => 2022,
+                'startyear' => get_config('local_nudge', 'uxstartdate'),
                 'optional' => false
             ]
         );
         $mform->hideIf('remindertypefixeddate', 'remindertype', 'neq', nudge::REMINDER_DATE_INPUT_FIXED);
+        $mform->addHelpButton('remindertypefixeddate', 'form_nudge_remindertypefixeddate', 'local_nudge');
 
         $mform->addElement(
             'duration',
             'reminderdaterelativeenrollment',
-            'Repeat every x after enrollment, TODO make this minium 5 minutes to make it align with cron',
+            gs('form_nudge_remindertyperelativedate', 'local_nudge'),
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS
@@ -123,17 +130,19 @@ class edit extends moodleform {
         );
         $mform->setDefault('reminderdaterelativeenrollment', 86400);
         $mform->hideIf('reminderdaterelativeenrollment', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_ENROLLMENT);
+        $mform->addHelpButton('reminderdaterelativeenrollment', 'form_nudge_remindertyperelativedate', 'local_nudge');
 
         $mform->addElement(
             'duration',
             'reminderdaterelativecourseend',
-            'Reminder x before course ends',
+            gs('form_nudge_reminderdatecoruseend', 'local_nudge'),
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS
             ]
         );
         $mform->hideIf('reminderdaterelativecourseend', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_COURSE_END);
+        $mform->addHelpButton('reminderdaterelativecourseend', 'form_nudge_reminderdatecoruseend', 'local_nudge');
 
         $this->add_action_buttons();
     }
@@ -154,7 +163,6 @@ class edit extends moodleform {
             'courseid' => $data->courseid,
             'linkedlearnernotificationid' => (isset($data->linkedlearnernotificationid)) ? $data->linkedlearnernotificationid : 0,
             'linkedmanagernotificationid' => (isset($data->linkedmanagernotificationid)) ? $data->linkedmanagernotificationid : 0,
-            // TODO BUG this doesn't work on initial creation eg. new course -> adjust nudge -> initially save as enabled.
             'isenabled' => (isset($data->isenabled)) ? true : false,
             'reminderrecipient' => $data->reminderrecipient,
             'remindertype' => $data->remindertype

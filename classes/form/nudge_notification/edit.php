@@ -19,15 +19,16 @@
 namespace local_nudge\form\nudge_notification;
 
 use coding_exception;
-use local_nudge\dml\nudge_db;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 use local_nudge\local\nudge_notification_content;
 use moodleform;
+use stdClass;
 
-use function \get_string as gs;
+use function get_config;
+use function get_string as gs;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,8 +63,8 @@ class edit extends moodleform {
 
     public function __construct($id = null) {
         if (\is_int($id) && $id) {
-            if (nudge_db::get_by_id($id) === null) {
-                throw new \exception('TODO');
+            if (nudge_notification_db::get_by_id($id) === null) {
+                throw new \moodle_exception('nudgenotificationdoesntexist', 'local_nudge', '', $id);
             }
             $this->id = $id;
         }
@@ -87,7 +88,11 @@ class edit extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', \PARAM_INT);
 
-        $mform->addElement('text', 'title', 'Add a title');
+        $mform->addElement(
+            'text',
+            'title',
+            gs('form_notification_title', 'local_nudge')
+        );
         $mform->setType('title', \PARAM_RAW);
 
         $userquery = $DB->get_records_sql(<<<SQL
@@ -106,21 +111,22 @@ class edit extends moodleform {
         $mform->addElement(
             'autocomplete',
             'userfromid',
-            'Select a user as the sender for this email',
+            gs('form_notification_userfrom', 'local_nudge'),
             $useroptions
         );
 
         // Add some help around the template variables.
+        $helptext = gs('form_notification_templatevar_help', 'local_nudge');
         $helpitems = '';
         foreach (nudge::TEMPLATE_VARIABLES as $templatevariable) {
             [$templateobj, $templatename] = \explode('_', \trim($templatevariable, '{}'));
             $helpitems .= "<li><code>$templatevariable</code> -> {$templateobj}'s {$templatename}</li>";
         }
-        $mform->addElement('header', 'templatevarinfohdr', 'Template Infomation');
+        $mform->addElement('header', 'templatevarinfohdr', gs('form_notification_templatevar_title', 'local_nudge'));
         $mform->addElement(
             'html',
             <<<HTML
-                <em>You can use the following properties in a translation:<em>
+                <em>{$helptext}<em>
                 <ul>
                     {$helpitems}
                 </ul>
@@ -133,16 +139,21 @@ class edit extends moodleform {
 
         $groupelements = [
             $mform->createElement('hidden', 'contentid'),
-            $mform->createElement('header', 'translationhdr', "Translation"),
-            $mform->createElement('autocomplete', 'lang', 'Select a language', $languageoptions),
-            $mform->createElement('text', 'subject', 'Add a Subject'),
-            $mform->createElement($editor, 'body', 'Add a body')
+            $mform->createElement('header', 'translationhdr', gs('form_notification_translation_header', 'local_nudge')),
+            $mform->createElement('autocomplete', 'lang', gs('form_notification_selectlang', 'local_nudge'), $languageoptions),
+            $mform->createElement('text', 'subject', gs('form_notification_addsubject', 'local_nudge')),
+            $mform->createElement($editor, 'body', gs('form_notification_addbody', 'local_nudge'))
         ];
 
         $repeatcount = ($this->id > 0)
-            // TODO: handle ids that don't exist. Maybe on instancing.
             ? count(nudge_notification_db::get_by_id($this->id)->get_contents())
             : 1;
+
+        // Pluralise the add label if required.
+        $addcount = get_config('local_nudge', 'uxaddtranslationcount');
+        $repeatlabel = \strtr(gs('form_notification_addprompt', 'local_nudge'), [
+            'possible_s' => ($addcount > 1) ? 's' : ''
+        ]);
 
         $this->repeat_elements(
             $groupelements,
@@ -160,8 +171,8 @@ class edit extends moodleform {
             ],
             'hiddenrepeat',
             'add',
-            1,
-            'Add {no} more translation',
+            $addcount,
+            $repeatlabel,
         );
 
         $this->add_action_buttons();
@@ -240,7 +251,18 @@ class edit extends moodleform {
             // Setup a nice custom header.
             $langlist = \get_string_manager()->get_list_of_languages();
             $language = $langlist[$notificationcontent->lang] ?? 'Unknown Translation';
-            $defaults["translationhdr[{$i}]"] = "Translation - {$language}: {$notificationcontent->subject}";
+
+            $langdata = [
+                'language' => $language,
+                'subject' => $notificationcontent->subject,
+            ];
+
+            $translationheader = gs(
+                'form_notification_translation_template',
+                'local_nudge',
+                $langdata
+            );
+            $defaults["translationhdr[{$i}]"] = $translationheader;
 
             foreach (self::RECURRING_FIELDS as $formvalue => $datavalue) {
                 // Moodle has a CRAZY API, It's just old and given that they are doing well :)

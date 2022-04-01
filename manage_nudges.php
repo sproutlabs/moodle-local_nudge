@@ -31,8 +31,11 @@
 
 use local_nudge\dml\nudge_db;
 
+use function get_string as gs;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = \required_param('courseid', \PARAM_INT);
 
@@ -49,7 +52,6 @@ $PAGE->set_url($baseurl);
 
 echo $OUTPUT->header();
 
-// TODO lang string "add a nudge".
 echo $OUTPUT->single_button(
     new moodle_url(
         '/local/nudge/edit_nudge.php',
@@ -58,7 +60,7 @@ echo $OUTPUT->single_button(
             'courseid' => $courseid
         ]
     ),
-    'Add a nudge',
+    gs('manage_nudge_add', 'local_nudge'),
     'get'
 );
 
@@ -86,10 +88,12 @@ $selectsql = <<<SQL
     SELECT
         *
     FROM
-        {{$nudgetable}}
+        {{$nudgetable}} as nudge
+    WHERE
+        nudge.courseid = :courseid
 SQL;
 
-$nudgestomanage = nudge_db::get_all_sql($selectsql);
+$nudgestomanage = nudge_db::get_all_sql($selectsql, ['courseid' => $courseid]);
 
 foreach ($nudgestomanage as $nudge) {
 

@@ -144,9 +144,10 @@ abstract class abstract_nudge_db {
      * an {@see T} or you will encounter a {@throws \UnexpectedValueException}.
      *
      * @param string $sql MUST return a single instance. {@see static::get_all_sql()} for multiple.
+     * @param array|null $params SQL Params.
      * @return T|null Returns a single wrapped instance of {@see T}.
      */
-    public static function get_sql($sql) {
+    public static function get_sql($sql, $params = null) {
         if (!\is_string($sql)) {
             throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
         }
@@ -154,7 +155,7 @@ abstract class abstract_nudge_db {
         /** @var \moodle_database $DB */
         global $DB;
 
-        $record = $DB->get_record_sql($sql);
+        $record = $DB->get_record_sql($sql, $params);
 
         return ($record instanceof stdClass)
             ? new static::$entityclass($record)
@@ -168,9 +169,10 @@ abstract class abstract_nudge_db {
      * an {@see T} or you will encounter a {@throws UnexpectedValueException}.
      *
      * @param string $sql Will return multiple. {@see static::get_sql} for a non array wrapped return.
+     * @param array|null $params SQL Params.
      * @return array<T>
      */
-    public static function get_all_sql($sql) {
+    public static function get_all_sql($sql, $params = null) {
         if (!\is_string($sql)) {
             throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
         }
@@ -180,7 +182,7 @@ abstract class abstract_nudge_db {
 
         /** @var array<T> $entities */
         $entities = [];
-        foreach ($set = $DB->get_recordset_sql($sql) as $record) {
+        foreach ($set = $DB->get_recordset_sql($sql, $params) as $record) {
             $entities[] = new static::$entityclass($record);
         }
         $set->close();
