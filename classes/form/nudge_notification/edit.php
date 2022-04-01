@@ -151,7 +151,7 @@ class edit extends moodleform {
         // Pluralise the add label if required.
         $addcount = get_config('local_nudge', 'uxaddtranslationcount');
         $repeatlabel = \strtr(get_string('form_notification_addprompt', 'local_nudge'), [
-            'possible_s' => ($addcount > 1) ? 's' : ''
+            '{possible_s}' => ($addcount > 1) ? 's' : ''
         ]);
 
         $this->repeat_elements(
