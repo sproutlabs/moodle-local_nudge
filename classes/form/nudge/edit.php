@@ -32,7 +32,7 @@ use local_nudge\local\nudge;
 use moodle_exception;
 use moodleform;
 
-use function get_string as gs;
+use function get_string;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -63,14 +63,14 @@ class edit extends moodleform {
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', \PARAM_INT);
 
-        $mform->addElement('checkbox', 'isenabled', gs('form_nudge_isenabled', 'local_nudge'));
+        $mform->addElement('checkbox', 'isenabled', get_string('form_nudge_isenabled', 'local_nudge'));
         $mform->addHelpButton('isenabled', 'form_nudge_isenabled', 'local_nudge');
 
         $reminderrecipientenum = nudge_scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
         $mform->addElement(
             'select',
             'reminderrecipient',
-            gs('form_nudge_reminderrecipient', 'local_nudge'),
+            get_string('form_nudge_reminderrecipient', 'local_nudge'),
             $reminderrecipientenum,
         );
         $mform->addHelpButton('reminderrecipient', 'form_nudge_reminderrecipient', 'local_nudge');
@@ -81,7 +81,7 @@ class edit extends moodleform {
         $mform->addElement(
             'autocomplete',
             'linkedlearnernotificationid',
-            gs('form_nudge_learnernotification', 'local_nudge'),
+            get_string('form_nudge_learnernotification', 'local_nudge'),
             $notificationarray
         );
         $mform->hideIf('linkedlearnernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_MANAGERS]);
@@ -91,7 +91,7 @@ class edit extends moodleform {
         $mform->addElement(
             'autocomplete',
             'linkedmanagernotificationid',
-            gs('form_nudge_managernotification', 'local_nudge'),
+            get_string('form_nudge_managernotification', 'local_nudge'),
             $notificationarray
         );
         $mform->hideIf('linkedmanagernotificationid', 'reminderrecipient', 'in', [nudge::REMINDER_RECIPIENT_LEARNER]);
@@ -101,7 +101,7 @@ class edit extends moodleform {
         $mform->addElement(
             'select',
             'remindertype',
-            gs('form_nudge_remindertype', 'local_nudge'),
+            get_string('form_nudge_remindertype', 'local_nudge'),
             $remindertypeenum,
         );
         $mform->addHelpButton('remindertype', 'form_nudge_remindertype', 'local_nudge');
@@ -110,7 +110,7 @@ class edit extends moodleform {
         $mform->addElement(
             'date_selector',
             'remindertypefixeddate',
-            gs('form_nudge_remindertypefixeddate', 'local_nudge'),
+            get_string('form_nudge_remindertypefixeddate', 'local_nudge'),
             [
                 'startyear' => get_config('local_nudge', 'uxstartdate'),
                 'optional' => false
@@ -122,7 +122,7 @@ class edit extends moodleform {
         $mform->addElement(
             'duration',
             'reminderdaterelativeenrollment',
-            gs('form_nudge_remindertyperelativedate', 'local_nudge'),
+            get_string('form_nudge_remindertyperelativedate', 'local_nudge'),
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS
@@ -135,7 +135,7 @@ class edit extends moodleform {
         $mform->addElement(
             'duration',
             'reminderdaterelativecourseend',
-            gs('form_nudge_reminderdatecoruseend', 'local_nudge'),
+            get_string('form_nudge_reminderdatecoruseend', 'local_nudge'),
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS

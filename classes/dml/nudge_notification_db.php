@@ -50,6 +50,8 @@ class nudge_notification_db extends abstract_nudge_db {
         $lremoves = nudge_db::get_all_filtered(['linkedlearnernotificationid' => $id]);
         $mremoves = nudge_db::get_all_filtered(['linkedmanagernotificationid' => $id]);
 
+        // TODO, These need to be disabled and a notification needs to be sent to an admin.
+
         foreach ($lremoves as $remove) {
             $remove->linkedlearnernotificationid = 0;
             nudge_db::save($remove);

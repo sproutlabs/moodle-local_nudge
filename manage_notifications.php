@@ -31,7 +31,7 @@
 
 use local_nudge\dml\nudge_notification_db;
 
-use function get_string as gs;
+use function get_string;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -52,7 +52,7 @@ echo $OUTPUT->single_button(
             'id' => 0
         ]
     ),
-    gs('manage_notification_add', 'local_nudge'),
+    get_string('manage_notification_add', 'local_nudge'),
     'get'
 );
 

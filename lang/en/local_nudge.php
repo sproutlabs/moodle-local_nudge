@@ -170,6 +170,11 @@ You can select a start date here to limit date pickers.
 EOF;
 
 // Performance Settings
+$string['admin_performance_heading']                =       'Performance Settings';
+$string['admin_performance_heading_desc']           =       <<<EOF
+You can make some preformance tradeoffs here.
+EOF;
+
 // TODO: Implement me
 $string['admin_performance_nolog']                  =       'Performance mode';
 $string['admin_performance_nolog_desc']             =       <<<EOF

@@ -39,7 +39,7 @@ use admin_setting_configselect;
 use admin_setting_configtext;
 use admin_setting_heading;
 
-use function get_string as gs;
+use function get_string;
 use function profile_get_custom_fields;
 
 use const PARAM_INT;
@@ -52,7 +52,7 @@ if ($hassiteconfig) {
         'courses',
         new admin_externalpage(
             'configurenudgenotifications',
-            gs('configurenudgenotifications', 'local_nudge'),
+            get_string('configurenudgenotifications', 'local_nudge'),
             new moodle_url('/local/nudge/manage_notifications.php'),
             'local/nudge:configurenudgenotifications',
         ),
@@ -65,13 +65,13 @@ if ($hassiteconfig) {
         'localplugins',
         new admin_category(
             'local_nudge_settings',
-            gs('pluginname', 'local_nudge'),
+            get_string('pluginname', 'local_nudge'),
         )
     );
 
     $settingspage = new admin_settingpage(
         'managelocalnudge',
-        gs('manage_settings', 'local_nudge'),
+        get_string('manage_settings', 'local_nudge'),
     );
 
     if ($ADMIN->fulltree) {
@@ -94,54 +94,59 @@ if ($hassiteconfig) {
             // Manger section.
             new admin_setting_heading(
                 'nudge_admin_manager_heading',
-                gs('admin_manager_heading', 'local_nudge'),
-                gs('admin_manager_heading_desc', 'local_nudge'),
+                get_string('admin_manager_heading', 'local_nudge'),
+                get_string('admin_manager_heading_desc', 'local_nudge'),
             ),
             new admin_setting_configcheckbox(
                 'local_nudge/custommangerresolution',
-                gs('admin_custom_managerresolution', 'local_nudge'),
-                gs('admin_custom_managerresolution_desc', 'local_nudge'),
+                get_string('admin_custom_managerresolution', 'local_nudge'),
+                get_string('admin_custom_managerresolution_desc', 'local_nudge'),
                 '0',
             ),
             new admin_setting_configselect(
                 'local_nudge/managermatchonfield',
-                gs('admin_manager_matchon_field', 'local_nudge'),
-                gs('admin_manager_matchon_field_desc', 'local_nudge'),
+                get_string('admin_manager_matchon_field', 'local_nudge'),
+                get_string('admin_manager_matchon_field_desc', 'local_nudge'),
                 // Empty select index is less likely to cause an error.
                 'idnumber',
                 $matchonfields,
             ),
             new admin_setting_configselect(
                 'local_nudge/managermatchwithfield',
-                gs('admin_manager_matchwith_field', 'local_nudge'),
-                gs('admin_manager_matchwith_field_desc', 'local_nudge'),
+                get_string('admin_manager_matchwith_field', 'local_nudge'),
+                get_string('admin_manager_matchwith_field_desc', 'local_nudge'),
                 '',
                 $customfieldsselect,
             ),
             // UX section.
             new admin_setting_heading(
                 'nudge_admin_ux_heading',
-                gs('admin_ux_heading', 'local_nudge'),
-                gs('admin_ux_heading_desc', 'local_nudge'),
+                get_string('admin_ux_heading', 'local_nudge'),
+                get_string('admin_ux_heading_desc', 'local_nudge'),
             ),
             new admin_setting_configtext(
                 'local_nudge/uxaddtranslationcount',
-                gs('admin_ux_addtranslationcount', 'local_nudge'),
-                gs('admin_ux_addtranslationcount_desc', 'local_nudge'),
+                get_string('admin_ux_addtranslationcount', 'local_nudge'),
+                get_string('admin_ux_addtranslationcount_desc', 'local_nudge'),
                 1,
                 PARAM_INT,
             ),
             new admin_setting_configtext(
                 'local_nudge/uxstartdate',
-                gs('admin_ux_startdate', 'local_nudge'),
-                gs('admin_ux_startdate_desc', 'local_nudge'),
+                get_string('admin_ux_startdate', 'local_nudge'),
+                get_string('admin_ux_startdate_desc', 'local_nudge'),
                 2000,
                 PARAM_INT,
             ),
+            new admin_setting_heading(
+                'nudge_admin_performance_heading',
+                get_string('admin_performance_heading', 'local_nudge'),
+                get_string('admin_performance_heading_desc', 'local_nudge'),
+            ),
             new admin_setting_configcheckbox(
                 'local_nudge/performancenolog',
-                gs('admin_performance_nolog', 'local_nudge'),
-                gs('admin_performance_nolog_desc', 'local_nudge'),
+                get_string('admin_performance_nolog', 'local_nudge'),
+                get_string('admin_performance_nolog_desc', 'local_nudge'),
                 '0',
             ),
         ];

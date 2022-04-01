@@ -28,7 +28,7 @@ use moodleform;
 use stdClass;
 
 use function get_config;
-use function get_string as gs;
+use function get_string;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -91,7 +91,7 @@ class edit extends moodleform {
         $mform->addElement(
             'text',
             'title',
-            gs('form_notification_title', 'local_nudge')
+            get_string('form_notification_title', 'local_nudge')
         );
         $mform->setType('title', \PARAM_RAW);
 
@@ -111,18 +111,18 @@ class edit extends moodleform {
         $mform->addElement(
             'autocomplete',
             'userfromid',
-            gs('form_notification_userfrom', 'local_nudge'),
+            get_string('form_notification_userfrom', 'local_nudge'),
             $useroptions
         );
 
         // Add some help around the template variables.
-        $helptext = gs('form_notification_templatevar_help', 'local_nudge');
+        $helptext = get_string('form_notification_templatevar_help', 'local_nudge');
         $helpitems = '';
         foreach (nudge::TEMPLATE_VARIABLES as $templatevariable) {
             [$templateobj, $templatename] = \explode('_', \trim($templatevariable, '{}'));
             $helpitems .= "<li><code>$templatevariable</code> -> {$templateobj}'s {$templatename}</li>";
         }
-        $mform->addElement('header', 'templatevarinfohdr', gs('form_notification_templatevar_title', 'local_nudge'));
+        $mform->addElement('header', 'templatevarinfohdr', get_string('form_notification_templatevar_title', 'local_nudge'));
         $mform->addElement(
             'html',
             <<<HTML
@@ -139,10 +139,10 @@ class edit extends moodleform {
 
         $groupelements = [
             $mform->createElement('hidden', 'contentid'),
-            $mform->createElement('header', 'translationhdr', gs('form_notification_translation_header', 'local_nudge')),
-            $mform->createElement('autocomplete', 'lang', gs('form_notification_selectlang', 'local_nudge'), $languageoptions),
-            $mform->createElement('text', 'subject', gs('form_notification_addsubject', 'local_nudge')),
-            $mform->createElement($editor, 'body', gs('form_notification_addbody', 'local_nudge'))
+            $mform->createElement('header', 'translationhdr', get_string('form_notification_translation_header', 'local_nudge')),
+            $mform->createElement('autocomplete', 'lang', get_string('form_notification_selectlang', 'local_nudge'), $languageoptions),
+            $mform->createElement('text', 'subject', get_string('form_notification_addsubject', 'local_nudge')),
+            $mform->createElement($editor, 'body', get_string('form_notification_addbody', 'local_nudge'))
         ];
 
         $repeatcount = ($this->id > 0)
@@ -151,7 +151,7 @@ class edit extends moodleform {
 
         // Pluralise the add label if required.
         $addcount = get_config('local_nudge', 'uxaddtranslationcount');
-        $repeatlabel = \strtr(gs('form_notification_addprompt', 'local_nudge'), [
+        $repeatlabel = \strtr(get_string('form_notification_addprompt', 'local_nudge'), [
             'possible_s' => ($addcount > 1) ? 's' : ''
         ]);
 
@@ -257,7 +257,7 @@ class edit extends moodleform {
                 'subject' => $notificationcontent->subject,
             ];
 
-            $translationheader = gs(
+            $translationheader = get_string(
                 'form_notification_translation_template',
                 'local_nudge',
                 $langdata
