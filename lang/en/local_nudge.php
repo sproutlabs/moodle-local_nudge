@@ -172,7 +172,7 @@ EOF;
 // Performance Settings
 $string['admin_performance_heading']                =       'Performance Settings';
 $string['admin_performance_heading_desc']           =       <<<EOF
-You can make some preformance tradeoffs here.
+You can make some performance tradeoffs here.
 EOF;
 
 // TODO: Implement me
