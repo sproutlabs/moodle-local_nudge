@@ -35,7 +35,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userfromkey" TYPE="foreign-unique" FIELDS="userfromid" REFTABLE="user" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="Foreign key constraint for has one to user."/>
+        <KEY NAME="userfromkey" TYPE="foreign" FIELDS="userfromid" REFTABLE="user" REFFIELDS="id" DEFERREDINSTALL="true" COMMENT="Foreign key constraint for has one to user."/>
       </KEYS>
     </TABLE>
     <TABLE NAME="local_nudge_notif_content" COMMENT="'nudge_notification_content's have one nudge_notification and provide translations/content for it.">
