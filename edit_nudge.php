@@ -64,8 +64,10 @@ $newnudge->courseid = $courseid;
 if ($nudgeid === 0) {
     $nudge = $newnudge;
 } else {
-    // TODO: Maybe exception and not new here.
-    $nudge = nudge_db::get_by_id($nudgeid) ?? $newnudge;
+    $nudge = nudge_db::get_by_id($nudgeid);
+    if ($nudge === null) {
+        throw new moodle_exception('nudgedoesntexist', 'local_nudge', '', $nudgeid);
+    }
 }
 
 $mform->set_data($nudge);

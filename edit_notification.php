@@ -49,7 +49,6 @@ if ($mform->is_cancelled()) {
     \redirect($manageurl);
 } else if ($editdata = $mform->get_data()) {
     if ($editdata === null) {
-        // TODO: something went wrong.
         \redirect($manageurl);
     }
 
@@ -66,8 +65,10 @@ if ($mform->is_cancelled()) {
 if ($notificationid === 0) {
     $nudgenotification = new nudge_notification();
 } else {
-    // TODO: Maybe exception and not new here.
-    $nudgenotification = nudge_notification_db::get_by_id($notificationid) ?? new nudge_notification();
+    $nudgenotification = nudge_notification_db::get_by_id($notificationid);
+    if ($nudgenotification === null) {
+        throw new moodle_exception('nudgenotificationdoesntexist', 'local_nudge', '', $notificationid);
+    }
 }
 
 $mform->set_data($nudgenotification->as_notification_form());
