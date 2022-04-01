@@ -199,3 +199,7 @@ $string['cantmatchmanager']                         =       'The option to match
 
 // Nudge
 $string['validation_nudge_neednotifications']       =       'The selected recipient type was: "{$a}" but there wasn\'t wasn\'t enough notifications to cover the recipients.';
+
+// Nudge Notification
+$string['validation_notification_needsender']       =       'You must set a sender';
+$string['validation_notification_needtitle']        =       'Title is required for usability';

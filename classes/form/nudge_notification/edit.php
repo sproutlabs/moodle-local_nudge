@@ -93,6 +93,7 @@ class edit extends moodleform {
             get_string('form_notification_title', 'local_nudge')
         );
         $mform->setType('title', \PARAM_RAW);
+        $mform->addRule('title', get_string('validation_notification_needtitle', 'local_nudge'), 'required');
 
         $userquery = $DB->get_records_sql(<<<SQL
             SELECT
@@ -113,6 +114,7 @@ class edit extends moodleform {
             get_string('form_notification_userfrom', 'local_nudge'),
             $useroptions
         );
+        $mform->addRule('userfromid', get_string('validation_notification_needsender', 'local_nudge'), 'required');
 
         // Add some help around the template variables.
         $helptext = get_string('form_notification_templatevar_help', 'local_nudge');
@@ -161,11 +163,16 @@ class edit extends moodleform {
                 'contentid' => [
                     'type' => \PARAM_INT
                 ],
+                'lang' => [
+                    'rule' => 'required'
+                ],
                 'subject' => [
-                    'type' => \PARAM_RAW
+                    'type' => \PARAM_RAW,
+                    'rule' => 'required'
                 ],
                 'body' => [
-                    'type' => \PARAM_RAW
+                    'type' => \PARAM_RAW,
+                    'rule' => 'required'
                 ]
             ],
             'hiddenrepeat',
