@@ -25,7 +25,6 @@ use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 use local_nudge\local\nudge_notification_content;
 use moodleform;
-use stdClass;
 
 use function get_config;
 use function get_string;
@@ -184,6 +183,9 @@ class edit extends moodleform {
      * @return nudge_notification_form_data|null
      */
     public function get_data() {
+        /** @var \core_config $CFG */
+        global $CFG;
+
         $data = parent::get_data();
 
         if ($data == null) {
@@ -200,6 +202,11 @@ class edit extends moodleform {
         for ($i = 0; $i < $submittedtranslationcount; $i++) {
             /** @var array<string, string> */
             $translationdata = [];
+
+            // Moodle's newer editor returns some nested stuff n things.
+            if (!isset($CFG->totara_version)) {
+                $data->body[$i] = $data->body[$i]['text'];
+            }
 
             foreach (self::RECURRING_FIELDS as $formvalue => $datavalue) {
                 $translationdata[$datavalue] = $data->{$formvalue}[$i];
@@ -228,6 +235,9 @@ class edit extends moodleform {
      * @return void
      */
     public function set_data($nudgenotificationformdata) {
+        /** @var \core_config $CFG */
+        global $CFG;
+
         if (!$nudgenotificationformdata instanceof nudge_notification_form_data) {
             throw new coding_exception(\sprintf(
                 'You must provide a instance of %s to this form %s.',
@@ -265,7 +275,11 @@ class edit extends moodleform {
             $defaults["translationhdr[{$i}]"] = $translationheader;
 
             foreach (self::RECURRING_FIELDS as $formvalue => $datavalue) {
-                // Moodle has a CRAZY API, It's just old and given that they are doing well :)
+                // Moodle's newer editor returns some nested stuff n things.
+                if (!isset($CFG->totara_version) && $datavalue === 'body') {
+                    $defaults["{$formvalue}[{$i}]"]['text'] = $notificationcontent->{$datavalue};
+                    continue;
+                }
                 // Example: With index 0 and the body field:
                 // $defaults["body['0']"] = $notificationcontent->body;
                 $defaults["{$formvalue}[{$i}]"] = $notificationcontent->{$datavalue};
