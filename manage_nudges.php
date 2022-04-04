@@ -43,7 +43,7 @@ $course = \get_course($courseid);
 $context = \context_course::instance($course->id);
 
 // Require the permissions to track courses.
-\require_capability('local/nudge:trackcourse', $context);
+\require_capability('local/nudge:configurenudges', $context);
 
 $baseurl = new \moodle_url('/local/nudge/manage_nudges.php', ['courseid' => $courseid]);
 $PAGE->set_url($baseurl);

@@ -51,7 +51,7 @@ function local_nudge_extend_navigation_course(
     stdClass $course,
     context_course $context
 ) {
-    if (!\has_capability('local/nudge:trackcourse', $context)) {
+    if (!\has_capability('local/nudge:configurenudges', $context)) {
         return;
     }
 
@@ -60,7 +60,7 @@ function local_nudge_extend_navigation_course(
     ]);
 
     $parentnode->add(
-        \get_string('trackcourse', 'local_nudge'),
+        \get_string('configurenudges', 'local_nudge'),
         $url,
         \navigation_node::TYPE_SETTING,
         null,

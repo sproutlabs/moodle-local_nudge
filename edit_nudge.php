@@ -39,7 +39,7 @@ $courseid = \required_param('courseid', \PARAM_INT);
 
 \require_login($courseid);
 $context = \context_course::instance($courseid);
-\require_capability('local/nudge:trackcourse', $context);
+\require_capability('local/nudge:configurenudges', $context);
 
 $manageurl = new \moodle_url('/local/nudge/manage_nudges.php', ['courseid' => $courseid]);
 $PAGE->set_url($manageurl);

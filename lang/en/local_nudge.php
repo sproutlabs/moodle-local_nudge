@@ -28,8 +28,7 @@
 // META
 $string['pluginname']                               =       'Nudge';
 $string['crontask']                                 =       'Nudge Cron Task';
-$string['trackcourse']                              =       'Adjust Nudge Reminders';
-$string['managetracking']                           =       'Manage Nudge Reminders';
+$string['configurenudges']                          =       'Configure Nudge Reminders';
 $string['configurenudgenotifications']              =       'Configure Site Nudge Notifications';
 
 

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'local/nudge:trackcourse' => [
+    'local/nudge:configurenudges' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -36,16 +36,6 @@ $capabilities = [
         ],
     ],
     'local/nudge:configurenudgenotifications' => [
-        'riskbitmask' => RISK_XSS,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'teacher' => CAP_PREVENT,
-            'editingteacher' => CAP_PREVENT,
-            'manager' => CAP_PREVENT,
-        ],
-    ],
-    'local/nudge:configurenudgenotificationcontents' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
