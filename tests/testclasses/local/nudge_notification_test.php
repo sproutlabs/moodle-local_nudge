@@ -143,7 +143,11 @@ class nudge_notification_test extends advanced_testcase {
 
         $result = $notification->as_notification_form();
 
-        $this->assertInstanceOf(nudge_notification_form_data::class, $result, 'as_notification_form should return a notification form data dto');
+        $this->assertInstanceOf(
+            nudge_notification_form_data::class,
+            $result,
+            'as_notification_form should return a notification form data dto'
+        );
         $this->assertInstanceOf(nudge_notification::class, $result->notification);
         $this->assertEquals('example', $result->notification->title);
         $langs = \array_column($result->notificationcontents, 'lang');

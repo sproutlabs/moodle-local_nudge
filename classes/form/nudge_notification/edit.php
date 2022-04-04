@@ -143,7 +143,12 @@ class edit extends moodleform {
         $groupelements = [
             $mform->createElement('hidden', 'contentid'),
             $mform->createElement('header', 'translationhdr', get_string('form_notification_translation_header', 'local_nudge')),
-            $mform->createElement('autocomplete', 'lang', get_string('form_notification_selectlang', 'local_nudge'), $languageoptions),
+            $mform->createElement(
+                'autocomplete',
+                'lang',
+                get_string('form_notification_selectlang', 'local_nudge'),
+                $languageoptions
+            ),
             $mform->createElement('text', 'subject', get_string('form_notification_addsubject', 'local_nudge')),
             $mform->createElement($editor, 'body', get_string('form_notification_addbody', 'local_nudge'))
         ];

@@ -32,9 +32,8 @@ class nudge_created extends base {
      * @return string
      */
     public function get_description() {
-        // @codingStandardsIgnoreStart
+        // phpcs:ignore
         return "The user with the ID: '{$this->userid}' updated nudge with the ID of: '{$this->other['id']}' for the course ID of: '{$this->other['courseid']}'.";
-        // @codingStandardsIgnoreEnd
     }
 
     /**
