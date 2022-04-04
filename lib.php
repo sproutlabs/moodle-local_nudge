@@ -230,7 +230,9 @@ function nudge_get_managers_for_user($user): array {
     /** @var \core_config $CFG */
     global $CFG;
 
-    if ((bool) get_config('local_nudge', 'custommangerresolution')) {
+    $custommanagerresolutionenabled = (bool) get_config('local_nudge', 'custommangerresolution');
+
+    if ($custommanagerresolutionenabled) {
         // First check its setup correctly.
         if (
             get_config('local_nudge', 'managermatchonfield') == null ||
@@ -244,9 +246,9 @@ function nudge_get_managers_for_user($user): array {
             return [];
         }
 
-        return [moodle_get_managers_for_user($user)];
+        return [nudge_moodle_get_manager_for_user($user)];
     } else {
-        return totara_get_managers_for_user($user);
+        return nudge_totara_get_managers_for_user($user);
     }
 }
 
