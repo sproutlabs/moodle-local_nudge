@@ -30,19 +30,6 @@
   * @var \admin_root         $ADMIN
   */
 
-use stdClass;
-use moodle_url;
-use admin_externalpage;
-use admin_category;
-use admin_settingpage;
-use admin_setting_configselect;
-use admin_setting_configtext;
-use admin_setting_heading;
-
-use function profile_get_custom_fields;
-
-use const PARAM_INT;
-
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
