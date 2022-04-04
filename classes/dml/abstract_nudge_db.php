@@ -206,11 +206,7 @@ abstract class abstract_nudge_db {
 
         if ($instance->id === null || $instance->id === 0) {
             // Add defaults they exist and are null in the current record.
-            foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
-                if ($instance->$defaultfield === null) {
-                    $instance->$defaultfield = $value;
-                }
-            }
+            static::populate_defaults($instance);
 
             self::call_hook('on_before_create', $instance);
 
@@ -292,6 +288,28 @@ abstract class abstract_nudge_db {
         global $DB;
 
         $DB->delete_records_select(static::$table, $sql, $params);
+    }
+
+    /**
+     * Populates default fields if they are not already set.
+     *
+     * Replaces the following values (strict) if registered as a default:
+     *  - null
+     *  - '' (empty strings)
+     *  - 0 (int)
+     *
+     * @param T $instance
+     * @return void
+     */
+    public static function populate_defaults(abstract_nudge_entity $instance): void {
+        foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
+            if ($instance->{$defaultfield} === null ||
+                $instance->{$defaultfield} === '' ||
+                $instance->{$defaultfield} === 0
+            ) {
+                $instance->{$defaultfield} = $value;
+            }
+        }
     }
 
     /**
