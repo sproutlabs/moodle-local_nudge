@@ -188,7 +188,7 @@ class nudge extends abstract_nudge_entity {
     /**
      * @return array<mixed>
      */
-    public function get_summary_fields() {
+    public function get_summary_fields(): array {
         return [
             $this->id,
             // TODO: Should this be a link?

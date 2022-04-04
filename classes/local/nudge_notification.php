@@ -86,7 +86,7 @@ class nudge_notification extends abstract_nudge_entity {
     /**
      * @return array<mixed>
      */
-    public function get_summary_fields() {
+    public function get_summary_fields(): array {
         $notificationcount = count($this->get_contents());
         return [
             $this->id,
