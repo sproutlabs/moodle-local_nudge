@@ -104,6 +104,8 @@ function nudge_scaffold_select_from_constants($class, $filter): array {
  *
  * EXAMPLE: `REMINDER_DATE_RELATIVE_ENROLLMENT` -> `reminderdaterelativeenrollment` then lookup that in the lang strings.
  *
+ * @access public
+ *
  * @param string $enumstring
  * @return string
  */
@@ -274,6 +276,8 @@ function totara_get_managers_for_user($user): array {
 
 /**
  * Returns the manger for this user. In our current setup in MOODLE users can only have one manager.
+ *
+ * @access private This is public but its preferable that you use the wrapper function {@see nudge_get_managers_for_user}.
  *
  * @param \core\entity\user|stdClass $user
  * @return \core\entity\user|stdClass|null
