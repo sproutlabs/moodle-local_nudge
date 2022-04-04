@@ -298,9 +298,14 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
     $matchwith = $user->{"profile_field_{$matchwithfield}"};
 
     try {
-        $manager = $DB->get_record('user', [
-            $matchonfield => $matchwith
-        ]);
+        $manager = $DB->get_record(
+            'user',
+            [
+                $matchonfield => $matchwith
+            ],
+            '*',
+            IGNORE_MULTIPLE
+        );
     } catch (dml_exception $e) {
         // TODO: Log failed to find manager.
         return null;
