@@ -41,9 +41,12 @@ class nudge_notification_db extends abstract_nudge_db {
 
     /**
      * Override to unset relations.
+     *
+     * @todo Refractor this to a hook.
+     *
      * {@inheritDoc}
      */
-    public static function delete($id = null) {
+    public static function delete(?int $id = null): void {
         // Could just use that SQL thingie here.
         parent::delete($id);
 

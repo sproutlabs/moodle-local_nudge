@@ -19,6 +19,7 @@
 namespace local_nudge\dml;
 
 use coding_exception;
+use local_nudge\local\abstract_nudge_entity;
 use stdClass;
 
 /**
@@ -62,7 +63,7 @@ abstract class abstract_nudge_db {
      * @throws coding_exception
      * @return T|null
      */
-    public static function get_by_id($id) {
+    public static function get_by_id(int $id): ?abstract_nudge_entity {
         if (!\is_int($id) || ($id <= 0)) {
             throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
         }
@@ -80,7 +81,7 @@ abstract class abstract_nudge_db {
      *
      * @return array<T>
      */
-    public static function get_all() {
+    public static function get_all(): array {
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -100,7 +101,7 @@ abstract class abstract_nudge_db {
      * @param array $filter A {@see moodle_database::get_record()} filter.
      * @return T|null
      */
-    public static function get_filtered($filter) {
+    public static function get_filtered(array $filter): ?abstract_nudge_entity {
         if (!\is_array($filter)) {
             throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
         }
@@ -119,7 +120,7 @@ abstract class abstract_nudge_db {
      * @param array $filter A {@see moodle_database::get_record()} filter.
      * @return array<T>
      */
-    public static function get_all_filtered($filter) {
+    public static function get_all_filtered(array $filter): array {
         if (!\is_array($filter)) {
             throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
         }
@@ -147,7 +148,7 @@ abstract class abstract_nudge_db {
      * @param array|null $params SQL Params.
      * @return T|null Returns a single wrapped instance of {@see T}.
      */
-    public static function get_sql($sql, $params = null) {
+    public static function get_sql(string $sql, ?array $params = null): ?abstract_nudge_entity {
         if (!\is_string($sql)) {
             throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
         }
@@ -172,7 +173,7 @@ abstract class abstract_nudge_db {
      * @param array|null $params SQL Params.
      * @return array<T>
      */
-    public static function get_all_sql($sql, $params = null) {
+    public static function get_all_sql(string $sql, ?array $params = null): array {
         if (!\is_string($sql)) {
             throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
         }
@@ -195,7 +196,7 @@ abstract class abstract_nudge_db {
      *
      * @param T $instance
      */
-    public static function save($instance) {
+    public static function save(abstract_nudge_entity $instance) {
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -241,7 +242,7 @@ abstract class abstract_nudge_db {
      * @throws coding_exception
      * @return void
      */
-    public static function delete($id = null) {
+    public static function delete(?int $id = null): void {
         if (!\is_int($id) || ($id <= 0)) {
             throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
         }
@@ -259,11 +260,11 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} matching the filter.
      *
-     * @todo Bulk events.
+     * @todo Bulk hooks.
      * @param array $filter
      * @return void
      */
-    public static function delete_all($filter) {
+    public static function delete_all(array $filter): void {
         if (!\is_array($filter)) {
             throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
         }
@@ -277,12 +278,12 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} filtered by SQL.
      *
-     * @todo Bulk events.
+     * @todo Bulk hooks.
      * @param string $sql
      * @param array|null $params
      * @return void
      */
-    public static function delete_all_select($sql, $params = null) {
+    public static function delete_all_select(string $sql, ?array $params = null): void {
         if (!\is_string($sql)) {
             throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
         }
@@ -297,7 +298,7 @@ abstract class abstract_nudge_db {
      * Calls a very simple hook.
      *
      * @param string $methodname
-     * @param mixed|T $data
+     * @param mixed $data Most often a {@see T} or int
      * @return void
      */
     private static function call_hook(string $methodname, $data): void {
