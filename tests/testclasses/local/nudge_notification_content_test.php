@@ -22,7 +22,7 @@
  * @license     GNU GPL v3 or later
  */
 
-namespace local_nudge\classes;
+namespace local_nudge\testclasses\local;
 
 use advanced_testcase;
 use local_nudge\dml\nudge_notification_content_db;
@@ -30,15 +30,14 @@ use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge_notification;
 use local_nudge\local\nudge_notification_content;
 
+// phpcs:disable moodle.Commenting
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 // phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
-// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 
 /**
- * @testdox When using a nudge_notification entity
+ * @testdox When using a nudge_notification_content entity
  */
-class nudge_notification_test extends advanced_testcase {
-
+class nudge_notification_content_test extends advanced_testcase {
     public function setUp(): void
     {
         parent::setUp();
@@ -46,50 +45,29 @@ class nudge_notification_test extends advanced_testcase {
 
     /**
      * @test
-     * @testdox Calling the get_content_for_lang function returns filtered has many instances of nudge_notification_content.
-     * @covers local_nudge\local\nudge_notification::get_content_for_lang
+     * @testdox Calling get_notification returns the has one in the expected state.
+     * @covers local_nudge\local\nudge_notification_content::get_notification
      */
-    public function test_get_content_for_lang(): void
+    public function test_get_notification(): void
     {
+        $this->resetAfterTest();
+
         /** @var \moodle_database $DB */
         global $DB;
-
-        $this->resetAfterTest(true);
 
         $notification = new nudge_notification([]);
         $notificationid = nudge_notification_db::save($notification);
 
-        // Refresh the model with it's ID. Save clones the entity and that worth keeping in mind while developing.
+        // Get with defaults and id.
         $notification = nudge_notification_db::get_by_id($notificationid);
 
-        $eng = new nudge_notification_content([
-            'nudgenotificationid' => $notificationid,
+        $content = new nudge_notification_content([
+            'nudgenotificationid' => $notificationid
         ]);
-        nudge_notification_content_db::save($eng);
 
-        $br = new nudge_notification_content([
-            'nudgenotificationid' => $notificationid,
-            'lang' => 'br',
-            'body' => 'differentcontent'
-        ]);
-        nudge_notification_content_db::save($br);
+        $resultingnotification = $content->get_notification();
 
-        $goteng = $notification->get_content_for_lang('en');
-
-        // Should be defaults.
-        $this->assertInstanceOf(nudge_notification_content::class, $goteng);
-        $this->assertEquals($goteng->lang, nudge_notification_content::DEFAULTS['lang']);
-        $this->assertEquals($goteng->subject, nudge_notification_content::DEFAULTS['subject']);
-        $this->assertEquals($goteng->body, nudge_notification_content::DEFAULTS['body']);
-
-        $gotbr = $notification->get_content_for_lang('br');
-
-        $this->assertEquals($gotbr->lang, 'br');
-        $this->assertEquals($gotbr->body, 'differentcontent');
-
-        $gotgl = $notification->get_content_for_lang('gl');
-
-        $this->assertNull($gotgl);
+        $this->assertEquals($notification, $resultingnotification);
 
         $DB->delete_records(nudge_notification_db::$table);
         $DB->delete_records(nudge_notification_content_db::$table);

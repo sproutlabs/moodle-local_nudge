@@ -84,6 +84,8 @@ class nudge_notification extends abstract_nudge_entity {
     }
 
     /**
+     * @codeCoverageIgnore More or less static return.
+     *
      * @return array<mixed>
      */
     public function get_summary_fields(): array {

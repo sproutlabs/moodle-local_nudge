@@ -22,13 +22,14 @@
  * @license     GNU GPL v3 or later
  */
 
-namespace local_nudge\classes;
+namespace local_nudge\testclasses\local;
 
 use advanced_testcase;
 use local_nudge\dml\nudge_db;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
+use moodle_exception;
 use stdClass;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
@@ -55,8 +56,8 @@ class nudge_test extends advanced_testcase {
     {
         /** @var \moodle_database $DB */
         global $DB;
-        
-        $this->resetAfterTest(true);
+
+        $this->resetAfterTest();
 
         $courseid = $this->getDataGenerator()->create_course()->id;
 
@@ -75,6 +76,12 @@ class nudge_test extends advanced_testcase {
         $this->assertInstanceOf(nudge_notification::class, $learnerresult);
         $this->assertInstanceOf(nudge_notification::class, $managerresult);
 
+        $nullnudge = new nudge([]);
+
+        $expectednull = $nullnudge->get_learner_notification();
+        $this->assertNull($expectednull, 'A new nudge without a linked notification should not return anything');
+        $expectednull = $nullnudge->get_manager_notification();
+
         // Cleanup.
         $DB->delete_records('course');
         $DB->delete_records(nudge_db::$table);
@@ -91,7 +98,7 @@ class nudge_test extends advanced_testcase {
         /** @var \moodle_database $DB */
         global $DB;
 
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -108,6 +115,57 @@ class nudge_test extends advanced_testcase {
 
         // Cleanup.
         $DB->delete_records('course');
+        $DB->delete_records(nudge_db::$table);
+    }
+
+    /**
+     * @test
+     * @testdox Triggering a nudge with invalid database (or runtime) data fails.
+     * @covers local_nudge\local\nudge::trigger
+     */
+    public function test_trigger_expected(): void {
+        $nudge = new nudge([]);
+        $nudge->reminderrecipient = 'xyz';
+
+        $this->expectException(moodle_exception::class);
+        // Make sure its our moodle exception.
+        $this->expectExceptionMessage(\get_string('expectedunreachable', 'local_nudge'));
+        $nudge->trigger(new stdClass());
+    }
+
+    /**
+     * @test
+     * @testdox Creating a new instance will return sane correctly typed defaults.
+     * @covers local_nudge\local\nudge::cast_fields
+     */
+    public function tests_defaults_casted() {
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $nudge = new nudge([
+            'courseid' => 1
+        ]);
+        $nudgeid = nudge_db::save($nudge);
+        $nudge = nudge_db::get_by_id($nudgeid);
+
+        /** @var nudge $nudge */
+        $this->assertIsInt($nudge->courseid);
+        $this->assertSame(1, $nudge->courseid);
+        $this->assertIsInt($nudge->linkedlearnernotificationid);
+        $this->assertSame(0, $nudge->linkedlearnernotificationid);
+        $this->assertIsInt($nudge->linkedmanagernotificationid);
+        $this->assertSame(0, $nudge->linkedmanagernotificationid);
+        $this->assertIsBool($nudge->isenabled);
+        $this->assertFalse($nudge->isenabled);
+        $this->assertIsString($nudge->reminderrecipient);
+        $this->assertSame(nudge::REMINDER_RECIPIENT_LEARNER, $nudge->reminderrecipient);
+        $this->assertIsString($nudge->remindertype);
+        $this->assertSame(nudge::REMINDER_DATE_RELATIVE_COURSE_END, $nudge->remindertype);
+        $this->assertIsInt($nudge->remindertypefixeddate);
+        $this->assertSame(0, $nudge->remindertypefixeddate);
+
         $DB->delete_records(nudge_db::$table);
     }
 

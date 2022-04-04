@@ -15,33 +15,52 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     local_nudge
+ * @package     local_nudge\tests
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
  */
 
-namespace local_nudge\form\nudge_notification;
+namespace local_nudge\testclasses\form\nudge;
 
-defined('MOODLE_INTERNAL') || die();
+use advanced_testcase;
 
-require_once($CFG->libdir . '/formslib.php');
+// phpcs:disable moodle.Commenting
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
+// phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
 
 /**
- * @codeCoverageIgnore
+ * @testdox When working with a nudge form
  */
-class delete extends \moodleform {
-    public function definition() {
-        $mform = $this->_form;
+class edit_test extends advanced_testcase {
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
+    /**
+     * @test
+     * @testdox User without capability can't submit.
+     */
+    public function test_user_without_cap_cant_submit(): void
+    {
+        $this->assertTrue(true);
+    }
 
-        $mform->addElement('html', '<div class="alert alert-danger">Are you sure you want delete this notification?<div><br/>');
+    /**
+     * @test
+     * @testdox User with capability can submit.
+     *
+     * @return void
+     */
+    public function test_user_with_cap_can_submit(): void
+    {
+        $this->assertTrue(true);
+    }
 
-        // TODO: Add checkbox here to also delete notification translations that is checked by default.
-
-        $this->add_action_buttons(true, get_string('delete'));
+    public function tearDown(): void
+    {
+        parent::tearDown();
     }
 }

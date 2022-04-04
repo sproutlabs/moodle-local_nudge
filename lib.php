@@ -41,6 +41,8 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
  *
  * @access public
  *
+ * @codeCoverageIgnore Not really logical - Maybe a functional test to check capabilities.
+ *
  * @param navigation_node  $parentnode
  * @param stdClass         $course
  * @param context_course   $context
@@ -105,6 +107,8 @@ function nudge_scaffold_select_from_constants($class, $filter): array {
  * EXAMPLE: `REMINDER_DATE_RELATIVE_ENROLLMENT` -> `reminderdaterelativeenrollment` then lookup that in the lang strings.
  *
  * @access public
+ *
+ * @codeCoverageIgnore
  *
  * @param string $enumstring
  * @return string
