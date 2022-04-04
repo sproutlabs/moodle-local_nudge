@@ -56,7 +56,7 @@ class nudge_created extends base {
      */
     protected function init() {
         $this->data['objecttable']  = nudge_db::$table;
-        $this->data['crud']         = 'u';
+        $this->data['crud']         = 'c';
         $this->data['edulevel']     = self::LEVEL_OTHER;
         $this->context              = context_system::instance();
     }
