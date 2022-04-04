@@ -25,6 +25,7 @@
 
 namespace local_nudge\dml;
 
+use core_user;
 use local_nudge\local\nudge_notification;
 
 /**
@@ -38,6 +39,17 @@ class nudge_notification_db extends abstract_nudge_db {
 
     /** {@inheritdoc} */
     public static $entityclass = nudge_notification::class;
+
+    /**
+     * Ensure the no-reply user is the sender even if form validation fails.
+     *
+     * @param nudge_notification $notification
+     */
+    public static function on_before_create($notification): void {
+        if ($notification->userfromid == null) {
+            $notification->userfromid = core_user::get_noreply_user()->id;
+        }
+    }
 
     /**
      * Override to unset relations.
