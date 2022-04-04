@@ -83,14 +83,14 @@ class nudge extends abstract_nudge_entity {
      * @var array<string>
      */
     public const TEMPLATE_VARIABLES = [
-        '{user_firstname}',
-        '{user_lastname}',
-        '{course_fullname}',
-        '{course_shortname}',
-        '{course_link}',
-        '{sender_firstname}',
-        '{sender_lastname}',
-        '{notification_name}',
+        '{user_firstname}' => 'Unresolved',
+        '{user_lastname}' => 'Unresolved',
+        '{course_fullname}' => 'Unresolved',
+        '{course_shortname}' => 'Unresolved',
+        '{course_link}' => 'Unresolved',
+        '{sender_firstname}' => 'Unresolved',
+        '{sender_lastname}' => 'Unresolved',
+        '{notification_title}' => 'Unresolved',
     ];
 
     /**
