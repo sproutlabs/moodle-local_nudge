@@ -258,7 +258,7 @@ function nudge_get_managers_for_user($user): array {
  * @param \core\entity\user|stdClass $user
  * @return array<\core\entity\user|stdClass>
  */
-function totara_get_managers_for_user($user): array {
+function nudge_totara_get_managers_for_user($user): array {
     /**
      * @var array<\core\entity\user|stdClass> $allmanagers
      */
@@ -282,7 +282,7 @@ function totara_get_managers_for_user($user): array {
  * @param \core\entity\user|stdClass $user
  * @return \core\entity\user|stdClass|null
  */
-function moodle_get_managers_for_user($user): ?stdClass {
+function nudge_moodle_get_manager_for_user($user): ?stdClass {
     /** @var \moodle_database $DB */
     global $DB;
 
