@@ -180,7 +180,7 @@ function nudge_get_email_message($nudge, $user, $manager = null): message {
 }
 
 /**
- * @todo
+ * Templates a notification string with the expected content.
  *
  * @access public
  *
@@ -217,7 +217,7 @@ function nudge_hydrate_notification_template(
 }
 
 /**
- * @todo
+ * Gets a list of managers for a user. This calls the correct function based on the custommangerresolution setting.
  *
  * @access public
  *
@@ -249,7 +249,7 @@ function nudge_get_managers_for_user($user): array {
 }
 
 /**
- * @todo
+ * Return all the managers for this user.
  *
  * @access private This is public but its preferable that you use the wrapper function {@see nudge_get_managers_for_user}.
  *

@@ -76,6 +76,8 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
         /** @var array<stdClass> $customfields */
         $customfields = profile_get_custom_fields();
+        // TODO: Filter these for only text fields or stuff will break :-o !!!
+        // TODO: Warn that this matching is case-insensitive or make it case sense.
         $customfieldsselect = (count($customfields) > 0)
             ? array_combine(
                 array_column($customfields, 'shortname'),

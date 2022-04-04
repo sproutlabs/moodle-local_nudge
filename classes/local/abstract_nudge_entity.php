@@ -63,14 +63,14 @@ abstract class abstract_nudge_entity {
     // TODO created date & last user/time-modifed.
 
     /**
-     * Constructs an instance of this record from an array or stdClass (preferably returned from the a {@see $DB} recordset).
+     * Constructs an instance of this record from an array or stdClass.
      *
      * Will attempt to set to set properties on this object using array keys of typecasted $data as follows:
      *      1. If there is a method named set_{fieldname} it will be delegated the handling of loading this property.
      *      2. If the property exists with an identical name it will set directly.
      *      3. If neither of the above work: {@throws UnexpectedValueException}.
      *
-     * If you pass null the contructor will return immediately giving an instance with nulled fields.
+     * If you pass nothing the contructor will return immediately giving an instance with nulled fields (casted).
      *
      * @param stdClass|array|null $data The data to wrap with a nudge entity/instance.
      * @throws coding_exception Passed data that cannot be casted to an array.
