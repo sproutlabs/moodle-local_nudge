@@ -222,9 +222,9 @@ abstract class abstract_nudge_db {
 
         self::call_hook('on_before_save', $instance);
 
-        $updatedid = $DB->update_record(static::$table, $instance);
+        $DB->update_record(static::$table, $instance);
 
-        self::call_hook('on_after_save', $updatedid);
+        self::call_hook('on_after_save', $instance->id);
 
         return $instance->id;
     }

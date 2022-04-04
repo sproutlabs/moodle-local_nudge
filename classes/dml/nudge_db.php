@@ -24,6 +24,8 @@
 
 namespace local_nudge\dml;
 
+use context_course;
+use context_system;
 use local_nudge\event\nudge_created;
 use local_nudge\event\nudge_deleted;
 use local_nudge\event\nudge_updated;
@@ -54,6 +56,9 @@ class nudge_db extends abstract_nudge_db {
     public static function on_after_create($id): void {
         $creatednudge = (array) self::get_by_id(\intval($id));
         $event = nudge_created::create([
+            'context' => ($creatednudge['courseid'] ?? false)
+                ? context_course::instance($creatednudge['courseid'])
+                : context_system::instance(),
             'objectid' => $id,
             'other' => $creatednudge,
         ]);
@@ -65,6 +70,9 @@ class nudge_db extends abstract_nudge_db {
     public static function on_after_save($id): void {
         $updatednudge = (array) self::get_by_id(\intval($id));
         $event = nudge_updated::create([
+            'context' => ($updatednudge['courseid'] ?? false)
+                ? context_course::instance($updatednudge['courseid'])
+                : context_system::instance(),
             'objectid' => $id,
             'other' => $updatednudge
         ]);
@@ -77,6 +85,9 @@ class nudge_db extends abstract_nudge_db {
     public static function on_before_delete($id): void {
         $nudgetobedeleted = (array) self::get_by_id(\intval($id));
         $event = nudge_deleted::create([
+            'context' => ($nudgetobedeleted['courseid'] ?? false)
+                ? context_course::instance($nudgetobedeleted['courseid'])
+                : context_system::instance(),
             'objectid' => $id,
             'other' => $nudgetobedeleted
         ]);

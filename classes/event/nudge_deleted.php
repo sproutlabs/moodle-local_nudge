@@ -18,7 +18,6 @@
 
 namespace local_nudge\event;
 
-use context_system;
 use core\event\base;
 use local_nudge\dml\nudge_db;
 use moodle_url;
@@ -57,6 +56,5 @@ class nudge_deleted extends base {
         $this->data['objecttable']  = nudge_db::$table;
         $this->data['crud']         = 'd';
         $this->data['edulevel']     = self::LEVEL_OTHER;
-        $this->context              = context_system::instance();
     }
 }
