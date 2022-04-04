@@ -133,7 +133,7 @@ class nudge extends abstract_nudge_entity {
     /**
      * The fixed reminder date to nudge at if {@see self::$remindertype} == {@see self::REMINDER_DATE_INPUT_FIXED}.
      *
-     * @var string|null Timestamp.
+     * @var int|null Timestamp.
      */
     public $remindertypefixeddate = null;
 
@@ -242,6 +242,13 @@ class nudge extends abstract_nudge_entity {
 
     /** {@inheritDoc} */
     protected function cast_fields() {
-        $this->isenabled = (bool) $this->isenabled;
+        $this->courseid = (int) $this->courseid;
+        $this->linkedlearnernotificationid = (int) $this->linkedlearnernotificationid;
+        $this->linkedmanagernotificationid = (int) $this->linkedmanagernotificationid;
+        $this->isenabled = (bool)($this->isenabled ?? false);
+        $this->reminderrecipient = (string) $this->reminderrecipient;
+        $this->remindertype = (string) $this->remindertype;
+        $this->remindertypefixeddate = (int) $this->remindertypefixeddate;
+        $this->remindertypeperiod = (int) $this->remindertypeperiod;
     }
 }

@@ -77,11 +77,18 @@ abstract class abstract_nudge_entity {
      */
     public function __construct($data = null) {
         if ($data == null) {
+
+            $this->id = (int) $this->id;
+
+            $this->cast_fields();
+
             return;
         }
+
         if (\is_object($data)) {
             $data = (array)$data;
         }
+
         if (!\is_array($data)) {
             throw new coding_exception(\sprintf(
                 'You must provide valid data to %s to wrap a instance of %s',
@@ -111,50 +118,24 @@ abstract class abstract_nudge_entity {
             ));
         }
 
+        $this->id = (int) $this->id;
+
         $this->cast_fields();
     }
 
-
     /**
-     * Gets a field on this {@see static} limited to a certain number of characters.
+     * Fluent setter.
      *
-     * @param int $maxlength The maximum ammount of characters before terminating with:
-     * @param string $endlimiter A few characters to indicate continuation of field.
-     * @return string|null
+     * @return $this
      */
-    public function get_field_trimmed($fieldname, $maxlength = 10, $endlimiter = '...') {
-        if (!\property_exists($this, $fieldname)) {
-            throw new coding_exception(\sprintf(
-                'Property %s doesn\'t exist on class %s',
-                $fieldname,
-                static::class
-            ));
-        }
-
-        $fieldinstance = $this->$fieldname;
-
-        if (!\is_string($fieldinstance)) {
-            throw new coding_exception(\sprintf(
-                'Property %s on class %s isn\'t cast to a string',
-                $fieldname,
-                static::class
-            ));
-        }
-
-        if (\strlen($fieldinstance) > $maxlength) {
-            $trimmedinstance = \substr($fieldinstance, 0, $maxlength);
-            $fieldinstance = "{$trimmedinstance}{$endlimiter}";
-        }
-
-        return $fieldinstance;
+    public function set_field(string $fieldname, mixed $fieldvalue) {
+        $this->{$fieldname} = $fieldvalue;
     }
 
     /**
-     * Casts the fields populated by {@see self::__construct()} to some sane defaults.
+     * Casts the fields populated by {@see static::__construct()} to some sane defaults.
      *
      * @return void
      */
-    protected function cast_fields() {
-        // TODO.
-    }
+    abstract protected function cast_fields();
 }
