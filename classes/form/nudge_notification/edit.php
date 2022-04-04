@@ -118,11 +118,13 @@ class edit extends moodleform {
 
         // Add some help around the template variables.
         $helptext = get_string('form_notification_templatevar_help', 'local_nudge');
-        $helpitems = '';
+        /** @var array<string> */
+        $helpitems = [];
         foreach (nudge::TEMPLATE_VARIABLES as $templatevariable) {
             [$templateobj, $templatename] = \explode('_', \trim($templatevariable, '{}'));
-            $helpitems .= "<li><code>$templatevariable</code> -> {$templateobj}'s {$templatename}</li>";
+            $helpitems[] = "<li><code>$templatevariable</code> -> {$templateobj}'s {$templatename}</li>";
         }
+        $helpitems = \implode('\\n', $helpitems);
         $mform->addElement('header', 'templatevarinfohdr', get_string('form_notification_templatevar_title', 'local_nudge'));
         $mform->addElement(
             'html',
