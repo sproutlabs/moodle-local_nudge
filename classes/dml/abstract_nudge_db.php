@@ -25,6 +25,8 @@ use stdClass;
 /**
  * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
  *
+ * @todo Handle IDs that a less than 0 with nice moodle exception saying "can't find entityclass with id etc".
+ *
  * Coding exception used throughout and are not documented with @\throws since they should not occur at runtime.
  *
  * @package     local_nudge\dml
