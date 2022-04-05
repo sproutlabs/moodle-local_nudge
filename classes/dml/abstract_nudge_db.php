@@ -69,6 +69,17 @@ abstract class abstract_nudge_db {
     }
 
     /**
+     * Shorthand for {@see static::save} then {@see static::get_by_id}.
+     *
+     * @param T $instance
+     * @return T|null
+     */
+    public static function create_or_refresh(abstract_nudge_entity $instance): ?abstract_nudge_entity {
+        $instanceid = static::save($instance);
+        return static::get_by_id($instanceid);
+    }
+
+    /**
      * @param int $id
      * @throws coding_exception
      * @return T|null
