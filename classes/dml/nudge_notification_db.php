@@ -59,7 +59,7 @@ class nudge_notification_db extends abstract_nudge_db {
      * {@inheritDoc}
      */
     public static function delete(?int $id = null): void {
-        // Could just use that SQL thingie here.
+        // Could just use an SQL key here.
         parent::delete($id);
 
         $lremoves = nudge_db::get_all_filtered(['linkedlearnernotificationid' => $id]);

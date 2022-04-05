@@ -22,8 +22,18 @@ use coding_exception;
 use local_nudge\local\abstract_nudge_entity;
 use stdClass;
 
+use function nudge_mockable_time as time;
+
+defined('MOODLE_INTERNAL') || die();
+
+/** @var \core_config $CFG */
+global $CFG;
+require_once(__DIR__ . '/../../lib.php');
+
 /**
  * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
+ *
+ * @todo Handle IDs that a less than 0 with nice moodle exception saying "can't find entityclass with id etc".
  *
  * Coding exception used throughout and are not documented with @\throws since they should not occur at runtime.
  *
@@ -56,6 +66,17 @@ abstract class abstract_nudge_db {
      */
     private function __construct() {
         throw new coding_exception('Read the doc-blocks for this method.');
+    }
+
+    /**
+     * Shorthand for {@see static::save} then {@see static::get_by_id}.
+     *
+     * @param T $instance
+     * @return T|null
+     */
+    public static function create_or_refresh(abstract_nudge_entity $instance): ?abstract_nudge_entity {
+        $instanceid = static::save($instance);
+        return static::get_by_id($instanceid);
     }
 
     /**
@@ -195,18 +216,24 @@ abstract class abstract_nudge_db {
      * Persists or create a database row from a {@see T} instance.
      *
      * @param T $instance
+     * @return int
      */
-    public static function save(abstract_nudge_entity $instance) {
+    public static function save(abstract_nudge_entity $instance): int {
         /** @var \moodle_database $DB */
-        global $DB;
+        /** @var stdClass $USER */
+        global $DB, $USER;
 
         $instance = clone $instance;
 
-        $instance->lastmodified = \time();
+        $instance->lastmodified = time();
+        $instance->lastmodifiedby = $USER->id;
 
         if ($instance->id === null || $instance->id === 0) {
             // Add defaults they exist and are null in the current record.
             static::populate_defaults($instance);
+
+            $instance->createdby = $USER->id;
+            $instance->timecreated = time();
 
             self::call_hook('on_before_create', $instance);
 
@@ -219,6 +246,8 @@ abstract class abstract_nudge_db {
 
         self::call_hook('on_before_save', $instance);
 
+        unset($instance->createdby);
+        unset($instance->timecreated);
         $DB->update_record(static::$table, $instance);
 
         self::call_hook('on_after_save', $instance->id);

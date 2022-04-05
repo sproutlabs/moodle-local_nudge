@@ -199,6 +199,7 @@ class edit extends moodleform {
             throw new coding_exception(\sprintf('You must provide a instance of %s to this form %s.', nudge::class, __CLASS__));
         }
 
+        // TODO This is a bugged.
         $reltime = ($nudge->remindertypeperiod === null || $nudge->remindertypeperiod === 0)
             ? \DAYSECS
             : $nudge->remindertypeperiod;
@@ -225,7 +226,7 @@ class edit extends moodleform {
      * @return array<string, string>
      */
     public function validation($data, $files) {
-        $errors = [];
+        $errors = parent::validation($data, $files);
 
         // Validate it: Has notifications linked for the selected REMINDER_RECIPIENT type.
         if (!empty($data['reminderrecipient'])) {

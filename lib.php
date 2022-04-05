@@ -318,3 +318,19 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
     // Null if there is no manager.
     return $manager ?: null;
 }
+
+/**
+ * Return current Unix timestamp, {@see time()} but mockable for tests.
+ *
+ * @return int
+ */
+function nudge_mockable_time(): int {
+    /** @var \core_config $CFG */
+    global $CFG;
+
+    if (!isset($CFG->nudgemocktime)) {
+        return time();
+    } else {
+        return $CFG->nudgemocktime;
+    }
+}

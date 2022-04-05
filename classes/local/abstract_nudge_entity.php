@@ -60,7 +60,25 @@ abstract class abstract_nudge_entity {
      */
     public $id = null;
 
-    // TODO created date & last user/time-modifed.
+    /**
+     * @var int|null ID of an {@see \core\entity\user} that created this entity.
+     */
+    public $createdby = null;
+
+    /**
+     * @var int|null Timestamp representing the time this entity was created.
+     */
+    public $timecreated = null;
+
+    /**
+     * @var int|null ID of an {@see \core\entity\user} that last modified this entity.
+     */
+    public $lastmodifiedby = null;
+
+    /**
+     * @var int|null Timestamp representing the last time this entity was modified.
+     */
+    public $lastmodified = null;
 
     /**
      * Constructs an instance of this record from an array or stdClass.
@@ -79,6 +97,10 @@ abstract class abstract_nudge_entity {
         if ($data == null) {
 
             $this->id = (int) $this->id;
+            $this->createdby = (int) $this->createdby;
+            $this->timecreated = (int) $this->timecreated;
+            $this->lastmodifiedby = (int) $this->lastmodifiedby;
+            $this->lastmodified = (int) $this->lastmodified;
 
             $this->cast_fields();
 
@@ -119,6 +141,10 @@ abstract class abstract_nudge_entity {
         }
 
         $this->id = (int) $this->id;
+        $this->createdby = (int) $this->createdby;
+        $this->timecreated = (int) $this->timecreated;
+        $this->lastmodifiedby = (int) $this->lastmodifiedby;
+        $this->lastmodified = (int) $this->lastmodified;
 
         $this->cast_fields();
     }

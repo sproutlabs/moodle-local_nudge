@@ -116,11 +116,6 @@ class nudge extends abstract_nudge_entity {
     public $isenabled = null;
 
     /**
-     * @var int|null The timestamp this nudge instance was last modified at.
-     */
-    public $lastmodified = null;
-
-    /**
      * @var string|null The the reminder recipients of this nudge.
      */
     public $reminderrecipient = null;

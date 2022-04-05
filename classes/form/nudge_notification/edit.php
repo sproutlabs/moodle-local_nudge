@@ -120,11 +120,11 @@ class edit extends moodleform {
         $helptext = get_string('form_notification_templatevar_help', 'local_nudge');
         /** @var array<string> */
         $helpitems = [];
-        foreach (nudge::TEMPLATE_VARIABLES as $templatevariable) {
+        foreach (\array_keys(nudge::TEMPLATE_VARIABLES) as $templatevariable) {
             [$templateobj, $templatename] = \explode('_', \trim($templatevariable, '{}'));
             $helpitems[] = "<li><code>$templatevariable</code> -> {$templateobj}'s {$templatename}</li>";
         }
-        $helpitems = \implode('\\n', $helpitems);
+        $helpitems = \implode('', $helpitems);
         $mform->addElement('header', 'templatevarinfohdr', get_string('form_notification_templatevar_title', 'local_nudge'));
         $mform->addElement(
             'html',
@@ -302,5 +302,35 @@ class edit extends moodleform {
         }
 
         $this->_form->setDefaults($defaults);
+    }
+
+    /**
+     * Validation of this form.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, string> $files
+     * @return array<string, string>
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        // Validate it: Only has one translation for each language.
+        if (!empty($data['lang'])) {
+
+            $langs = $data['lang'];
+
+            if (count($langs) !== count(\array_unique($langs))) {
+                // If duplicates are found mark every single language as invalid.
+                // Not sure if there is a better element to display this on.
+                for ($i = 0; $i < count($langs); $i++) {
+                    $errors["lang[{$i}]"] = get_string(
+                        'validation_notification_duplicatelangs',
+                        'local_nudge'
+                    );
+                }
+            }
+        }
+
+        return $errors;
     }
 }
