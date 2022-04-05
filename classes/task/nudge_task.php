@@ -27,11 +27,14 @@ use local_nudge\dml\nudge_user_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_user;
 
+use function nudge_mockable_time as time;
+
 defined('MOODLE_INTERNAL') || die();
 
 /** @var \core_config $CFG */
 global $CFG;
-require_once($CFG->libdir . '/completionlib.php');
+require_once($CFG->libdir . '/completionlib.php');;
+require_once(__DIR__ . '/../../lib.php');
 
 /**
  * @package     local_nudge\task
@@ -94,7 +97,7 @@ class nudge_task extends scheduled_task {
                     $timetoremindofendofcourse = $nudgescourse->enddate - $enabledinstance->remindertypeperiod;
 
                     // NO-OP
-                    if ($timetoremindofendofcourse < \time()) {
+                    if ($timetoremindofendofcourse < time()) {
                         break;
                     }
 
@@ -126,7 +129,7 @@ class nudge_task extends scheduled_task {
         // TODO handle: \enrol_get_enrolment_end()
 
         // No more need to recurr the course has ended.
-        if ($nudgescourse->enddate < \time()) {
+        if ($nudgescourse->enddate < time()) {
             $nudge->isenabled = false;
             nudge_db::save($nudge);
 
@@ -163,7 +166,7 @@ class nudge_task extends scheduled_task {
             }
 
             // NO-OP for this user.
-            if ($previoustiming->recurrancetime > \time()) {
+            if ($previoustiming->recurrancetime > time()) {
                 continue;
             }
 
@@ -171,7 +174,7 @@ class nudge_task extends scheduled_task {
             $nudge->trigger($incompleteuser);
 
             // Setup the next period for this user.
-            $previoustiming->recurrancetime = \time() + $nudge->remindertypeperiod;
+            $previoustiming->recurrancetime = time() + $nudge->remindertypeperiod;
             nudge_user_db::save($previoustiming);
         }
     }

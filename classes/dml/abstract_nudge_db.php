@@ -22,6 +22,14 @@ use coding_exception;
 use local_nudge\local\abstract_nudge_entity;
 use stdClass;
 
+use function nudge_mockable_time as time;
+
+defined('MOODLE_INTERNAL') || die();
+
+/** @var \core_config $CFG */
+global $CFG;
+require_once(__DIR__ . '/../../lib.php');
+
 /**
  * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
  *
@@ -197,15 +205,16 @@ abstract class abstract_nudge_db {
      * Persists or create a database row from a {@see T} instance.
      *
      * @param T $instance
+     * @return int
      */
-    public static function save(abstract_nudge_entity $instance) {
+    public static function save(abstract_nudge_entity $instance): int {
         /** @var \moodle_database $DB */
         /** @var stdClass $USER */
         global $DB, $USER;
 
         $instance = clone $instance;
 
-        $instance->lastmodified = \time();
+        $instance->lastmodified = time();
         $instance->lastmodifiedby = $USER->id;
 
         if ($instance->id === null || $instance->id === 0) {
@@ -213,7 +222,7 @@ abstract class abstract_nudge_db {
             static::populate_defaults($instance);
 
             $instance->createdby = $USER->id;
-            $instance->timecreated = \time();
+            $instance->timecreated = time();
 
             self::call_hook('on_before_create', $instance);
 
