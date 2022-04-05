@@ -63,8 +63,12 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
         /** @var array<stdClass> $customfields */
         $customfields = profile_get_custom_fields();
-        // TODO: Filter these for only text fields or stuff will break :-o !!!
-        // TODO: Warn that this matching is case-insensitive or make it case sense.
+
+        // Filter for only text.
+        $customfields = array_filter($customfields, function (stdClass $customfield) {
+            return $customfield->datatype === 'text';
+        });
+
         $customfieldsselect = (count($customfields) > 0)
             ? array_combine(
                 array_column($customfields, 'shortname'),
@@ -83,7 +87,17 @@ if ($hassiteconfig) {
             new admin_setting_heading(
                 'nudge_admin_manager_heading',
                 get_string('admin_manager_heading', 'local_nudge'),
-                get_string('admin_manager_heading_desc', 'local_nudge'),
+                implode('', [
+                    <<<HTML
+                    <div class="alert alert-danger p-3 pt-4 mt-4">
+                        <p>It is <strong>very important</strong> to note that manager matching is case-insensitive.</p>
+                        <p>If this doesn't work for you feel free to contribute to this plugin via a pull
+                            request or if you are a client get in contact with us via:</p>
+                        <center><a href="mailto:support@sproutlabs.com.au">Support @ Sprout Labs</a></center>
+                    </div>
+                    HTML,
+                    get_string('admin_manager_heading_desc', 'local_nudge'),
+                ]),
             ),
             new admin_setting_configcheckbox(
                 'local_nudge/custommangerresolution',
@@ -95,7 +109,6 @@ if ($hassiteconfig) {
                 'local_nudge/managermatchonfield',
                 get_string('admin_manager_matchon_field', 'local_nudge'),
                 get_string('admin_manager_matchon_field_desc', 'local_nudge'),
-                // Empty select index is less likely to cause an error.
                 'idnumber',
                 $matchonfields,
             ),
