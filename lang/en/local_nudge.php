@@ -40,6 +40,8 @@ $string['manage_nudge_add']                         =       'Add a Nudge';
 
 // Nudge Notification
 $string['manage_notification_add']                  =       'Add a Nudge Notification';
+
+
 // ---------------------------------------
 //              EDIT FORMS
 // ---------------------------------------
@@ -90,6 +92,8 @@ $string['form_nudge_reminderdatecoruseend_help']    =       <<<EOF
 TODO
 EOF;
 
+$string['form_nudge_deleteconfirm']                 =       'Are you sure you want delete this nudge?';
+
 // Notification
 $string['form_notification_title']                  =       'Add a title';
 
@@ -107,6 +111,9 @@ $string['form_notification_addbody']                =       'Add a body';
 
 $string['form_notification_addprompt']              =       'Add {no} more translation{possible_s}';
 
+$string['form_notification_deleteconfirm']                 =       'Are you sure you want delete this notification?';
+
+
 // ---------------------------------------
 //              ENUM TITLES
 // See: local/nudge/lib.php::nudge_scaffold_select_from_constants()
@@ -120,6 +127,7 @@ $string['reminderdaterelativecourseend']            =       'Reminder Date Relat
 $string['reminderrecipientlearner']                 =       'The Learner';
 $string['reminderrecipientmanagers']                =       'The Learner\'s Managers';
 $string['reminderrecipientboth']                    =       'Both the Learner and their Managers';
+
 
 // ---------------------------------------
 //                  ADMIN
@@ -183,10 +191,10 @@ EOF;
 
 // TODO: convert some of the DML called from the cron to SQL.
 
+
 // ---------------------------------------
 //                 ERRORS
 // ---------------------------------------
-
 $string['expectedunreachable']                      =       'Expected unreachable, It\'s possible a malformed database value was encountered.';
 $string['nudgenotificationdoesntexist']             =       'Can\'t find Nudge Notification with the ID: {$a}';
 $string['nudgedoesntexist']                         =       'Can\'t find Nudge with the ID: {$a}';
@@ -195,7 +203,6 @@ $string['cantmatchmanager']                         =       'The option to match
 // ---------------------------------------
 //               VALIDATION
 // ---------------------------------------
-
 // Nudge
 $string['validation_nudge_neednotifications']       =       'The selected recipient type was: "{$a}" but there wasn\'t wasn\'t enough notifications to cover the recipients.';
 
