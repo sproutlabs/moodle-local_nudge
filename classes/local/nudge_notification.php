@@ -42,11 +42,6 @@ class nudge_notification extends abstract_nudge_entity {
     public $title = null;
 
     /**
-     * @var int|null Last modified time stored as a timestamp.
-     */
-    public $lastmodified = null;
-
-    /**
      * @var int|null The id of a {@see core_user} to send notifications from.
      */
     public $userfromid = null;

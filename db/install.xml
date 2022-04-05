@@ -7,11 +7,14 @@
     <TABLE NAME="local_nudge" COMMENT="Stores instances of Nudge that indicate and provide metadata for Courses who want Nudge reminders">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user that created this Nudge instance." />
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A timestamp for when this Nudge instance was created." />
+        <FIELD NAME="lastmodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last user that modified this Nudge instance." />
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge instance was modified." />
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course that this nudge instance is linked to."/>
         <FIELD NAME="linkedlearnernotificationid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The has one for a nudge_notification that will be sent to the Learner on nudge trigger."/>
         <FIELD NAME="linkedmanagernotificationid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The has one for a nudge_notification that will be sent to the Manager on nudge trigger."/>
         <FIELD NAME="isenabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicates that this nudge instance is enabled and ready to send messages."/>
-        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge instance was modified."/>
         <FIELD NAME="reminderrecipient" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum indicating who should receive reminders from this Nudge instance. See the local_nudge\\local\\nudge for details."/>
         <FIELD NAME="remindertype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Enum representing this nudge's method of determining the appropriate date to nudge on."/>
         <FIELD NAME="remindertypefixeddate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="See entity comment on local_nudge\\local\\nudge"/>
@@ -30,7 +33,10 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Title for this notification template."/>
-        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp this notification was last modified at."/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user that created this Nudge Notification instance." />
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A timestamp for when this Nudge Notification instance was created." />
+        <FIELD NAME="lastmodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last user that modified this Nudge Notification instance." />
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge Notification instance was modified." />
         <FIELD NAME="userfromid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="A has one to an instance of user that this notification can be sent from. Will use core's no-reply user if null."/>
       </FIELDS>
       <KEYS>
@@ -41,6 +47,10 @@
     <TABLE NAME="local_nudge_notif_content" COMMENT="'nudge_notification_content's have one nudge_notification and provide translations/content for it.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user that created this Nudge Notification Content instance." />
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A timestamp for when this Nudge Notification Content instance was created." />
+        <FIELD NAME="lastmodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last user that modified this Nudge Notification Content instance." />
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge Notification Content instance was modified." />
         <FIELD NAME="nudgenotificationid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has one to a nudge_notification"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Language for this notification content"/>
         <FIELD NAME="subject" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Subject for this notification content"/>
@@ -54,6 +64,10 @@
     <TABLE NAME="local_nudge_user" COMMENT="This table joins between a nudge instance and a user to keep track of the recurrence time if relative to the users enrollment date.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user that created this Nudge User instance." />
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A timestamp for when this Nudge User instance was created." />
+        <FIELD NAME="lastmodifiedby" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last user that modified this Nudge User instance." />
+        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The last time this Nudge User instance was modified." />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has_one to user."/>
         <FIELD NAME="nudgeid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="has one to nudge."/>
         <FIELD NAME="recurrancetime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Used to track individual enrollments for recurring notifications."/>
