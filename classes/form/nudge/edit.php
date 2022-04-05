@@ -226,7 +226,7 @@ class edit extends moodleform {
      * @return array<string, string>
      */
     public function validation($data, $files) {
-        $errors = [];
+        $errors = parent::validation($data, $files);
 
         // Validate it: Has notifications linked for the selected REMINDER_RECIPIENT type.
         if (!empty($data['reminderrecipient'])) {
