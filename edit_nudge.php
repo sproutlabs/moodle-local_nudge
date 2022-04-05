@@ -36,6 +36,7 @@ require_once($CFG->libdir . '/adminlib.php');
 
 $nudgeid = \required_param('id', \PARAM_INT);
 $courseid = \required_param('courseid', \PARAM_INT);
+// TODO: CourseID doesn't exist.
 
 \require_login($courseid);
 $context = \context_course::instance($courseid);
