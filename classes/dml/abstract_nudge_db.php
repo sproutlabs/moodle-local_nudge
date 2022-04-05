@@ -200,15 +200,20 @@ abstract class abstract_nudge_db {
      */
     public static function save(abstract_nudge_entity $instance) {
         /** @var \moodle_database $DB */
-        global $DB;
+        /** @var stdClass $USER */
+        global $DB, $USER;
 
         $instance = clone $instance;
 
         $instance->lastmodified = \time();
+        $instance->lastmodifiedby = $USER->id;
 
         if ($instance->id === null || $instance->id === 0) {
             // Add defaults they exist and are null in the current record.
             static::populate_defaults($instance);
+
+            $instance->createdby = $USER->id;
+            $instance->timecreated = \time();
 
             self::call_hook('on_before_create', $instance);
 
@@ -221,6 +226,8 @@ abstract class abstract_nudge_db {
 
         self::call_hook('on_before_save', $instance);
 
+        unset($instance->createdby);
+        unset($instance->timecreated);
         $DB->update_record(static::$table, $instance);
 
         self::call_hook('on_after_save', $instance->id);
