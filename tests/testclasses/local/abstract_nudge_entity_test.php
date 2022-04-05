@@ -26,6 +26,7 @@ namespace local_nudge\testclasses\local;
 
 use advanced_testcase;
 use coding_exception;
+use local_nudge\dml\nudge_db;
 use local_nudge\local\nudge;
 use stdClass;
 use UnexpectedValueException;
@@ -79,13 +80,15 @@ class abstract_nudge_entity_test extends advanced_testcase {
      * @dataProvider provide_construct_with_valid_data
      * @covers local_nudge\local\abstract_nudge_entity::__construct
      */
-    public function test_contruct_with_valid_data($data): void {
+    public function test_contruct_with_valid_data($data): void
+    {
         $nudge = new nudge($data);
 
         $this->assertInstanceOf(nudge::class, $nudge);
     }
 
-    public function provide_construct_with_invalid_data(): array {
+    public function provide_construct_with_invalid_data(): array
+    {
         $invalidstdclass = new stdClass();
         $invalidstdclass->propertythatdoesntexist = 1;
 
@@ -123,7 +126,8 @@ class abstract_nudge_entity_test extends advanced_testcase {
      * @testdox Constructing without data works fine.
      * @covers local_nudge\local\abstract_nudge_entity::__construct
      */
-    public function test_contruct_with_no_data(): void {
+    public function test_contruct_with_no_data(): void
+    {
         $nudge = new nudge();
 
         $this->assertInstanceOf(nudge::class, $nudge);
@@ -131,7 +135,166 @@ class abstract_nudge_entity_test extends advanced_testcase {
         $this->assertEquals($nudge->courseid, null);
     }
 
-    public function tearDown(): void {
+    // TODO: Some of these may be better placed in DML tests.
+
+    /**
+     * @test
+     * @testdox Saving will result in createdby being set to the current user.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_set_and_update_createdby(): void
+    {
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->createdby);
+        $this->assertEquals($user->id, $nudge->createdby);
+
+        $this->setUser();
+
+        $whatuser = new nudge();
+        $whatuser = nudge_db::create_or_refresh($whatuser);
+
+        $this->assertIsInt($whatuser->createdby);
+        $this->assertEquals(0, $whatuser->createdby);
+    }
+
+    /**
+     * @test
+     * @testdox Createdby will not be changed.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_immutable_createdby(): void
+    {
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertEquals($user->id, $nudge->createdby);
+
+        $nudge->createdby = 5;
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertNotEquals(5, $nudge->createdby);
+    }
+
+    /**
+     * @test
+     * @testdox Saving will result in timecreated being set to current time.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_set_and_update_timecreated(): void
+    {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->timecreated);
+        $this->assertEquals($time, $nudge->timecreated);
+    }
+
+    /**
+     * @test
+     * @testdox Timecreated will not be changed.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_immutable_timecreated(): void
+    {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertEquals($time, $nudge->timecreated);
+
+        $nudge->timecreated = 5;
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertNotEquals(5, $nudge->timecreated);
+    }
+
+    /**
+     * @test
+     * @testdox When saving lastmodifiedby will be set to the current user and change when updated.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_set_and_update_lastmodifedby(): void
+    {
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user1);
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->lastmodifiedby);
+        $this->assertEquals($user1->id, $nudge->lastmodifiedby);
+
+        $this->setUser($user2);
+
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->lastmodifiedby);
+        $this->assertEquals($user2->id, $nudge->lastmodifiedby);
+    }
+
+    /**
+     * @test
+     * @testdox When saving lastmodified will be set to the current time and changed when updated.
+     * @covers local_nudge\dml\nudge_db::save
+     */
+    public function test_set_and_update_lastmodifed(): void
+    {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $nudge = new nudge();
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->lastmodified);
+        $this->assertEquals($time, $nudge->lastmodified);
+
+        $newtime = \time();
+        $CFG->nudgemocktime = $newtime;
+
+        $nudge = nudge_db::create_or_refresh($nudge);
+
+        $this->assertIsInt($nudge->lastmodified);
+        $this->assertEquals($newtime, $nudge->lastmodified);
+    }
+
+    public function tearDown(): void
+    {
         parent::tearDown();
     }
 }
