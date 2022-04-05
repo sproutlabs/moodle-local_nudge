@@ -209,3 +209,4 @@ $string['validation_nudge_neednotifications']       =       'The selected recipi
 // Nudge Notification
 $string['validation_notification_needsender']       =       'You must set a sender';
 $string['validation_notification_needtitle']        =       'Title is required for usability';
+$string['validation_notification_duplicatelangs']   =       'Ensure there is only one translation for each language';
