@@ -65,6 +65,10 @@ class nudge_task extends scheduled_task {
     SQL;
 
     /**
+     * Returns a sane name for this cron task.
+     *
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     public function get_name() {
@@ -72,6 +76,9 @@ class nudge_task extends scheduled_task {
     }
 
     /**
+     * Iterates through enabled instances of {@see nudge} and works out if it needs to {@see nudge::trigger} them-
+     * or further process via {@see self::handle_recurring}.
+     *
      * @return void
      */
     public function execute() {
