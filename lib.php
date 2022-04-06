@@ -215,6 +215,7 @@ function nudge_hydrate_notification_template(
     $templatevars['{course_link}'] = $CFG->wwwroot . '/course/view.php?id=' . $course->id;
     $templatevars['{sender_firstname}'] = $userfrom->firstname;
     $templatevars['{sender_lastname}'] = $userfrom->lastname;
+    $templatevars['{sender_email}'] = $userfrom->email;
     $templatevars['{notification_title}'] = $notification->title;
 
     $result = \strtr($contenttotemplate, $templatevars);

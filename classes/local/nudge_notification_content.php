@@ -36,9 +36,9 @@ class nudge_notification_content extends abstract_nudge_entity {
         'lang' => 'en',
         'subject' => 'You just got a nudge, Your educator would like to reminder you of some learning.',
         'body' => <<<HTML
-        <p>Hi [user_fullname], You are receiving have some unfinished learning from course: [course_fullname].</p>
-        <p>You can return to this course to complete it here: [course_link].</p>
-        <p>Hope this helps! If you have any questions you can reach out @ [educator_email]</p>
+        <p>Hi {user_firstname} {user_lastname}, You are receiving have some unfinished learning from course: {course_fullname}.</p>
+        <p>You can return to this course to complete it here: {course_link}.</p>
+        <p>Hope this helps! If you have any questions you can reach out @ {sender_email}</p>
         HTML
     ];
 
