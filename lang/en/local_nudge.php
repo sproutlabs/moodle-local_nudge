@@ -39,6 +39,7 @@ $string['configurenudgenotifications']              =       'Configure Site Nudg
 // ---------------------------------------
 // Nudge
 $string['manage_nudge_add']                         =       'Add a Nudge';
+$string['manage_nudge_notificationslink']           =       'Manage Notifications';
 
 // Nudge Notification
 $string['manage_notification_add']                  =       'Add a Nudge Notification';

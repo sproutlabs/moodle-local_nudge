@@ -61,6 +61,11 @@ echo $OUTPUT->single_button(
     get_string('manage_nudge_add', 'local_nudge'),
     'get'
 );
+echo $OUTPUT->single_button(
+    new moodle_url('/local/nudge/manage_notifications.php'),
+    get_string('manage_nudge_notificationslink', 'local_nudge'),
+    'get',
+);
 
 $table = new \flexible_table('nudge_table');
 $table->define_baseurl(new moodle_url('/local/nudge/manage_nudges.php'));
