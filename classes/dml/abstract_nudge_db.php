@@ -346,9 +346,9 @@ abstract class abstract_nudge_db {
      * @param mixed $data Most often a {@see T} or int
      * @return void
      */
-    private static function call_hook(string $methodname, $data): void {
+    private static function call_hook(string $methodname, &$data): void {
         if (\method_exists(static::class, $methodname)) {
-            \call_user_func_array([static::class , $methodname], [$data]);
+            \call_user_func_array([static::class , $methodname], [&$data]);
         }
     }
 }
