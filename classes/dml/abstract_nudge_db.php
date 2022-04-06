@@ -26,8 +26,6 @@ use function nudge_mockable_time as time;
 
 defined('MOODLE_INTERNAL') || die();
 
-/** @var \core_config $CFG */
-global $CFG;
 require_once(__DIR__ . '/../../lib.php');
 
 /**

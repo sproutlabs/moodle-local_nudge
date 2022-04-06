@@ -25,6 +25,8 @@
  * @license     GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 // META
 $string['pluginname']                               =       'Nudge';
 $string['crontask']                                 =       'Nudge Cron Task';
