@@ -187,7 +187,7 @@ class edit extends moodleform {
             'title' => (isset($data->group_header['title']))
                 ? $data->group_header['title']
                 : nudge::DEFAULTS['title'],
-            'isenabled' => (isset($data->group_header->isenabled)) ? true : false,
+            'isenabled' => (isset($data->group_header['isenabled'])) ? true : false,
             'reminderrecipient' => $data->reminderrecipient,
             'remindertype' => $data->remindertype
         ];
