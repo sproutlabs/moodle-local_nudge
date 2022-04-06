@@ -48,6 +48,10 @@ $string['manage_notification_add']                  =       'Add a Nudge Notific
 // ---------------------------------------
 //              EDIT FORMS
 // ---------------------------------------
+// Universal
+$string['form_metahdr']                             =       'Metadata';
+$string['form_noyetset']                            =       'Not yet set.';
+
 // Nudge
 $string['form_nudge_title']                         =       'Title';
 

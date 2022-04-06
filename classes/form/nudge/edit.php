@@ -31,6 +31,7 @@ use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge;
 use moodle_exception;
 use moodleform;
+use core_user;
 
 use function get_string;
 
@@ -157,6 +158,13 @@ class edit extends moodleform {
         $mform->hideIf('reminderdaterelativecourseend', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_COURSE_END);
         $mform->addHelpButton('reminderdaterelativecourseend', 'form_nudge_reminderdatecoruseend', 'local_nudge');
 
+        $mform->addElement('header', 'metahdr', get_string('form_metahdr', 'local_nudge'));
+        $mform->addElement('static', 'createdby', 'Created by');
+        $mform->addElement('static', 'timecreated', 'Time created');
+        $mform->addElement('static', 'lastmodifiedby', 'Last modified by');
+        $mform->addElement('static', 'lastmodified', 'Last modified at');
+        $mform->setExpanded('metahdr', false);
+
         $this->add_action_buttons();
     }
 
@@ -237,6 +245,21 @@ class edit extends moodleform {
             'lastmodifiedby' => get_string('form_noyetset', 'local_nudge'),
             'lastmodified' => get_string('form_noyetset', 'local_nudge'),
         ];
+
+        // Format in the metadata.
+        foreach (['createdby', 'lastmodifiedby'] as $usermetadata) {
+            if (($nudge->{$usermetadata} ?? 0) !== 0) {
+                $defaults[$usermetadata] = fullname(core_user::get_user($nudge->{$usermetadata}));
+            }
+        }
+        foreach (['timecreated', 'lastmodified'] as $timemetadata) {
+            if (($nudge->{$timemetadata} ?? 0) > 0) {
+                $defaults[$timemetadata] = \date(
+                    nudge::DATE_FORMAT_NICE,
+                    $nudge->{$timemetadata}
+                );
+            }
+        }
 
         $this->_form->setDefaults($defaults);
     }

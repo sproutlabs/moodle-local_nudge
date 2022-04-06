@@ -36,6 +36,11 @@ require_once(__DIR__ . '/../../lib.php');
  */
 class nudge extends abstract_nudge_entity {
 
+    // This is just here since the nudge entity is pretty universal.
+    // It should be in the lib but I don't quite have my head around the entire require || die security stuff yet.
+    // Example: `Monday 17th of June at 11:38am`
+    public const DATE_FORMAT_NICE = 'l jS \of F \a\\t g:ia';
+
     // BEGIN ENUM - REMINDER DATE    ////////////////////
     /**
      * This Nudge instance's reminder timing is a fixed date selected when setting up the reminder.
