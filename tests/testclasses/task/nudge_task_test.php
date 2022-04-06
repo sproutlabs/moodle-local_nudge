@@ -48,10 +48,8 @@ class nudge_task_test extends advanced_testcase {
 
     /**
      * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_INPUT_FIXED}
-     *
-     * @return void
      */
-    public function test_fixed_date(): void
+    public function test_send_fixed_date(): void
     {
         // -------------------------------
         //          SETUP TEST
@@ -67,23 +65,28 @@ class nudge_task_test extends advanced_testcase {
         // -------------------------------
         //          SETUP DATA
         // -------------------------------
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
         $course = $this->getDataGenerator()->create_course();
         $sender = $this->getDataGenerator()->create_user();
         $user = $this->getDataGenerator()->create_and_enrol($course);
 
         // TODO: dataGenerators for nudge, notification and contents.
-        $notification = nudge_notification_db::create_or_refresh(new nudge_notification([
-            'userfromid' => $sender->id
-        ]));
+        $notification = nudge_notification_db::create_or_refresh(
+            new nudge_notification(['userfromid' => $sender->id])
+        );
         $contents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
             'nudgenotificationid' => $notification->id
         ]));
-        $nudge = nudge_db::create_or_refresh(new nudge([
+        nudge_db::create_or_refresh(new nudge([
             'isenabled' => 1,
             'courseid' => $course->id,
             'linkedlearnernotificationid' => $notification->id,
             'remindertype' => nudge::REMINDER_DATE_INPUT_FIXED,
-            'remindertypefixeddate' => \time() - 1// Now.
+            // Still in the future.
+            'remindertypefixeddate' => $time + 1
         ]));
 
         $courselink = $CFG->wwwroot . "/course/view.php?id=" . $course->id;
@@ -98,15 +101,207 @@ class nudge_task_test extends advanced_testcase {
         $expectedbody = \strtr(nudge_notification_content::DEFAULTS['body'], $vars);
 
         // -------------------------------
-        //          RUN TASK
+        //      PERFORM ASSERTIONS
         // -------------------------------
 
         (new nudge_task)->execute();
 
+        $this->assertEquals(0, $sink->count(), 'The message should not go out yet.');
+
+        $CFG->nudgemocktime += 2;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'The message was not sent when expected.');
+
+        $message = $sink->get_messages()[0];
+
+        $this->assertEquals($sender->id,            $message->useridfrom);
+        $this->assertEquals($user->id,              $message->useridto);
+        $this->assertEquals($contents->subject,     $message->subject);
+        $this->assertNull($message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
+        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertNull($message->smallmessage);
+        $this->assertEquals('local_nudge',          $message->component);
+        $this->assertEquals('learneremail',         $message->eventtype);
+        $this->assertEquals($courselink,            $message->contexturl);
+        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertNull($message->timeread);
+        $this->assertNull($message->customdata);
+        $this->assertEquals(1,                      $message->notification);
+    }
+
+    /**
+     * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_COURSE_END}
+     */
+    public function test_send_relative_courseend(): void
+    {
+        // -------------------------------
+        //          SETUP TEST
+        // -------------------------------
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $sink = $this->redirectMessages();
+
+        // -------------------------------
+        //          SETUP DATA
+        // -------------------------------
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $course = $this->getDataGenerator()->create_course([
+            'enddate' => $time + 10
+        ]);
+        $sender = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_and_enrol($course);
+
+        // TODO: dataGenerators for nudge, notification and contents.
+        $notification = nudge_notification_db::create_or_refresh(
+            new nudge_notification(['userfromid' => $sender->id])
+        );
+        $contents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id
+        ]));
+        $nudge = nudge_db::create_or_refresh(new nudge([
+            'isenabled' => 1,
+            'courseid' => $course->id,
+            'linkedlearnernotificationid' => $notification->id,
+            'remindertype' => nudge::REMINDER_DATE_RELATIVE_COURSE_END,
+            // Reminder 5 seconds before the course ends which is in 10 seconds from now.
+            'remindertypeperiod' => 5
+        ]));
+
+        $courselink = $CFG->wwwroot . "/course/view.php?id=" . $course->id;
+
+        $vars = [
+            '{user_firstname}' => $user->firstname,
+            '{user_lastname}' => $user->lastname,
+            '{course_fullname}' => $course->fullname,
+            '{course_link}' => $courselink,
+            '{sender_email}' => $sender->email,
+        ];
+        $expectedbody = \strtr(nudge_notification_content::DEFAULTS['body'], $vars);
+
         // -------------------------------
         //      PERFORM ASSERTIONS
         // -------------------------------
-        $this->assertEquals(1, $sink->count());
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(0, $sink->count(), 'The message should not go out yet.');
+
+        $CFG->nudgemocktime += 5;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'The message was not sent when expected.');
+
+        $this->assertFalse(nudge_db::get_by_id($nudge->id)->isenabled, 'The instance should now be disabled.');
+
+        $message = $sink->get_messages()[0];
+
+        $this->assertEquals($sender->id,            $message->useridfrom);
+        $this->assertEquals($user->id,              $message->useridto);
+        $this->assertEquals($contents->subject,     $message->subject);
+        $this->assertNull($message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
+        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertNull($message->smallmessage);
+        $this->assertEquals('local_nudge',          $message->component);
+        $this->assertEquals('learneremail',         $message->eventtype);
+        $this->assertEquals($courselink,            $message->contexturl);
+        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertNull($message->timeread);
+        $this->assertNull($message->customdata);
+        $this->assertEquals(1,                      $message->notification);
+    }
+
+    /**
+     * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_ENROLLMENT}
+     */
+    public function test_send_relative_enrollment(): void
+    {
+        // -------------------------------
+        //          SETUP TEST
+        // -------------------------------
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $sink = $this->redirectMessages();
+
+        // -------------------------------
+        //          SETUP DATA
+        // -------------------------------
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $course = $this->getDataGenerator()->create_course([]);
+        $sender = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_and_enrol($course);
+
+        // TODO: dataGenerators for nudge, notification and contents.
+        $notification = nudge_notification_db::create_or_refresh(
+            new nudge_notification(['userfromid' => $sender->id])
+        );
+        $contents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id
+        ]));
+        nudge_db::create_or_refresh(new nudge([
+            'isenabled' => 1,
+            'courseid' => $course->id,
+            'linkedlearnernotificationid' => $notification->id,
+            'remindertype' => nudge::REMINDER_DATE_RELATIVE_ENROLLMENT,
+            // Every 2 minutes after the user's enrolment. Note that the user recieves a message on the first run.
+            'remindertypeperiod' => \MINSECS * 2
+        ]));
+
+        $courselink = $CFG->wwwroot . "/course/view.php?id=" . $course->id;
+
+        $vars = [
+            '{user_firstname}' => $user->firstname,
+            '{user_lastname}' => $user->lastname,
+            '{course_fullname}' => $course->fullname,
+            '{course_link}' => $courselink,
+            '{sender_email}' => $sender->email,
+        ];
+        $expectedbody = \strtr(nudge_notification_content::DEFAULTS['body'], $vars);
+
+        // -------------------------------
+        //      PERFORM ASSERTIONS
+        // -------------------------------
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'There should be an immediate message to the user.');
+
+        $CFG->nudgemocktime += (\MINSECS * 2) - 1;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'The message was sent early.');
+
+        $CFG->nudgemocktime += 1;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(2, $sink->count(), 'The user should now have a second message.');
+
+        // We don't care for the internal message id.
+        foreach ($sink->get_messages() as &$message) {
+            unset($message->id);
+        }
+
+        $this->assertEquals($sink->get_messages()[0], $sink->get_messages()[1], 'The messages should be the same.');
 
         $message = $sink->get_messages()[0];
 
