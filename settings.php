@@ -133,10 +133,10 @@ if ($hassiteconfig) {
                 PARAM_INT,
             ),
             new admin_setting_configtext(
-                'local_nudge/uxstartdate',
-                get_string('admin_ux_startdate', 'local_nudge'),
-                get_string('admin_ux_startdate_desc', 'local_nudge'),
-                2000,
+                'local_nudge/uxenddate',
+                get_string('admin_ux_enddate', 'local_nudge'),
+                get_string('admin_ux_enddate_desc', 'local_nudge'),
+                date('Y', time() + (YEARSECS * 10)),
                 PARAM_INT,
             ),
             new admin_setting_heading(

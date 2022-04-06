@@ -125,7 +125,7 @@ class edit extends moodleform {
             'remindertypefixeddate',
             get_string('form_nudge_remindertypefixeddate', 'local_nudge'),
             [
-                'startyear' => get_config('local_nudge', 'uxstartdate'),
+                'stopyear' => get_config('local_nudge', 'uxenddate'),
                 'optional' => false
             ]
         );
