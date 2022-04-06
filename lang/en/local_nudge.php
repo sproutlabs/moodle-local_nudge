@@ -25,6 +25,8 @@
  * @license     GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 // META
 $string['pluginname']                               =       'Nudge';
 $string['crontask']                                 =       'Nudge Cron Task';
@@ -37,6 +39,7 @@ $string['configurenudgenotifications']              =       'Configure Site Nudg
 // ---------------------------------------
 // Nudge
 $string['manage_nudge_add']                         =       'Add a Nudge';
+$string['manage_nudge_notificationslink']           =       'Manage Notifications';
 
 // Nudge Notification
 $string['manage_notification_add']                  =       'Add a Nudge Notification';
@@ -45,7 +48,13 @@ $string['manage_notification_add']                  =       'Add a Nudge Notific
 // ---------------------------------------
 //              EDIT FORMS
 // ---------------------------------------
+// Universal
+$string['form_metahdr']                             =       'Metadata';
+$string['form_noyetset']                            =       'Not yet set.';
+
 // Nudge
+$string['form_nudge_title']                         =       'Title';
+
 $string['form_nudge_isenabled']                     =       'Is Enabled?';
 $string['form_nudge_isenabled_help']                =       <<<EOF
 <p>You can enable or disable this notification here.</p>
@@ -171,8 +180,8 @@ $string['admin_ux_addtranslationcount_desc']        =       <<<EOF
 The amount of translations to add each time when creating a Nudge Notification.
 EOF;
 
-$string['admin_ux_startdate']                       =       'Start date';
-$string['admin_ux_startdate_desc']                  =       <<<EOF
+$string['admin_ux_enddate']                       =       'Start date';
+$string['admin_ux_enddate_desc']                  =       <<<EOF
 You can select a start date here to limit date pickers.
 EOF;
 
@@ -205,6 +214,7 @@ $string['cantmatchmanager']                         =       'The option to match
 // ---------------------------------------
 // Nudge
 $string['validation_nudge_neednotifications']       =       'The selected recipient type was: "{$a}" but there wasn\'t wasn\'t enough notifications to cover the recipients.';
+$string['validation_nudge_needtitle']               =       'You need to supply a title for identification';
 
 // Nudge Notification
 $string['validation_notification_needsender']       =       'You must set a sender';

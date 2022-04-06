@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting
+
 /**
  * @package     local_nudge\tests
  * @author      Liam Kearney <liam@sproutlabs.com.au>
@@ -150,21 +152,33 @@ class nudge_test extends advanced_testcase {
         $nudgeid = nudge_db::save($nudge);
         $nudge = nudge_db::get_by_id($nudgeid);
 
-        /** @var nudge $nudge */
+        /**
+         * Using two instead of assertSame() since its more verbose.
+         * @var nudge $nudge
+        */
         $this->assertIsInt($nudge->courseid);
-        $this->assertSame(1, $nudge->courseid);
+        $this->assertEquals(1, $nudge->courseid);
+
         $this->assertIsInt($nudge->linkedlearnernotificationid);
-        $this->assertSame(0, $nudge->linkedlearnernotificationid);
+        $this->assertEquals(0, $nudge->linkedlearnernotificationid);
+
         $this->assertIsInt($nudge->linkedmanagernotificationid);
-        $this->assertSame(0, $nudge->linkedmanagernotificationid);
+        $this->assertEquals(0, $nudge->linkedmanagernotificationid);
+
+        $this->assertIsString($nudge->title);
+        $this->assertEquals('Untitled Nudge', $nudge->title);
+
         $this->assertIsBool($nudge->isenabled);
         $this->assertFalse($nudge->isenabled);
+
         $this->assertIsString($nudge->reminderrecipient);
-        $this->assertSame(nudge::REMINDER_RECIPIENT_LEARNER, $nudge->reminderrecipient);
+        $this->assertEquals(nudge::REMINDER_RECIPIENT_LEARNER, $nudge->reminderrecipient);
+
         $this->assertIsString($nudge->remindertype);
-        $this->assertSame(nudge::REMINDER_DATE_RELATIVE_COURSE_END, $nudge->remindertype);
+        $this->assertEquals(nudge::REMINDER_DATE_RELATIVE_COURSE_END, $nudge->remindertype);
+
         $this->assertIsInt($nudge->remindertypefixeddate);
-        $this->assertSame(0, $nudge->remindertypefixeddate);
+        $this->assertEquals(0, $nudge->remindertypefixeddate);
 
         $DB->delete_records(nudge_db::$table);
     }

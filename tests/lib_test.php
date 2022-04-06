@@ -117,23 +117,23 @@ class lib_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
         $courselink = $CFG->wwwroot . "/course/view.php?id=" . $course->id;
-        $userrfrom = core_user::get_noreply_user();
+        $userfrom = core_user::get_noreply_user();
         $notification = new nudge_notification();
 
         // phpcs:ignore
-        $content = '1{user_firstname}{user_firstname}2{user_lastname}3{course_fullname}4{course_shortname}5{course_link}6{sender_firstname}7{sender_lastname}8{notification_title}';
+        $content = '1{user_firstname}{user_firstname}2{user_lastname}3{course_fullname}4{course_shortname}5{course_link}6{sender_firstname}7{sender_lastname}8{sender_email}9{notification_title}';
 
         $result = nudge_hydrate_notification_template(
             $content,
             $user,
             $course,
-            $userrfrom,
+            $userfrom,
             $notification
         );
 
         $this->assertSame(
             // phpcs:ignore
-            "1{$user->firstname}{$user->firstname}2{$user->lastname}3{$course->fullname}4{$course->shortname}5{$courselink}6{$userrfrom->firstname}7{$userrfrom->lastname}8{$notification->title}",
+            "1{$user->firstname}{$user->firstname}2{$user->lastname}3{$course->fullname}4{$course->shortname}5{$courselink}6{$userfrom->firstname}7{$userfrom->lastname}8{$userfrom->email}9{$notification->title}",
             $result
         );
 

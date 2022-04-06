@@ -19,6 +19,7 @@
 namespace local_nudge\form\nudge_notification;
 
 use coding_exception;
+use core_user;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\nudge;
@@ -126,6 +127,7 @@ class edit extends moodleform {
         }
         $helpitems = \implode('', $helpitems);
         $mform->addElement('header', 'templatevarinfohdr', get_string('form_notification_templatevar_title', 'local_nudge'));
+        $mform->setExpanded('templatevarinfohdr');
         $mform->addElement(
             'html',
             <<<HTML
@@ -187,6 +189,12 @@ class edit extends moodleform {
             $addcount,
             $repeatlabel,
         );
+
+        $mform->addElement('header', 'metahdr', get_string('form_metahdr', 'local_nudge'));
+        $mform->addElement('static', 'createdby', 'Created by');
+        $mform->addElement('static', 'timecreated', 'Time created');
+        $mform->addElement('static', 'lastmodifiedby', 'Last modified by');
+        $mform->addElement('static', 'lastmodified', 'Last modified at');
 
         $this->add_action_buttons();
     }
@@ -260,13 +268,18 @@ class edit extends moodleform {
             ));
         }
 
+        $notification = $nudgenotificationformdata->notification;
         $notificationcount = \count($nudgenotificationformdata->notificationcontents);
 
         $defaults = [
-            'id' => $nudgenotificationformdata->notification->id,
-            'userfromid' => $nudgenotificationformdata->notification->userfromid,
-            'title' => $nudgenotificationformdata->notification->title,
+            'id' => $notification->id,
+            'userfromid' => $notification->userfromid,
+            'title' => $notification->title,
             'hiddenrepeat' => $notificationcount,
+            'createdby' => get_string('form_noyetset', 'local_nudge'),
+            'timecreated' => get_string('form_noyetset', 'local_nudge'),
+            'lastmodifiedby' => get_string('form_noyetset', 'local_nudge'),
+            'lastmodified' => get_string('form_noyetset', 'local_nudge'),
         ];
 
         for ($i = 0; $i < $notificationcount; $i++) {
@@ -298,7 +311,21 @@ class edit extends moodleform {
                 // $defaults["body['0']"] = $notificationcontent->body;
                 $defaults["{$formvalue}[{$i}]"] = $notificationcontent->{$datavalue};
             }
+        }
 
+        // Format in the metadata.
+        foreach (['createdby', 'lastmodifiedby'] as $usermetadata) {
+            if (($notification->{$usermetadata} ?? 0) !== 0) {
+                $defaults[$usermetadata] = fullname(core_user::get_user($notification->{$usermetadata}));
+            }
+        }
+        foreach (['timecreated', 'lastmodified'] as $timemetadata) {
+            if (($notification->{$timemetadata} ?? 0) > 0) {
+                $defaults[$timemetadata] = \date(
+                    nudge::DATE_FORMAT_NICE,
+                    $notification->{$timemetadata}
+                );
+            }
         }
 
         $this->_form->setDefaults($defaults);

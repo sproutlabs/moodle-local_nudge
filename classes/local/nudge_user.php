@@ -44,4 +44,9 @@ class nudge_user extends abstract_nudge_entity {
      * @var int|null Timestamp representing the last time this user was sent a notification.
      */
     public $recurrancetime = null;
+
+    protected function cast_fields() {
+        $this->userid = (int) $this->userid;
+        $this->nudgeid = (int) $this->nudgeid;
+    }
 }

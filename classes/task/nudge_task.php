@@ -65,6 +65,10 @@ class nudge_task extends scheduled_task {
     SQL;
 
     /**
+     * Returns a sane name for this cron task.
+     *
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     public function get_name() {
@@ -72,6 +76,9 @@ class nudge_task extends scheduled_task {
     }
 
     /**
+     * Iterates through enabled instances of {@see nudge} and works out if it needs to {@see nudge::trigger} them-
+     * or further process via {@see self::handle_recurring}.
+     *
      * @return void
      */
     public function execute() {
@@ -80,7 +87,7 @@ class nudge_task extends scheduled_task {
                 // Manually defined time to reminder incomplete users.
                 case (nudge::REMINDER_DATE_INPUT_FIXED):
                     // NO-OP
-                    if ($enabledinstance->remindertypefixeddate < time()) {
+                    if ($enabledinstance->remindertypefixeddate > time()) {
                         break;
                     }
 
@@ -97,7 +104,7 @@ class nudge_task extends scheduled_task {
                     $timetoremindofendofcourse = $nudgescourse->enddate - $enabledinstance->remindertypeperiod;
 
                     // NO-OP
-                    if ($timetoremindofendofcourse < time()) {
+                    if ($timetoremindofendofcourse > time()) {
                         break;
                     }
 
@@ -129,7 +136,7 @@ class nudge_task extends scheduled_task {
         // TODO handle: \enrol_get_enrolment_end()
 
         // No more need to recurr the course has ended.
-        if ($nudgescourse->enddate < time()) {
+        if ($nudgescourse->enddate > time()) {
             $nudge->isenabled = false;
             nudge_db::save($nudge);
 

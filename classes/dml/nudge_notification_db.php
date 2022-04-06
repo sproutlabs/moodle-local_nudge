@@ -45,8 +45,8 @@ class nudge_notification_db extends abstract_nudge_db {
      *
      * @param nudge_notification $notification
      */
-    public static function on_before_create($notification): void {
-        if ($notification->userfromid == null) {
+    public static function on_before_create(&$notification): void {
+        if ($notification->userfromid === 0) {
             $notification->userfromid = core_user::get_noreply_user()->id;
         }
     }
