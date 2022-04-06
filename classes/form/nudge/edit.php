@@ -65,10 +65,11 @@ class edit extends moodleform {
         $mform->setType('courseid', \PARAM_INT);
 
         $headergroup = [
-            $mform->createElement('text', 'title', get_string('form_nudge_title')),
+            $mform->createElement('text', 'title', get_string('form_nudge_title', 'local_nudge')),
             $mform->createElement('checkbox', 'isenabled', get_string('form_nudge_isenabled', 'local_nudge'))
         ];
         $mform->addGroup($headergroup, 'group_header', 'Title');
+        $mform->setType('group_header[title]', \PARAM_TEXT);
         $mform->addGroupRule('group_header', [
             'title' => [
                 [
