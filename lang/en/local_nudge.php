@@ -48,6 +48,8 @@ $string['manage_notification_add']                  =       'Add a Nudge Notific
 //              EDIT FORMS
 // ---------------------------------------
 // Nudge
+$string['form_nudge_title']                         =       'Title';
+
 $string['form_nudge_isenabled']                     =       'Is Enabled?';
 $string['form_nudge_isenabled_help']                =       <<<EOF
 <p>You can enable or disable this notification here.</p>
@@ -207,6 +209,7 @@ $string['cantmatchmanager']                         =       'The option to match
 // ---------------------------------------
 // Nudge
 $string['validation_nudge_neednotifications']       =       'The selected recipient type was: "{$a}" but there wasn\'t wasn\'t enough notifications to cover the recipients.';
+$string['validation_nudge_needtitle']               =       'You need to supply a title for identification';
 
 // Nudge Notification
 $string['validation_notification_needsender']       =       'You must set a sender';

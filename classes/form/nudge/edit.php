@@ -63,8 +63,21 @@ class edit extends moodleform {
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', \PARAM_INT);
 
-        $mform->addElement('checkbox', 'isenabled', get_string('form_nudge_isenabled', 'local_nudge'));
-        $mform->addHelpButton('isenabled', 'form_nudge_isenabled', 'local_nudge');
+        $headergroup = [
+            $mform->createElement('text', 'title', get_string('form_nudge_title')),
+            $mform->createElement('checkbox', 'isenabled', get_string('form_nudge_isenabled', 'local_nudge'))
+        ];
+        $mform->addGroup($headergroup, 'group_header', 'Title');
+        $mform->addGroupRule('group_header', [
+            'title' => [
+                [
+                    get_string('validation_nudge_needtitle', 'local_nudge'),
+                    'required'
+                ]
+            ]
+        ]);
+
+        $mform->addHelpButton('group_header', 'form_nudge_isenabled', 'local_nudge');
 
         $reminderrecipientenum = nudge_scaffold_select_from_constants(nudge::class, 'REMINDER_RECIPIENT');
         $mform->addElement(
@@ -163,7 +176,10 @@ class edit extends moodleform {
             'courseid' => $data->courseid,
             'linkedlearnernotificationid' => (isset($data->linkedlearnernotificationid)) ? $data->linkedlearnernotificationid : 0,
             'linkedmanagernotificationid' => (isset($data->linkedmanagernotificationid)) ? $data->linkedmanagernotificationid : 0,
-            'isenabled' => (isset($data->isenabled)) ? true : false,
+            'title' => (isset($data->group_header['title']))
+                ? $data->group_header['title']
+                : nudge::DEFAULTS['title'],
+            'isenabled' => (isset($data->group_header->isenabled)) ? true : false,
             'reminderrecipient' => $data->reminderrecipient,
             'remindertype' => $data->remindertype
         ];
@@ -204,18 +220,25 @@ class edit extends moodleform {
             ? \DAYSECS
             : $nudge->remindertypeperiod;
 
-        $this->_form->setDefaults([
+        $defaults = [
             'id' => $nudge->id,
             'courseid' => $nudge->courseid,
             'linkedlearnernotificationid' => $nudge->linkedlearnernotificationid,
             'linkedmanagernotificationid' => $nudge->linkedmanagernotificationid,
-            'isenabled' => $nudge->isenabled,
+            'group_header[title]' => $nudge->title,
+            'group_header[isenabled]' => $nudge->isenabled,
             'reminderrecipient' => $nudge->reminderrecipient,
             'remindertype' => $nudge->remindertype,
             'remindertypefixeddate' => $nudge->remindertypefixeddate,
             'reminderdaterelativeenrollment' => $reltime,
-            'reminderdaterelativecourseend' => $reltime
-        ]);
+            'reminderdaterelativecourseend' => $reltime,
+            'createdby' => get_string('form_noyetset', 'local_nudge'),
+            'timecreated' => get_string('form_noyetset', 'local_nudge'),
+            'lastmodifiedby' => get_string('form_noyetset', 'local_nudge'),
+            'lastmodified' => get_string('form_noyetset', 'local_nudge'),
+        ];
+
+        $this->_form->setDefaults($defaults);
     }
 
     /**

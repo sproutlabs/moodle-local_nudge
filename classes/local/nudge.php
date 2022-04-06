@@ -72,9 +72,10 @@ class nudge extends abstract_nudge_entity {
 
     /** {@inheritDoc} */
     public const DEFAULTS = [
+        'title' => 'Untitled Nudge',
         'isenabled' => 0,
         'reminderrecipient' => self::REMINDER_RECIPIENT_LEARNER,
-        'remindertype' => self::REMINDER_DATE_RELATIVE_COURSE_END
+        'remindertype' => self::REMINDER_DATE_RELATIVE_COURSE_END,
     ];
 
     /**
@@ -109,6 +110,11 @@ class nudge extends abstract_nudge_entity {
      * 0 (no foreign reference) will use the default language string.
      */
     public $linkedmanagernotificationid = null;
+
+    /**
+     * @var string|null This is a decorative title for this nudge.
+     */
+    public $title = null;
 
     /**
      * @var bool|null Is this instance of nudge enabled (Is nudge enabled for this course)?
@@ -185,7 +191,7 @@ class nudge extends abstract_nudge_entity {
      */
     public function get_summary_fields(): array {
         return [
-            $this->id,
+            $this->title,
             // TODO: Should this be a link?
             // TODO: If it has both notifications but the type is still only one -
             // show only one.
@@ -240,6 +246,7 @@ class nudge extends abstract_nudge_entity {
         $this->courseid = (int) $this->courseid;
         $this->linkedlearnernotificationid = (int) $this->linkedlearnernotificationid;
         $this->linkedmanagernotificationid = (int) $this->linkedmanagernotificationid;
+        $this->title = (string) $this->title;
         $this->isenabled = (bool)($this->isenabled ?? false);
         $this->reminderrecipient = (string) $this->reminderrecipient;
         $this->remindertype = (string) $this->remindertype;

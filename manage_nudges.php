@@ -65,14 +65,14 @@ echo $OUTPUT->single_button(
 $table = new \flexible_table('nudge_table');
 $table->define_baseurl(new moodle_url('/local/nudge/manage_nudges.php'));
 $table->define_columns([
-    'id',
+    'title',
     'learnerreminder',
     'managerreminder',
     'type',
     'actions'
 ]);
 $table->define_headers([
-    'ID',
+    'Title',
     'Learner Reminder',
     'Manager Reminder',
     'Type',
