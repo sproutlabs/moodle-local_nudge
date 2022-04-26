@@ -36,17 +36,15 @@ use local_nudge\dml\nudge_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
-
-/** @var \core_config $CFG */
-global $CFG;
-
 require_once($CFG->dirroot . '/user/profile/lib.php');
+// @codeCoverageIgnoreEnd
 
 /**
  * Adds a link to manage Nudge instances for this course.
  *
- * @access public
+ * @access private - Is public but not part of module's API.
  *
  * @codeCoverageIgnore Not really logical - Maybe a functional test to check capabilities.
  *
@@ -335,6 +333,8 @@ function nudge_get_managers_for_user($user): array {
  *
  * @access private This is public but its preferable that you use the wrapper function {@see nudge_get_managers_for_user}.
  *
+ * @codeCoverageIgnore We don't run CI with Totara. This one is tested via screams :)
+ *
  * @param \core\entity\user|stdClass $user
  * @return array<\core\entity\user|stdClass>
  */
@@ -384,10 +384,13 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
             '*',
             IGNORE_MULTIPLE
         );
+    // phpcs:ignore
+    // @codeCoverageIgnoreStart
     } catch (dml_exception $e) {
         // TODO: Log failed to find manager.
         return null;
     }
+    // @codeCoverageIgnoreEnd
 
     // Null if there is no manager.
     return $manager ?: null;
