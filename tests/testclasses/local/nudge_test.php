@@ -45,7 +45,7 @@ class nudge_test extends advanced_testcase {
     public function setUp(): void
     {
         parent::setUp();
-        
+
         $this->resetAfterTest();
     }
 
