@@ -29,6 +29,8 @@ use moodle_url;
  */
 class nudge_deleted extends base {
     /**
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     public function get_description() {
@@ -37,6 +39,8 @@ class nudge_deleted extends base {
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @return moodle_url
      */
     public function get_url() {
