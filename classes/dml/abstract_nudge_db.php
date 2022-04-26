@@ -158,7 +158,7 @@ abstract class abstract_nudge_db {
      * Be careful to ensure your SQL returns all the fields required to be wrapped in
      * an {@see T} or you will encounter a {@throws \UnexpectedValueException}.
      *
-     * @param string $sql MUST return a single instance. {@see static::get_all_sql()} for multiple.
+     * @param string $sql Should return a single instance. {@see static::get_all_sql()} for multiple.
      * @param array|null $params SQL Params.
      * @return T|null Returns a single wrapped instance of {@see T}.
      */
@@ -242,7 +242,7 @@ abstract class abstract_nudge_db {
     }
 
     // These delete functions don't actually wrap an entity so they are a pretty much pointless wrapper around $DB->delete etc.
-    // But it is nice to have everything consistant.
+    // But it is nice to have everything here for consistency.
 
     /**
      * Removes an {@see T} instance from the database.
