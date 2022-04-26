@@ -155,8 +155,17 @@ class edit extends moodleform {
             ]
         );
         $mform->setDefault('reminderdaterelativeenrollmentrecurring', 86400);
-        $mform->hideIf('reminderdaterelativeenrollmentrecurring', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING);
-        $mform->addHelpButton('reminderdaterelativeenrollmentrecurring', 'form_nudge_remindertyperelativedaterecurring', 'local_nudge');
+        $mform->hideIf(
+            'reminderdaterelativeenrollmentrecurring',
+            'remindertype',
+            'neq',
+            nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING
+        );
+        $mform->addHelpButton(
+            'reminderdaterelativeenrollmentrecurring',
+            'form_nudge_remindertyperelativedaterecurring',
+            'local_nudge'
+        );
 
         $mform->addElement(
             'duration',
