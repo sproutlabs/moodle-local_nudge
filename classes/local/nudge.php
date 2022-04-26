@@ -292,14 +292,12 @@ class nudge extends abstract_nudge_entity {
         switch ($this->reminderrecipient) {
             case (self::REMINDER_RECIPIENT_BOTH):
                 \message_send(nudge_get_email_message($this, $user));
-
                 foreach (nudge_get_managers_for_user($user) as $manager) {
                     if ($manager === null) {
                         continue;
                     }
                     \message_send(nudge_get_email_message($this, $user, $manager));
                 }
-
                 break;
 
             case (self::REMINDER_RECIPIENT_LEARNER):
@@ -313,7 +311,6 @@ class nudge extends abstract_nudge_entity {
                     }
                     \message_send(nudge_get_email_message($this, $user, $manager));
                 }
-
                 break;
             default:
                 // Weird.
@@ -321,7 +318,6 @@ class nudge extends abstract_nudge_entity {
                     'expectedunreachable',
                     'local_nudge'
                 );
-                break;
         }
     }
 
