@@ -24,13 +24,12 @@
 
 namespace local_nudge\form\nudge_notification;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
+// @codeCoverageIgnoreEnd
 
-/**
- * @codeCoverageIgnore
- */
 class delete extends \moodleform {
     public function definition() {
         $mform = $this->_form;
@@ -43,7 +42,7 @@ class delete extends \moodleform {
             <div class="alert alert-danger">{$deletestring}<div><br/>
         HTML);
 
-        // TODO: Add checkbox here to also delete notification translations that is checked by default.
+        $mform->addElement('static', 'title');
 
         $this->add_action_buttons(true, get_string('delete'));
     }

@@ -55,6 +55,7 @@ if ($nudgenotification === null) {
 
 $idholder = new stdClass();
 $idholder->id = $nudgenotification->id;
+$idholder->title = $nudgenotification->title;
 
 $mform->set_data($idholder);
 
