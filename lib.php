@@ -26,6 +26,12 @@
  */
 
 use core\message\message;
+use local_nudge\check\directory\classes_disallowed;
+use local_nudge\check\directory\dotfiles_disallowed;
+use local_nudge\check\directory\dotfolders_disallowed;
+use local_nudge\check\directory\installxml_disallowed;
+use local_nudge\check\directory\markdown_disallowed;
+use local_nudge\check\directory\tests_disallowed;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 
@@ -69,6 +75,26 @@ function local_nudge_extend_navigation_course(
         null,
         new \pix_icon('i/settings', '')
     );
+}
+
+/**
+ * Returns a few security checks that get added to `/report/security/index.php`.
+ *
+ * Totara doesn't allow extending this so don't expect to find it there.
+ *
+ * @access private - Is public but not part of module's API.
+ *
+ * @return array
+ */
+function local_nudge_security_checks(): array {
+    return [
+        new installxml_disallowed(),
+        new dotfolders_disallowed(),
+        new dotfiles_disallowed(),
+        new markdown_disallowed(),
+        new classes_disallowed(),
+        new tests_disallowed(),
+    ];
 }
 
 /**
