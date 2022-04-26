@@ -26,10 +26,12 @@ use moodle_exception;
 use stdClass;
 use moodle_url;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once(__DIR__ . '/../../lib.php');
+// @codeCoverageIgnoreEnd
 
 /**
  * @package     local_nudge\local
@@ -82,7 +84,6 @@ class nudge extends abstract_nudge_entity {
     public const REMINDER_RECIPIENT_BOTH = 'both';
     // END ENUM - REMINDER RECIPIENT    ////////////////////
 
-    /** {@inheritDoc} */
     public const DEFAULTS = [
         'title' => 'Untitled Nudge',
         'isenabled' => 0,
@@ -91,7 +92,7 @@ class nudge extends abstract_nudge_entity {
     ];
 
     /**
-     * {@see nudge::hydrate_notification_template()}
+     * {@see hydrate_notification_template()}
      *
      * @var array<string>
      */
@@ -174,6 +175,8 @@ class nudge extends abstract_nudge_entity {
     public $remindertypeperiod = null;
 
     /**
+     * Returns the notification configured to go to the learners.
+     *
      * @return nudge_notification|null
      */
     public function get_learner_notification() {
@@ -184,6 +187,8 @@ class nudge extends abstract_nudge_entity {
     }
 
     /**
+     * Returns the notification configured to go to a learner's managers.
+     *
      * @return nudge_notification|null
      */
     public function get_manager_notification() {
@@ -194,6 +199,8 @@ class nudge extends abstract_nudge_entity {
     }
 
     /**
+     * Returns the course this nudge is linked to.
+     *
      * @return \core\entity\course|\stdClass
      */
     public function get_course() {
@@ -286,6 +293,10 @@ class nudge extends abstract_nudge_entity {
         }
     }
 
+    /**
+     * Triggers this nudge to cause messages to send.
+     * This doesn't account for timing it merely sends the configured notifications to the configured recipients.
+     *
      * @param \core\entity\user|stdClass $user
      */
     public function trigger($user): void {

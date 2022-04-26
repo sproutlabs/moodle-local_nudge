@@ -29,22 +29,25 @@ use local_nudge\local\nudge_user;
 
 use function nudge_mockable_time as time;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 /** @var \core_config $CFG */
 global $CFG;
 require_once($CFG->libdir . '/completionlib.php');;
 require_once(__DIR__ . '/../../lib.php');
+// @codeCoverageIgnoreEnd
 
 /**
+ * This task handles deciding what instances of nudge to call {@see nudge::trigger()} on and for what users.
+ *
+ * The {@see nudge::trigger()} method actually sends the emails using various function in lib to template them.
+ *
  * @package     local_nudge\task
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
  * @license     http://www.gnu.org/copyleft/gpl.html
  * @license     GNU GPL v3 or later
- *
- * @todo Allthough nudge has a really nice DML thanks to a quick almost copy n paste of Catalyst's auth_outage
- * it might be a bit too expensive to use it during the cron so a switch to SQL here only might be a good idea.
  *
  * This is a very pref expensive plugin so a seperate cron worker for this task
  * should be recommended in the readme for serious use of the plugin.
@@ -220,7 +223,7 @@ class nudge_task extends scheduled_task {
     }
 
     /**
-     * Sends emails for incomplete users in an instance of {@see nudge}.
+     * Sends emails for all incomplete users in an instance of {@see nudge}.
      *
      * @param nudge $nudge
      * @return void
@@ -267,8 +270,6 @@ class nudge_task extends scheduled_task {
      *
      * If the user has multiple enrollment instances it picks the enrollment instance with the lowest timestarted
      * AKA the enrollment instance which first introduced the user to the course.
-     *
-     * @todo There seems to be a bug with something related in get_field_sql. works for now.
      *
      * @param int $userid
      * @param int $courseid
