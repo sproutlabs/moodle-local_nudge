@@ -15,3 +15,13 @@ function tt() {
     fi
 }
 ```
+
+and for running without overwritting coverage:
+
+```SHELL
+function xx() {
+    clear;
+    echo vendor/bin/phpunit -c local/nudge/tests/phpunit.xml --no-coverage --color --filter $1;
+    vendor/bin/phpunit -c local/nudge/tests/phpunit.xml --no-coverage --color --filter $1
+}
+```

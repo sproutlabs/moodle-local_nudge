@@ -37,6 +37,7 @@ use local_nudge\local\nudge_notification_content;
 // phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 
 /**
+ * @coversDefaultClass \local_nudge\local\nudge_notification
  * @testdox When using a nudge_notification entity
  */
 class nudge_notification_test extends advanced_testcase {
@@ -49,7 +50,7 @@ class nudge_notification_test extends advanced_testcase {
     /**
      * @test
      * @testdox Calling the get_contents function returns filtered has many instances of nudge_notification_content.
-     * @covers local_nudge\local\nudge_notification::get_contents
+     * @covers ::get_contents
      */
     public function test_get_contents(): void
     {
@@ -58,7 +59,7 @@ class nudge_notification_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        $notification = new nudge_notification([]);
+        $notification = new nudge_notification();
         $notificationid = nudge_notification_db::save($notification);
 
         // Refresh the model with it's ID. Save clones the entity and that worth keeping in mind while developing.
@@ -107,8 +108,8 @@ class nudge_notification_test extends advanced_testcase {
     /**
      * @test
      * @testdox Wrapping a {@see nudge_notification} in a {@see nudge_notification_form_data} stores the correct data.
-     * @covers local_nudge\local\nudge_notification::as_notification_form
-     * @covers local_nudge\dto\nudge_notification_form_data
+     * @covers ::as_notification_form
+     * @covers \local_nudge\dto\nudge_notification_form_data
      */
     public function test_as_notification_form(): void
     {
@@ -161,16 +162,16 @@ class nudge_notification_test extends advanced_testcase {
     /**
      * @test
      * @testdox Creating a new instance will return sane correctly typed defaults.
-     * @covers local_nudge\dml\nudge_notification_db::on_before_create
-     * @covers local_nudge\local\nudge_notification::cast_fields
+     * @covers ::cast_fields
+     * @covers \local_nudge\dml\nudge_notification_db::on_before_create
      */
-    public function tests_defaults_casted() {
+    public function test_defaults_casted() {
         /** @var \moodle_database $DB */
         global $DB;
 
         $this->resetAfterTest();
 
-        $notification = new nudge_notification([]);
+        $notification = new nudge_notification();
         $notificationid = nudge_notification_db::save($notification);
         $notification = nudge_notification_db::get_by_id($notificationid);
 

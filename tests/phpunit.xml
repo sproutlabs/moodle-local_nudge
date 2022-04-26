@@ -3,30 +3,57 @@
 <!-- TODO: https://docs.moodle.org/dev/Writing_PHPUnit_tests#Generating_include_and_exclude_configuration -->
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="../../../../lib/phpunit/phpunit.xsd"
+        xsi:noNamespaceSchemaLocation="../../../lib/phpunit/phpunit.xsd"
         bootstrap="../../../lib/phpunit/bootstrap.php"
+
+        defaultTestSuite="local_nudge_testsuite"
+
+        backupGlobals="false"
+        backupStaticAttributes="false"
+        processIsolation="false"
+
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
-        processIsolation="false"
-        backupGlobals="false"
-        backupStaticAttributes="false"
+
+        testdox="true"
+        colors="true"
+
         stopOnError="false"
+        stopOnWarning="false"
         stopOnFailure="false"
         stopOnIncomplete="false"
         stopOnSkipped="false"
-        testdox="true"
->
+        stopOnRisky="false"
+        stopOnDefect="false"
 
+        failOnRisky="false"
+        failOnWarning="false"
+>
     <testsuites>
         <testsuite name="local_nudge_testsuite">
             <directory suffix="_test.php">./</directory>
         </testsuite>
+        <testsuite name="local_nudge_benchsuite">
+            <directory suffix="_bench.php">./</directory>
+        </testsuite>
     </testsuites>
-
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="false">
-            <directory suffix=".php">../../classes</directory>
+            <directory suffix=".php">./../classes</directory>
+            <file>./../lib.php</file>
         </whitelist>
     </filter>
+    <logging>
+        <log
+            showUncoveredFiles="true"
+            type="coverage-text"
+            target="php://stdout"
+        />
+        <log
+            showUncoveredFiles="true"
+            type="coverage-html"
+            target="./.phpunit.result"
+        />
+    </logging>
 </phpunit>

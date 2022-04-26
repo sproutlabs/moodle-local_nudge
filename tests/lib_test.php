@@ -26,7 +26,7 @@
  * @license     GNU GPL v3 or later
  */
 
- namespace local_nudge;
+namespace local_nudge;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,7 +39,9 @@ require_once($CFG->dirroot.'/user/profile/field/text/define.class.php');
 
 use advanced_testcase;
 use core_user;
+use Exception;
 use Generator;
+use local_nudge\dml\nudge_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 use profile_define_text;
@@ -54,20 +56,65 @@ class lib_test extends advanced_testcase {
         parent::setUp();
     }
 
+    /**
+     * @test
+     * @testdox the hook to delete nudges upon their linked courses deletion works.
+     * @covers ::local_nudge_pre_course_delete
+     */
+    public function test_local_nudge_pre_course_delete(): void
+    {
+        $this->resetAfterTest();
+
+        $count = 5;
+
+        /** @var \moodle_database $DB */
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+
+        for ($i = $count; $i--;) {
+            $nudge = new nudge();
+            $nudge->courseid = $course->id;
+            nudge_db::save($nudge);
+        }
+
+        $this->assertEquals($count, $DB->count_records(nudge_db::$table));
+        $this->assertCount($count, nudge_db::get_all_filtered([
+            'courseid' => $course->id
+        ]));
+
+        \ob_start();
+        \delete_course($course);
+        $this->assertStringContainsString(
+            "Deleted - {$count} attached Nudges",
+            \ob_get_clean(),
+            'Nudges should be deleted'
+        );
+
+        $this->assertEquals(0, $DB->count_records(nudge_db::$table));
+        $this->assertCount(0, nudge_db::get_all_filtered([
+            'courseid' => $course->id
+        ]));
+    }
+
+    /**
+     * @return array<string, array<mixed>>
+     */
     public function provide_nudge_scaffold_select_from_constants(): array {
         return [
             'Class that doesn\'t exist' => [
                 '\\fake\\class',
                 'sss',
-                'reflectionexception'
+                ReflectionException::class
             ],
             'Nudge\'s REMINDER_DATE' => [
                 nudge::class,
                 'REMINDER_DATE',
                 [
                     'fixed' => 'Reminder Date Input Fixed',
-                    'enrollment' => 'Reminder Date Relative Enrollment',
                     'courseend' => 'Reminder Date Relative Course End',
+                    'enrollment' => 'Reminder Date Relative Enrollment',
+                    'enrollmentrecurring' => 'Reminder Date Relative Enrollment Recurring',
                 ]
             ],
             'Nudge\'s REMINDER_RECIPIENT' => [
@@ -86,11 +133,11 @@ class lib_test extends advanced_testcase {
      * @test
      * @testdox Providing $_dataName to nudge_scaffold_select_from_constants returns the expected result.
      * @dataProvider provide_nudge_scaffold_select_from_constants
-     * @covers nudge_scaffold_select_from_constants
+     * @covers ::nudge_scaffold_select_from_constants
      */
     public function test_nudge_scaffold_select_from_constants($class, $filter, $expected): void {
-        if ($expected === 'reflectionexception') {
-            $this->expectException(ReflectionException::class);
+        if (\is_a($expected, Exception::class, true)) {
+            $this->expectException($expected);
             nudge_scaffold_select_from_constants($class, $filter);
             return;
         }
@@ -103,12 +150,9 @@ class lib_test extends advanced_testcase {
     /**
      * @test
      * @testdox Calling nudge_hydrate_notification_template works with duplicate variables and data from moodle.
-     * @covers nudge_hydrate_notification_template
+     * @covers ::nudge_hydrate_notification_template
      */
     public function test_nudge_hydrate_notification_template(): void {
-        /** @var \moodle_database $DB */
-        global $DB;
-
         /** @var \core_config $CFG */
         global $CFG;
 
@@ -120,8 +164,9 @@ class lib_test extends advanced_testcase {
         $userfrom = core_user::get_noreply_user();
         $notification = new nudge_notification();
 
-        // phpcs:ignore
-        $content = '1{user_firstname}{user_firstname}2{user_lastname}3{course_fullname}4{course_shortname}5{course_link}6{sender_firstname}7{sender_lastname}8{sender_email}9{notification_title}';
+        $content = '1{user_firstname}{user_firstname}2{user_lastname}3{course_fullname}'
+            . '4{course_shortname}5{course_link}6{sender_firstname}'
+            . '7{sender_lastname}8{sender_email}9{notification_title}';
 
         $result = nudge_hydrate_notification_template(
             $content,
@@ -132,19 +177,17 @@ class lib_test extends advanced_testcase {
         );
 
         $this->assertSame(
-            // phpcs:ignore
-            "1{$user->firstname}{$user->firstname}2{$user->lastname}3{$course->fullname}4{$course->shortname}5{$courselink}6{$userfrom->firstname}7{$userfrom->lastname}8{$userfrom->email}9{$notification->title}",
+            "1{$user->firstname}{$user->firstname}2{$user->lastname}3{$course->fullname}"
+                . "4{$course->shortname}5{$courselink}6{$userfrom->firstname}"
+                . "7{$userfrom->lastname}8{$userfrom->email}9{$notification->title}",
             $result
         );
-
-        $DB->delete_records('course');
-        $DB->delete_records('user');
     }
 
     /**
      * @test
-     * @testdox TODO
-     * @covers nudge_get_email_message
+     * @testdox TODO totara testing?
+     * @covers ::nudge_get_email_message
      */
     public function test_nudge_get_email_message(): void
     {
@@ -162,43 +205,41 @@ class lib_test extends advanced_testcase {
      * @return \Generator<string, mixed>
      */
     public function provide_nudge_moodle_get_manager_for_user(): Generator {
-        yield 'match on email address should work.' => [
+        yield 'match on email address should work' => [
             'customemail',
             'email',
             'manager@example.org',
             'manager@example.org',
             true
         ];
-        yield 'mismatch on email address should fail.' => [
+        yield 'mismatch on email address should fail' => [
             'customemail2',
             'email',
             'manager2@example.com',
             'manager@example.com',
             false
         ];
-        yield 'match on idnumber should work.' => [
+        yield 'match on idnumber should work' => [
             'customidnumberfield',
             'idnumber',
             '233',
             '233',
             true
         ];
-        yield 'mismatch on idnumber should fail.' => [
+        yield 'mismatch on idnumber should fail' => [
             'idnumberfield',
             'idnumber',
             '233',
             '234',
             false
         ];
-        yield 'match on database id should work.' => [
+        yield 'match on database id should work' => [
             'manageridnumberfield',
             'id',
             'valid',
             'valid',
             true
         ];
-        // Working with sieve (silverstripe) has made me paranoid about php mysqli and its strings..
-        // TODO: This should be user documented, warned about in settings or changed.
         yield 'match on email address should be case in-sensitive' => [
             'managersemailadressfield',
             'email',
@@ -210,9 +251,9 @@ class lib_test extends advanced_testcase {
 
     /**
      * @test
-     * @testdox calling nudge_moodle_get_manager_for_user with a $_dataName
+     * @testdox calling nudge_moodle_get_manager_for_user with a $_dataName.
      * @dataProvider provide_nudge_moodle_get_manager_for_user
-     * @covers nudge_moodle_get_manager_for_user
+     * @covers ::nudge_moodle_get_manager_for_user
      */
     public function test_nudge_moodle_get_manager_for_user(
         string $matchwithfield,
@@ -275,7 +316,7 @@ class lib_test extends advanced_testcase {
      *
      * @test
      * @testdox When matching multiple managers with nudge_moodle_get_manager_for_user only one should return (ORDER BY ID).
-     * @covers nudge_moodle_get_manager_for_user
+     * @covers ::nudge_moodle_get_manager_for_user
      */
     public function test_nudge_moodle_manager_single_return(): void
     {
@@ -302,8 +343,8 @@ class lib_test extends advanced_testcase {
 
     /**
      * @test
-     * @testdox TODO
-     * @covers nudge_totara_get_managers_for_user
+     * @testdox TODO totara testing?
+     * @covers ::nudge_totara_get_managers_for_user
      *
      * // phpcs:ignore
      * @requires function (TODO: Find a totara only function. using @requires function looks like the easiest way to test conditionally)
