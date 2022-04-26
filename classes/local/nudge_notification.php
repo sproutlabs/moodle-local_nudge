@@ -64,6 +64,21 @@ class nudge_notification extends abstract_nudge_entity {
         return nudge_notification_content_db::get_all_filtered($filter);
     }
 
+    public function get_notification_edit_link(): string {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $link = "{$CFG->wwwroot}/local/nudge/edit_notification.php?id={$this->id}";
+
+        $linktitle = get_string('notification_edit_link', 'local_nudge', $this->title);
+
+        $linkhtml = <<<HTML
+            <a href="{$link}">{$linktitle}</a>
+        HTML;
+
+        return $linkhtml;
+    }
+
     /**
      * Returns $this wrapped in a {@link nudge_notification_form_data} with it's linked {@link nudge_notification_content}s.
      *
@@ -87,8 +102,7 @@ class nudge_notification extends abstract_nudge_entity {
         $notificationcount = count($this->get_contents());
         return [
             $this->id,
-            // TODO: Should this be a link?
-            $this->title,
+            $this->get_notification_edit_link(),
             <<<HTML
                 <p class="badge badge-primary">There are {$notificationcount} linked translations</p>
             HTML

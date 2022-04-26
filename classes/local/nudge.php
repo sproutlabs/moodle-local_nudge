@@ -202,21 +202,56 @@ class nudge extends abstract_nudge_entity {
     }
 
     /**
+     * Returns an array of mixed values to be casted to string an rendered as raw html on the display tables.
+     *
      * @return array<mixed>
      */
     public function get_summary_fields(): array {
+        $learnernotification = $this->get_learner_notification() ?? false;
+        $managernotification = $this->get_manager_notification() ?? false;
+
+        if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_BOTH) {
+            if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_LEARNER) {
+                $learnernotification = false;
+            }
+            if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_MANAGERS) {
+                $managernotification = false;
+            }
+        }
+
         return [
-            $this->title,
-            // TODO: Should this be a link?
-            // TODO: If it has both notifications but the type is still only one -
-            // show only one.
-            $this->get_learner_notification()->title ?? 'None',
-            $this->get_manager_notification()->title ?? 'None',
+            $this->get_nudge_edit_link(),
+            ($learnernotification)
+                ? $learnernotification->get_notification_edit_link()
+                : 'None',
+            ($managernotification)
+                ? $managernotification->get_notification_edit_link()
+                : 'None',
             \ucfirst($this->remindertype)
         ];
     }
 
     /**
+     * Gets a link to edit this nudge
+     *
+     * Note that this is scoped to course so the user may need that capability.
+     *
+     * @return string
+     */
+    public function get_nudge_edit_link(): string {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $link = "{$CFG->wwwroot}/local/nudge/edit_nudge.php?id={$this->id}&courseid={$this->courseid}";
+
+        $linktitle = \get_string('nudge_edit_link', 'local_nudge', $this->title);
+
+        $linkhtml = <<<HTML
+            <a href="{$link}">{$linktitle}</a>
+        HTML;
+
+        return $linkhtml;
+    }
 
     /**
      * Notifies both the user who created and last modified this nudge.
