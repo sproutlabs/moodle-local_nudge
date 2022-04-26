@@ -33,8 +33,6 @@ use moodle_exception;
 use moodleform;
 use core_user;
 
-use function get_string;
-
 defined('MOODLE_INTERNAL') || die();
 
 /** @var \core_config $CFG */
@@ -149,6 +147,19 @@ class edit extends moodleform {
 
         $mform->addElement(
             'duration',
+            'reminderdaterelativeenrollmentrecurring',
+            get_string('form_nudge_remindertyperelativedaterecurring', 'local_nudge'),
+            [
+                // Default to days.
+                'defaultunit' => \DAYSECS
+            ]
+        );
+        $mform->setDefault('reminderdaterelativeenrollmentrecurring', 86400);
+        $mform->hideIf('reminderdaterelativeenrollmentrecurring', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING);
+        $mform->addHelpButton('reminderdaterelativeenrollmentrecurring', 'form_nudge_remindertyperelativedaterecurring', 'local_nudge');
+
+        $mform->addElement(
+            'duration',
             'reminderdaterelativecourseend',
             get_string('form_nudge_reminderdatecoruseend', 'local_nudge'),
             [
@@ -199,6 +210,9 @@ class edit extends moodleform {
                 break;
             case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT):
                 $instancedata['remindertypeperiod'] = $data->reminderdaterelativeenrollment;
+                break;
+            case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING):
+                $instancedata['remindertypeperiod'] = $data->reminderdaterelativeenrollmentrecurring;
                 break;
             case (nudge::REMINDER_DATE_RELATIVE_COURSE_END):
                 $instancedata['remindertypeperiod'] = $data->reminderdaterelativecourseend;

@@ -51,14 +51,19 @@ class nudge extends abstract_nudge_entity {
     public const REMINDER_DATE_INPUT_FIXED = 'fixed';
 
     /**
-     * This Nudge instance's reminder timing is based on the user's date of enrollment.
+     * This Nudge instance's reminder timing is relative to the course's end date.
+     */
+    public const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
+
+    /**
+     * This Nudge instance's reminder timing is relative to the user's date of enrollment.
      */
     public const REMINDER_DATE_RELATIVE_ENROLLMENT = 'enrollment';
 
     /**
-     * This Nudge instance's reminder timing is infered from the course's end date.
+     * This Nudge instance's reminder timing recurrs based on the user's date of enrollment.
      */
-    public const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
+    public const REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING = 'enrollmentrecurring';
     // END ENUM - REMINDER DATE    ////////////////////
 
     // BEGIN ENUM - REMINDER RECIPIENT    ////////////////////
@@ -155,12 +160,15 @@ class nudge extends abstract_nudge_entity {
      * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_COURSE_END}
      * ```
      * OR
-     * the period of time post learner enrollment to repeat nudges if
+     * the period of time post learner enrollment to send nudges
      * ```
      * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT}.
      * ```
-     *
-     * @todo Validate that the the duration field cannot exceed MYSQL bigint on the form and below constructor.
+     * OR
+     * the period of time post learner enrollment to repeat nudges if
+     * ```
+     * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING}.
+     * ```
      *
      * @var int|null Time in seconds.
      */
