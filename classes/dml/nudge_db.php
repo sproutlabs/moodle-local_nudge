@@ -32,6 +32,8 @@ use local_nudge\event\nudge_updated;
 use local_nudge\local\nudge;
 
 /**
+ * DML for {@see nudge}
+ *
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge>
  */
@@ -45,6 +47,9 @@ class nudge_db extends abstract_nudge_db {
 
     /**
      * Returns an array of active instances.
+     *
+     * @codeCoverageIgnore
+     *
      * @return array<nudge>
      */
     public static function get_enabled() {
