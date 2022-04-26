@@ -93,7 +93,7 @@ class edit extends moodleform {
             'title',
             get_string('form_notification_title', 'local_nudge')
         );
-        $mform->setType('title', \PARAM_RAW);
+        $mform->setType('title', \PARAM_TEXT);
         $mform->addRule('title', get_string('validation_notification_needtitle', 'local_nudge'), 'required');
 
         $userquery = $DB->get_records_sql(<<<SQL
@@ -170,7 +170,7 @@ class edit extends moodleform {
             $repeatcount,
             [
                 'contentid' => [
-                    'type' => \PARAM_INT
+                    'type' => \PARAM_INT,
                 ],
                 'lang' => [
                     'rule' => 'required'
