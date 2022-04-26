@@ -68,10 +68,10 @@ class nudge_notification_content extends abstract_nudge_entity {
      */
     public function get_notification() {
         // Default notification.
-        if (\intval($this->nudgenotificationid) === 0) {
+        if ($this->nudgenotificationid === 0) {
             return null;
         }
-        return nudge_notification_db::get_by_id(\intval($this->nudgenotificationid));
+        return nudge_notification_db::get_by_id($this->nudgenotificationid);
     }
 
     protected function cast_fields(): void {

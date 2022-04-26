@@ -170,8 +170,7 @@ class nudge extends abstract_nudge_entity {
         if ($this->linkedlearnernotificationid == 0) {
             return null;
         }
-        // TODO: casting.
-        return nudge_notification_db::get_by_id(\intval($this->linkedlearnernotificationid));
+        return nudge_notification_db::get_by_id($this->linkedlearnernotificationid);
     }
 
     /**
@@ -181,8 +180,7 @@ class nudge extends abstract_nudge_entity {
         if ($this->linkedmanagernotificationid == 0) {
             return null;
         }
-        // TODO: casting.
-        return nudge_notification_db::get_by_id(\intval($this->linkedmanagernotificationid));
+        return nudge_notification_db::get_by_id($this->linkedmanagernotificationid);
     }
 
     /**

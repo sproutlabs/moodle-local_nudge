@@ -86,8 +86,8 @@ abstract class abstract_nudge_db {
      * @return T|null
      */
     public static function get_by_id(int $id): ?abstract_nudge_entity {
-        if (!\is_int($id) || ($id <= 0)) {
-            throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
+        if ($id <= 0) {
+            throw new coding_exception(\sprintf('You must supply a positive integer to %s', __METHOD__));
         }
 
         /** @var \moodle_database $DB */
@@ -124,10 +124,6 @@ abstract class abstract_nudge_db {
      * @return T|null
      */
     public static function get_filtered(array $filter): ?abstract_nudge_entity {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -143,10 +139,6 @@ abstract class abstract_nudge_db {
      * @return array<T>
      */
     public static function get_all_filtered(array $filter): array {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -171,10 +163,6 @@ abstract class abstract_nudge_db {
      * @return T|null Returns a single wrapped instance of {@see T}.
      */
     public static function get_sql(string $sql, ?array $params = null): ?abstract_nudge_entity {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -196,10 +184,6 @@ abstract class abstract_nudge_db {
      * @return array<T>
      */
     public static function get_all_sql(string $sql, ?array $params = null): array {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -265,15 +249,15 @@ abstract class abstract_nudge_db {
      *
      * WARNING: May delete all {@see T} instances that use `id` as something other than the primary key.
      *
-     * @param int|null $id
      * @codeCoverageIgnore Shallow wrapper.
      *
+     * @param int $id
      * @throws coding_exception
      * @return void
      */
-    public static function delete(?int $id = null): void {
-        if (!\is_int($id) || ($id <= 0)) {
-            throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
+    public static function delete(int $id): void {
+        if ($id <= 0) {
+            throw new coding_exception(\sprintf('You must supply a positive integer to %s', __METHOD__));
         }
 
         /** @var \moodle_database $DB */
@@ -296,10 +280,6 @@ abstract class abstract_nudge_db {
      * @return void
      */
     public static function delete_all(array $filter): void {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -317,10 +297,6 @@ abstract class abstract_nudge_db {
      * @return void
      */
     public static function delete_all_select(string $sql, ?array $params = null): void {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 

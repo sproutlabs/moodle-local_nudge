@@ -54,7 +54,7 @@ class nudge_db extends abstract_nudge_db {
     }
 
     public static function on_after_create($id): void {
-        $creatednudge = (array) self::get_by_id(\intval($id));
+        $creatednudge = (array) self::get_by_id($id);
         $event = nudge_created::create([
             'context' => ($creatednudge['courseid'] ?? false)
                 ? context_course::instance($creatednudge['courseid'])
@@ -68,7 +68,7 @@ class nudge_db extends abstract_nudge_db {
     }
 
     public static function on_after_save($id): void {
-        $updatednudge = (array) self::get_by_id(\intval($id));
+        $updatednudge = (array) self::get_by_id($id);
         $event = nudge_updated::create([
             'context' => ($updatednudge['courseid'] ?? false)
                 ? context_course::instance($updatednudge['courseid'])
@@ -83,7 +83,7 @@ class nudge_db extends abstract_nudge_db {
 
     // Ideally this would be after it succeeds.
     public static function on_before_delete($id): void {
-        $nudgetobedeleted = (array) self::get_by_id(\intval($id));
+        $nudgetobedeleted = (array) self::get_by_id($id);
         $event = nudge_deleted::create([
             'context' => ($nudgetobedeleted['courseid'] ?? false)
                 ? context_course::instance($nudgetobedeleted['courseid'])
