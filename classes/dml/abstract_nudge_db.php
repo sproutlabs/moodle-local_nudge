@@ -24,10 +24,11 @@ use stdClass;
 
 use function nudge_mockable_time as time;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../lib.php');
-
+// @codeCoverageIgnoreEnd
 /**
  * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
  *
@@ -38,7 +39,7 @@ require_once(__DIR__ . '/../../lib.php');
  * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- *
+ * @copyright   GNU GPL v3 or later
  * @template T
  */
 abstract class abstract_nudge_db {
@@ -58,6 +59,8 @@ abstract class abstract_nudge_db {
      *
      * Some IDEs/editors (mine) make __construct public regardless of actual visibility so just call it public.
      * Runtime will fail with the actual visibility if really needed.
+     *
+     * @codeCoverageIgnore
      *
      * @deprecated Don't use this see comments above.
      * @access public
@@ -262,6 +265,8 @@ abstract class abstract_nudge_db {
      * WARNING: May delete all {@see T} instances that use `id` as something other than the primary key.
      *
      * @param int|null $id
+     * @codeCoverageIgnore Shallow wrapper.
+     *
      * @throws coding_exception
      * @return void
      */
@@ -283,6 +288,8 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} matching the filter.
      *
+     * @codeCoverageIgnore Shallow wrapper.
+     *
      * @todo Bulk hooks.
      * @param array $filter
      * @return void
@@ -300,6 +307,8 @@ abstract class abstract_nudge_db {
 
     /**
      * Removes all instances of {@see T} filtered by SQL.
+     *
+     * @codeCoverageIgnore Shallow wrapper.
      *
      * @todo Bulk hooks.
      * @param string $sql
