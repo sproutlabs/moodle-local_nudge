@@ -95,7 +95,7 @@ class nudge_notification extends abstract_nudge_entity {
         ];
     }
 
-    protected function cast_fields() {
+    protected function cast_fields(): void {
         $this->title = (string) $this->title;
         $this->userfromid = (int) $this->userfromid;
     }

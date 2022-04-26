@@ -224,7 +224,8 @@ abstract class abstract_nudge_db {
         /** @var stdClass $USER */
         global $DB, $USER;
 
-        $instance = clone $instance;
+        // Immutability but more importantly handles re-casting if needed.
+        $instance = new static::$entityclass($instance);
 
         $instance->lastmodified = time();
         $instance->lastmodifiedby = $USER->id;

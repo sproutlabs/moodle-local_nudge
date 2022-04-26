@@ -74,7 +74,7 @@ class nudge_notification_content extends abstract_nudge_entity {
         return nudge_notification_db::get_by_id(\intval($this->nudgenotificationid));
     }
 
-    protected function cast_fields() {
+    protected function cast_fields(): void {
         $this->nudgenotificationid = (int) $this->nudgenotificationid;
         $this->lang = (string) $this->lang;
         $this->subject = (string) $this->subject;

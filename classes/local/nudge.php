@@ -247,8 +247,7 @@ class nudge extends abstract_nudge_entity {
         }
     }
 
-    /** {@inheritDoc} */
-    protected function cast_fields() {
+    protected function cast_fields(): void {
         $this->courseid = (int) $this->courseid;
         $this->linkedlearnernotificationid = (int) $this->linkedlearnernotificationid;
         $this->linkedmanagernotificationid = (int) $this->linkedmanagernotificationid;

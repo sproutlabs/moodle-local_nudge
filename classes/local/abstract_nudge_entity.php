@@ -163,5 +163,5 @@ abstract class abstract_nudge_entity {
      *
      * @return void
      */
-    abstract protected function cast_fields();
+    abstract protected function cast_fields(): void;
 }

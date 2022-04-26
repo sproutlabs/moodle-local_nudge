@@ -45,8 +45,9 @@ class nudge_user extends abstract_nudge_entity {
      */
     public $recurrancetime = null;
 
-    protected function cast_fields() {
+    protected function cast_fields(): void {
         $this->userid = (int) $this->userid;
         $this->nudgeid = (int) $this->nudgeid;
+        $this->recurrancetime = (int) $this->recurrancetime;
     }
 }
