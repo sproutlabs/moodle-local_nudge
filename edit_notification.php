@@ -58,7 +58,8 @@ if ($mform->is_cancelled()) {
         );
     }
 
-    $notificationid = nudge_notification_db::save($editdata->notification);
+    $notification = nudge_notification_db::create_or_refresh($editdata->notification);
+    $notificationid = $notification->id;
 
     foreach ($editdata->notificationcontents as $notificationcontent) {
         $notificationcontent->nudgenotificationid = $notificationid;
