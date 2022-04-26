@@ -132,10 +132,9 @@ abstract class abstract_nudge_entity {
             }
 
             throw new UnexpectedValueException(\sprintf(
-                '%s\'s %s method was passed a property/field that doesn\'t exist on %s. Property name was: %s',
-                __CLASS__,
-                __METHOD__,
-                __CLASS__,
+                '%s\'s __construct method was passed a property/field that doesn\'t exist on %s. Property name was: %s',
+                static::class,
+                static::class,
                 $key
             ));
         }
@@ -151,6 +150,8 @@ abstract class abstract_nudge_entity {
 
     /**
      * Fluent setter.
+     *
+     * @codeCoverageIgnore
      *
      * @return $this
      */
