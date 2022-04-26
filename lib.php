@@ -32,6 +32,7 @@ use local_nudge\check\directory\dotfolders_disallowed;
 use local_nudge\check\directory\installxml_disallowed;
 use local_nudge\check\directory\markdown_disallowed;
 use local_nudge\check\directory\tests_disallowed;
+use local_nudge\dml\nudge_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 
@@ -95,6 +96,30 @@ function local_nudge_security_checks(): array {
         new classes_disallowed(),
         new tests_disallowed(),
     ];
+}
+
+// TODO: pre_user_delete for nudge_user.
+
+/**
+ * Removes {@see nudge}s attached to a course prior to deletion.
+ *
+ * @access private - Is public but not part of module's API.
+ *
+ * @param stdClass|\core\entity\course $course
+ * @return void
+ */
+function local_nudge_pre_course_delete($course) {
+    /** @var \core_renderer $OUTPUT */
+    /** @var \moodle_database $DB */
+    global $OUTPUT, $DB;
+
+    $count = $DB->count_records(nudge_db::$table, ['courseid' => $course->id]);
+
+    nudge_db::delete_all([
+        'courseid' => $course->id
+    ]);
+
+    echo $OUTPUT->notification("Deleted - {$count} attached Nudges", 'notifysuccess');
 }
 
 /**
