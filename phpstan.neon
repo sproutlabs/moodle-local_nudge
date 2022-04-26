@@ -42,7 +42,13 @@ parameters:
     #             'popup': int
     #         }
     #     }
+    #     'owneremail': array{
+    #         'defaults': array{
+    #             'email': int,
+    #             'popup': int
+    #         }
+    #     }
     # }
-    NudgeMessageProviders: "array{'learneremail': array{'defaults': array{'email': int,'popup': int}},'manageremail': array{'defaults': array{'email': int,'popup': int}}}"
+    NudgeMessageProviders: "array{'learneremail': array{'defaults': array{'email': int,'popup': int}},'manageremail': array{'defaults': array{'email': int,'popup': int}}, 'owneremail': array{'defaults': array{'email': int,'popup': int}}}"
   universalObjectCratesClasses:
     - core\message\message
