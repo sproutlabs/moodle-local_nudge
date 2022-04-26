@@ -27,7 +27,9 @@ namespace local_nudge\testclasses\event;
 use advanced_testcase;
 use context_course;
 use local_nudge\dml\nudge_db;
+use local_nudge\event\nudge_created;
 use local_nudge\local\nudge;
+use moodle_url;
 
 use const CONTEXT_COURSE;
 
@@ -57,7 +59,9 @@ class nudge_event_test extends advanced_testcase {
      * @test
      * @large
      * @testdox Saving should create a new nudge_created event.
-     * @covers local_nudge\event\nudge_created
+     *
+     * @covers \local_nudge\event\nudge_created
+     * @covers \local_nudge\dml\nudge_db::on_after_create
      */
     public function test_nudge_created_event(): void
     {
@@ -98,7 +102,8 @@ class nudge_event_test extends advanced_testcase {
      * @test
      * @large
      * @testdox Deleting should create a new nudge_deleted event.
-     * @covers local_nudge\event\nudge_deleted
+     * @covers \local_nudge\event\nudge_deleted
+     * @covers \local_nudge\dml\nudge_db::on_before_delete
      */
     public function test_nudge_deleted_event(): void
     {
@@ -158,7 +163,8 @@ class nudge_event_test extends advanced_testcase {
      * @test
      * @large
      * @testdox Saving an existing instance should create a new nudge_updated event.
-     * @covers local_nudge\event\nudge_updated
+     * @covers \local_nudge\event\nudge_updated
+     * @covers \local_nudge\dml\nudge_db::on_after_save
      */
     public function test_nudge_updated_event(): void
     {

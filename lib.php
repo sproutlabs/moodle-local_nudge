@@ -26,20 +26,25 @@
  */
 
 use core\message\message;
+use local_nudge\check\directory\classes_disallowed;
+use local_nudge\check\directory\dotfiles_disallowed;
+use local_nudge\check\directory\dotfolders_disallowed;
+use local_nudge\check\directory\installxml_disallowed;
+use local_nudge\check\directory\markdown_disallowed;
+use local_nudge\check\directory\tests_disallowed;
+use local_nudge\dml\nudge_db;
 use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
-
-/** @var \core_config $CFG */
-global $CFG;
-
 require_once($CFG->dirroot . '/user/profile/lib.php');
+// @codeCoverageIgnoreEnd
 
 /**
  * Adds a link to manage Nudge instances for this course.
  *
- * @access public
+ * @access private - Is public but not part of module's API.
  *
  * @codeCoverageIgnore Not really logical - Maybe a functional test to check capabilities.
  *
@@ -72,9 +77,55 @@ function local_nudge_extend_navigation_course(
 }
 
 /**
+ * Returns a few security checks that get added to `/report/security/index.php`.
+ *
+ * Totara doesn't allow extending this so don't expect to find it there.
+ *
+ * @access private - Is public but not part of module's API.
+ *
+ * @return array
+ */
+function local_nudge_security_checks(): array {
+    return [
+        new installxml_disallowed(),
+        new dotfolders_disallowed(),
+        new dotfiles_disallowed(),
+        new markdown_disallowed(),
+        new classes_disallowed(),
+        new tests_disallowed(),
+    ];
+}
+
+// TODO: pre_user_delete for nudge_user.
+
+/**
+ * Removes {@see nudge}s attached to a course prior to deletion.
+ *
+ * @access private - Is public but not part of module's API.
+ *
+ * @param stdClass|\core\entity\course $course
+ * @return void
+ */
+function local_nudge_pre_course_delete($course) {
+    /** @var \core_renderer $OUTPUT */
+    /** @var \moodle_database $DB */
+    global $OUTPUT, $DB;
+
+    $count = $DB->count_records(nudge_db::$table, ['courseid' => $course->id]);
+
+    nudge_db::delete_all([
+        'courseid' => $course->id
+    ]);
+
+    echo $OUTPUT->notification("Deleted - {$count} attached Nudges", 'notifysuccess');
+}
+
+/**
  * Scaffolds an autocomplete form from class constant enums.
  *
  * @access public
+ *
+ * @throws ReflectionException Class doesn't exist for reflection
  *
  * @param class-string $class Class to lookup consts on via reflection
  * @param string $filter Filter string the constant group of enums contain.
@@ -85,11 +136,11 @@ function nudge_scaffold_select_from_constants($class, $filter): array {
     $rclass = new \ReflectionClass($class);
     $constants = $rclass->getConstants();
 
-    // Filter for constants containing: `REMINDER_DATE`
-    $constants = \array_filter($constants, function ($value, $name) use ($filter) {
+    // Filter for constants by prefix.
+    $constants = \array_filter($constants, function ($name) use ($filter) {
         $match = (\strpos($name, $filter) !== false);
         return $match;
-    }, \ARRAY_FILTER_USE_BOTH);
+    }, \ARRAY_FILTER_USE_KEY);
 
     // Convert constants to a sane reference to language strings.
     $constantfields = [];
@@ -224,6 +275,26 @@ function nudge_hydrate_notification_template(
 }
 
 /**
+ * Return current Unix timestamp, {@see time()} but mockable for tests.
+ *
+ * @access public
+ *
+ * @codeCoverageIgnore
+ *
+ * @return int
+ */
+function nudge_mockable_time(): int {
+    /** @var \core_config $CFG */
+    global $CFG;
+
+    if (!isset($CFG->nudgemocktime)) {
+        return time();
+    } else {
+        return $CFG->nudgemocktime;
+    }
+}
+
+/**
  * Gets a list of managers for a user. This calls the correct function based on the custommangerresolution setting.
  *
  * @access public
@@ -261,6 +332,8 @@ function nudge_get_managers_for_user($user): array {
  * Return all the managers for this user.
  *
  * @access private This is public but its preferable that you use the wrapper function {@see nudge_get_managers_for_user}.
+ *
+ * @codeCoverageIgnore We don't run CI with Totara. This one is tested via screams :)
  *
  * @param \core\entity\user|stdClass $user
  * @return array<\core\entity\user|stdClass>
@@ -311,27 +384,14 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
             '*',
             IGNORE_MULTIPLE
         );
+    // phpcs:ignore
+    // @codeCoverageIgnoreStart
     } catch (dml_exception $e) {
         // TODO: Log failed to find manager.
         return null;
     }
+    // @codeCoverageIgnoreEnd
 
     // Null if there is no manager.
     return $manager ?: null;
-}
-
-/**
- * Return current Unix timestamp, {@see time()} but mockable for tests.
- *
- * @return int
- */
-function nudge_mockable_time(): int {
-    /** @var \core_config $CFG */
-    global $CFG;
-
-    if (!isset($CFG->nudgemocktime)) {
-        return time();
-    } else {
-        return $CFG->nudgemocktime;
-    }
 }

@@ -35,27 +35,31 @@ use local_nudge\local\nudge_notification_content;
 // phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
 
 /**
+ * @coversDefaultClass \local_nudge\local\nudge_notification_content
  * @testdox When using a nudge_notification_content entity
  */
 class nudge_notification_content_test extends advanced_testcase {
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->resetAfterTest();
     }
 
     /**
      * @test
      * @testdox Calling get_notification returns the has one in the expected state.
-     * @covers local_nudge\local\nudge_notification_content::get_notification
+     * @covers ::get_notification
      */
     public function test_get_notification(): void
     {
-        $this->resetAfterTest();
-
         /** @var \moodle_database $DB */
         global $DB;
 
-        $notification = new nudge_notification([]);
+        $unlinkedcontent = new nudge_notification_content();
+        $this->assertNull($unlinkedcontent->get_notification());
+
+        $notification = new nudge_notification();
         $notificationid = nudge_notification_db::save($notification);
 
         // Get with defaults and id.
@@ -68,9 +72,31 @@ class nudge_notification_content_test extends advanced_testcase {
         $resultingnotification = $content->get_notification();
 
         $this->assertEquals($notification, $resultingnotification);
+    }
 
-        $DB->delete_records(nudge_notification_db::$table);
-        $DB->delete_records(nudge_notification_content_db::$table);
+
+    /**
+     * @test
+     * @testdox Creating a new instance will return sane correctly typed defaults.
+     * @covers ::cast_fields
+     */
+    public function test_defaults_casted() {
+        /** @var nudge_notification_content */
+        $contents = nudge_notification_content_db::create_or_refresh(
+            new nudge_notification_content()
+        );
+
+        $this->assertIsInt($contents->nudgenotificationid);
+        $this->assertEquals(0, $contents->nudgenotificationid);
+
+        $this->assertIsString($contents->lang);
+        $this->assertEquals(nudge_notification_content::DEFAULTS['lang'], $contents->lang);
+
+        $this->assertIsString($contents->subject);
+        $this->assertEquals(nudge_notification_content::DEFAULTS['subject'], $contents->subject);
+
+        $this->assertIsString($contents->body);
+        $this->assertEquals(nudge_notification_content::DEFAULTS['body'], $contents->body);
     }
 
     public function tearDown(): void

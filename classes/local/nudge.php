@@ -18,15 +18,20 @@
 
 namespace local_nudge\local;
 
+use core\message\message;
+use core_user;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge_notification;
 use moodle_exception;
 use stdClass;
+use moodle_url;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once(__DIR__ . '/../../lib.php');
+// @codeCoverageIgnoreEnd
 
 /**
  * @package     local_nudge\local
@@ -37,9 +42,8 @@ require_once(__DIR__ . '/../../lib.php');
 class nudge extends abstract_nudge_entity {
 
     // This is just here since the nudge entity is pretty universal.
-    // It should be in the lib but I don't quite have my head around the entire require || die security stuff yet.
-    // Example: `Monday 17th of June at 11:38am`
-    public const DATE_FORMAT_NICE = 'l jS \of F \a\\t g:ia';
+    // Example: `Monday 17th of June at 11:38am, 2444`
+    public const DATE_FORMAT_NICE = 'l jS \of F \a\\t g:ia, Y';
 
     // BEGIN ENUM - REMINDER DATE    ////////////////////
     /**
@@ -48,14 +52,19 @@ class nudge extends abstract_nudge_entity {
     public const REMINDER_DATE_INPUT_FIXED = 'fixed';
 
     /**
-     * This Nudge instance's reminder timing is based on the user's date of enrollment.
+     * This Nudge instance's reminder timing is relative to the course's end date.
+     */
+    public const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
+
+    /**
+     * This Nudge instance's reminder timing is relative to the user's date of enrollment.
      */
     public const REMINDER_DATE_RELATIVE_ENROLLMENT = 'enrollment';
 
     /**
-     * This Nudge instance's reminder timing is infered from the course's end date.
+     * This Nudge instance's reminder timing recurrs based on the user's date of enrollment.
      */
-    public const REMINDER_DATE_RELATIVE_COURSE_END = 'courseend';
+    public const REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING = 'enrollmentrecurring';
     // END ENUM - REMINDER DATE    ////////////////////
 
     // BEGIN ENUM - REMINDER RECIPIENT    ////////////////////
@@ -75,7 +84,6 @@ class nudge extends abstract_nudge_entity {
     public const REMINDER_RECIPIENT_BOTH = 'both';
     // END ENUM - REMINDER RECIPIENT    ////////////////////
 
-    /** {@inheritDoc} */
     public const DEFAULTS = [
         'title' => 'Untitled Nudge',
         'isenabled' => 0,
@@ -84,7 +92,7 @@ class nudge extends abstract_nudge_entity {
     ];
 
     /**
-     * {@see nudge::hydrate_notification_template()}
+     * {@see hydrate_notification_template()}
      *
      * @var array<string>
      */
@@ -152,40 +160,47 @@ class nudge extends abstract_nudge_entity {
      * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_COURSE_END}
      * ```
      * OR
-     * the period of time post learner enrollment to repeat nudges if
+     * the period of time post learner enrollment to send nudges
      * ```
      * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT}.
      * ```
-     *
-     * @todo Validate that the the duration field cannot exceed MYSQL bigint on the form and below constructor.
+     * OR
+     * the period of time post learner enrollment to repeat nudges if
+     * ```
+     * {@see self::$remindertype} == {@see self::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING}.
+     * ```
      *
      * @var int|null Time in seconds.
      */
     public $remindertypeperiod = null;
 
     /**
+     * Returns the notification configured to go to the learners.
+     *
      * @return nudge_notification|null
      */
     public function get_learner_notification() {
         if ($this->linkedlearnernotificationid == 0) {
             return null;
         }
-        // TODO: casting.
-        return nudge_notification_db::get_by_id(\intval($this->linkedlearnernotificationid));
+        return nudge_notification_db::get_by_id($this->linkedlearnernotificationid);
     }
 
     /**
+     * Returns the notification configured to go to a learner's managers.
+     *
      * @return nudge_notification|null
      */
     public function get_manager_notification() {
         if ($this->linkedmanagernotificationid == 0) {
             return null;
         }
-        // TODO: casting.
-        return nudge_notification_db::get_by_id(\intval($this->linkedmanagernotificationid));
+        return nudge_notification_db::get_by_id($this->linkedmanagernotificationid);
     }
 
     /**
+     * Returns the course this nudge is linked to.
+     *
      * @return \core\entity\course|\stdClass
      */
     public function get_course() {
@@ -193,35 +208,107 @@ class nudge extends abstract_nudge_entity {
     }
 
     /**
+     * Returns an array of mixed values to be casted to string an rendered as raw html on the display tables.
+     *
      * @return array<mixed>
      */
     public function get_summary_fields(): array {
+        $learnernotification = $this->get_learner_notification() ?? false;
+        $managernotification = $this->get_manager_notification() ?? false;
+
+        if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_BOTH) {
+            if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_LEARNER) {
+                $learnernotification = false;
+            }
+            if ($this->reminderrecipient !== self::REMINDER_RECIPIENT_MANAGERS) {
+                $managernotification = false;
+            }
+        }
+
         return [
-            $this->title,
-            // TODO: Should this be a link?
-            // TODO: If it has both notifications but the type is still only one -
-            // show only one.
-            $this->get_learner_notification()->title ?? 'None',
-            $this->get_manager_notification()->title ?? 'None',
+            $this->get_nudge_edit_link(),
+            ($learnernotification)
+                ? $learnernotification->get_notification_edit_link()
+                : 'None',
+            ($managernotification)
+                ? $managernotification->get_notification_edit_link()
+                : 'None',
             \ucfirst($this->remindertype)
         ];
     }
 
     /**
+     * Gets a link to edit this nudge
+     *
+     * Note that this is scoped to course so the user may need that capability.
+     *
+     * @return string
+     */
+    public function get_nudge_edit_link(): string {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $link = "{$CFG->wwwroot}/local/nudge/edit_nudge.php?id={$this->id}&courseid={$this->courseid}";
+
+        $linktitle = \get_string('nudge_edit_link', 'local_nudge', $this->title);
+
+        $linkhtml = <<<HTML
+            <a href="{$link}">{$linktitle}</a>
+        HTML;
+
+        return $linkhtml;
+    }
+
+    /**
+     * Notifies both the user who created and last modified this nudge.
+     * This is especially handy if the nudge has encountered an exception case and needs to be corrected.
+     *
+     * @param string $subject
+     * @param string $body Can be rich html.
+     * @return void
+     */
+    public function notify_owners(string $subject, string $body): void {
+        $course = $this->get_course();
+
+        foreach ([$this->lastmodifiedby, $this->createdby] as $userid) {
+            $user = core_user::get_user($userid, '*', \IGNORE_MISSING & \IGNORE_MULTIPLE);
+
+            if (!$user) {
+                continue;
+            }
+
+            $message = new message();
+            $message->component = 'local_nudge';
+            $message->name = 'owneremail';
+            $message->userfrom = core_user::get_noreply_user();
+            $message->userto = $user;
+            $message->subject = $subject;
+            $message->fullmessageformat = \FORMAT_HTML;
+            $message->fullmessagehtml = $body;
+            $message->notification = 1;
+            $message->courseid = $course->id;
+            $message->contexturl = new moodle_url('/course/view.php', ['id' => $course->id]);
+            $message->contexturlname = 'Course Link';
+            \message_send($message);
+        }
+    }
+
+    /**
+     * Triggers this nudge to cause messages to send.
+     * This doesn't account for timing it merely sends the configured notifications to the configured recipients.
+     *
      * @param \core\entity\user|stdClass $user
      */
     public function trigger($user): void {
         switch ($this->reminderrecipient) {
             case (self::REMINDER_RECIPIENT_BOTH):
                 \message_send(nudge_get_email_message($this, $user));
-
                 foreach (nudge_get_managers_for_user($user) as $manager) {
                     if ($manager === null) {
                         continue;
                     }
                     \message_send(nudge_get_email_message($this, $user, $manager));
                 }
-
                 break;
 
             case (self::REMINDER_RECIPIENT_LEARNER):
@@ -235,7 +322,6 @@ class nudge extends abstract_nudge_entity {
                     }
                     \message_send(nudge_get_email_message($this, $user, $manager));
                 }
-
                 break;
             default:
                 // Weird.
@@ -243,12 +329,10 @@ class nudge extends abstract_nudge_entity {
                     'expectedunreachable',
                     'local_nudge'
                 );
-                break;
         }
     }
 
-    /** {@inheritDoc} */
-    protected function cast_fields() {
+    protected function cast_fields(): void {
         $this->courseid = (int) $this->courseid;
         $this->linkedlearnernotificationid = (int) $this->linkedlearnernotificationid;
         $this->linkedmanagernotificationid = (int) $this->linkedmanagernotificationid;

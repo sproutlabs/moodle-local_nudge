@@ -29,14 +29,18 @@ use moodle_url;
  */
 class nudge_created extends base {
     /**
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     public function get_description() {
         // phpcs:ignore
-        return "The user with the ID: '{$this->userid}' updated nudge with the ID of: '{$this->other['id']}' for the course ID of: '{$this->other['courseid']}'.";
+        return "The user with the ID: '{$this->userid}' created nudge with the ID of: '{$this->other['id']}' for the course ID of: '{$this->other['courseid']}'.";
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @return moodle_url
      */
     public function get_url() {

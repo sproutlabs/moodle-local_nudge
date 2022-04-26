@@ -1,3 +1,12 @@
+# NOTE
+This plugin is not yet stable.
+There is rename that is going to happen to avoid conflicts with the L&D nudge but we are yet to decide on naming.
+## Maybe:
+Plugin is local_completionreminder and models:
+ - CourseTracker (nudge)
+ - Notification (nudge_notification)
+ - Translation (nudge_notification_content)
+
 # :point_right: Nudge
 > The Nudge plugin for MOODLE and Totara aims to provide a simple way to notify/remind users to revisit their course prior to course completion.
 >> The pugin supports multiple translation, templated messages, recurring remind dates, relative remind dates and the option to remind managers in both Totara *and MOODLE*.

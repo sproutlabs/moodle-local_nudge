@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting
+
 /**
  * DML for {@see nudge_notification}
  * @package     local_nudge\dml
@@ -26,7 +28,9 @@
 namespace local_nudge\dml;
 
 use core_user;
+use local_nudge\local\nudge;
 use local_nudge\local\nudge_notification;
+use stdClass;
 
 /**
  * {@inheritDoc}
@@ -52,29 +56,64 @@ class nudge_notification_db extends abstract_nudge_db {
     }
 
     /**
-     * Override to unset relations.
-     *
-     * @todo Refractor this to a hook.
+     * Override to unset relations and disable linked nudge.
      *
      * {@inheritDoc}
      */
     public static function delete(?int $id = null): void {
+        // TODO, These need to be disabled and a notification needs to be sent to an admin.
         // Could just use an SQL key here.
+        $notification = self::get_by_id($id);
         parent::delete($id);
 
+        /** @var \local_nudge\local\nudge[] */
         $lremoves = nudge_db::get_all_filtered(['linkedlearnernotificationid' => $id]);
+
+        foreach ($lremoves as $lremove) {
+            $lremove->linkedlearnernotificationid = 0;
+            $lremove->isenabled = false;
+            nudge_db::save($lremove);
+            self::send_deletion_message($lremove, $notification);
+        }
+
+        /** @var \local_nudge\local\nudge[] */
         $mremoves = nudge_db::get_all_filtered(['linkedmanagernotificationid' => $id]);
 
-        // TODO, These need to be disabled and a notification needs to be sent to an admin.
-
-        foreach ($lremoves as $remove) {
-            $remove->linkedlearnernotificationid = 0;
-            nudge_db::save($remove);
+        foreach ($mremoves as $mremove) {
+            $mremove->linkedmanagernotificationid = 0;
+            $mremove->isenabled = false;
+            nudge_db::save($mremove);
+            self::send_deletion_message($mremove, $notification);
         }
+    }
 
-        foreach ($mremoves as $remove) {
-            $remove->linkedmanagernotificationid = 0;
-            nudge_db::save($remove);
-        }
+    /**
+     * Templates a deletion message.
+     *
+     * @param nudge $nudge
+     * @param nudge_notification $notification
+     *
+     * @return void
+     */
+    private static function send_deletion_message(nudge $nudge, nudge_notification $notification): void {
+        /** @var stdClass $SITE */
+        global $SITE;
+
+        $templatedata = new stdClass();
+        $templatedata->sitefullname = $SITE->fullname;
+        $templatedata->nudgetitle = $nudge->title;
+        $templatedata->notificationtitle = $notification->title;
+
+        $nudge->notify_owners(
+            \get_string(
+                'nudge_exception_unlinked_notification_subject',
+                'local_nudge'
+            ),
+            \get_string(
+                'nudge_exception_unlinked_notification_body',
+                'local_nudge',
+                $templatedata
+            )
+        );
     }
 }

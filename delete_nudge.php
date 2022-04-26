@@ -30,8 +30,10 @@
 use local_nudge\dml\nudge_db;
 use local_nudge\form\nudge\delete;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+// @codeCoverageIgnoreEnd
 
 $id = \required_param('id', \PARAM_INT);
 $courseid = \optional_param('courseid', null, \PARAM_INT);
@@ -51,14 +53,15 @@ if ($mform->is_cancelled()) {
     \redirect($manageurl);
 }
 
-$nudgenotification = nudge_db::get_by_id($id);
-if ($nudgenotification === null) {
-    throw new \invalid_parameter_exception(sprintf('Nudge Notification with id: %s was not found.'));
+$nudge = nudge_db::get_by_id($id);
+if ($nudge === null) {
+    throw new \invalid_parameter_exception(sprintf('Nudge with id: %s was not found.'));
 }
 
 $idholder = new stdClass();
-$idholder->id = $nudgenotification->id;
+$idholder->id = $nudge->id;
 $idholder->courseid = $courseid;
+$idholder->title = $nudge->title;
 
 $mform->set_data($idholder);
 

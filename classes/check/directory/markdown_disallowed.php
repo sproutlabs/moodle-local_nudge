@@ -14,36 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// phpcs:disable moodle.Commenting
+
+namespace local_nudge\check\directory;
+
+use core\check\result;
+
 /**
- * @package     local_nudge
+ * @package     local_nudge\check\directory
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- * @license     http://www.gnu.org/copyleft/gpl.html
- * @license     GNU GPL v3 or later
+ * @copyright   GNU GPL v3 or later
  */
-
-namespace local_nudge\form\nudge_notification;
-
-// @codeCoverageIgnoreStart
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/formslib.php');
-// @codeCoverageIgnoreEnd
-
-class delete extends \moodleform {
-    public function definition() {
-        $mform = $this->_form;
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-
-        $deletestring = \get_string('form_notification_deleteconfirm', 'local_nudge');
-        $mform->addElement('html', <<<HTML
-            <div class="alert alert-danger">{$deletestring}<div><br/>
-        HTML);
-
-        $mform->addElement('static', 'title');
-
-        $this->add_action_buttons(true, get_string('delete'));
-    }
+class markdown_disallowed extends abstract_nudge_access_check {
+    protected static string $name = 'Markdown files';
+    protected static string $badlevel = result::WARNING;
+    protected static string $filepath = 'README.md';
+    protected static string $desc = <<<HTML
+    <p>Its generally a good idea to hide markdown files especially some of the ones in
+            nudge outline directory structure etc.</p>
+    <p>Specifically I check <code>README.md</code>.</p>
+    HTML;
 }

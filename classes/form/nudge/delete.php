@@ -24,13 +24,12 @@
 
 namespace local_nudge\form\nudge;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
+// @codeCoverageIgnoreEnd
 
-/**
- * @codeCoverageIgnore
- */
 class delete extends \moodleform {
     public function definition() {
         $mform = $this->_form;
@@ -38,6 +37,7 @@ class delete extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        // This is added for the form to return to the correct management screen.
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
 
@@ -45,6 +45,8 @@ class delete extends \moodleform {
         $mform->addElement('html', <<<HTML
             <div class="alert alert-danger">{$deletestring}<div><br/>
         HTML);
+
+        $mform->addElement('static', 'title');
 
         $this->add_action_buttons(true, get_string('delete'));
     }

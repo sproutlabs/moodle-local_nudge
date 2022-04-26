@@ -33,8 +33,6 @@ use moodle_exception;
 use moodleform;
 use core_user;
 
-use function get_string;
-
 defined('MOODLE_INTERNAL') || die();
 
 /** @var \core_config $CFG */
@@ -149,6 +147,28 @@ class edit extends moodleform {
 
         $mform->addElement(
             'duration',
+            'reminderdaterelativeenrollmentrecurring',
+            get_string('form_nudge_remindertyperelativedaterecurring', 'local_nudge'),
+            [
+                // Default to days.
+                'defaultunit' => \DAYSECS
+            ]
+        );
+        $mform->setDefault('reminderdaterelativeenrollmentrecurring', 86400);
+        $mform->hideIf(
+            'reminderdaterelativeenrollmentrecurring',
+            'remindertype',
+            'neq',
+            nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING
+        );
+        $mform->addHelpButton(
+            'reminderdaterelativeenrollmentrecurring',
+            'form_nudge_remindertyperelativedaterecurring',
+            'local_nudge'
+        );
+
+        $mform->addElement(
+            'duration',
             'reminderdaterelativecourseend',
             get_string('form_nudge_reminderdatecoruseend', 'local_nudge'),
             [
@@ -199,6 +219,9 @@ class edit extends moodleform {
                 break;
             case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT):
                 $instancedata['remindertypeperiod'] = $data->reminderdaterelativeenrollment;
+                break;
+            case (nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING):
+                $instancedata['remindertypeperiod'] = $data->reminderdaterelativeenrollmentrecurring;
                 break;
             case (nudge::REMINDER_DATE_RELATIVE_COURSE_END):
                 $instancedata['remindertypeperiod'] = $data->reminderdaterelativecourseend;
@@ -312,6 +335,24 @@ class edit extends moodleform {
                         );
                     }
                     break;
+            }
+        }
+
+        // Validate it: has no scheduling conflicts with the course's *current* end date.
+        if (
+            !empty($data['remindertype']) &&
+            $data['remindertype'] === nudge::REMINDER_DATE_INPUT_FIXED
+        ) {
+            $targetcourse = \get_course($data['courseid']);
+            $enddate = ((int) $targetcourse->enddate) ?: false;
+            if ($enddate) {
+                if ($data['remindertypefixeddate'] >= $enddate) {
+                    $errors['remindertypefixeddate'] = \get_string(
+                        'validation_nudge_timepastcourseend',
+                        'local_nudge',
+                        \date(nudge::DATE_FORMAT_NICE, $enddate)
+                    );
+                }
             }
         }
 

@@ -31,8 +31,10 @@
 
 use local_nudge\dml\nudge_notification_db;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+// @codeCoverageIgnoreEnd
 
 // Require a login for this course for the system.
 \admin_externalpage_setup("configurenudgenotifications");

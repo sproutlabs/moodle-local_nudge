@@ -38,6 +38,7 @@ use local_nudge\task\nudge_task;
 // phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
 
 /**
+ * @coversDefaultClass \local_nudge\task\nudge_task
  * @testdox When the nudge_tasks runs it should
  */
 class nudge_task_test extends advanced_testcase {
@@ -48,6 +49,14 @@ class nudge_task_test extends advanced_testcase {
 
     /**
      * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_INPUT_FIXED}
+     *
+     * @test
+     * @testdox nudge instances witha fixed reminder date should correctly send once when due.
+     * @covers ::execute
+     * @covers ::send_emails_for_incomplete_users
+     * @covers ::get_incomplete_users_for_nudge
+     * @covers \local_nudge\local\nudge::trigger
+     * @covers \nudge_get_email_message
      */
     public function test_send_fixed_date(): void
     {
@@ -81,7 +90,7 @@ class nudge_task_test extends advanced_testcase {
             'nudgenotificationid' => $notification->id
         ]));
         nudge_db::create_or_refresh(new nudge([
-            'isenabled' => 1,
+            'isenabled' => true,
             'courseid' => $course->id,
             'linkedlearnernotificationid' => $notification->id,
             'remindertype' => nudge::REMINDER_DATE_INPUT_FIXED,
@@ -114,6 +123,10 @@ class nudge_task_test extends advanced_testcase {
 
         $this->assertEquals(1, $sink->count(), 'The message was not sent when expected.');
 
+        $CFG->nudgemocktime += \DAYSECS;
+
+        $this->assertEquals(1, $sink->count(), 'There should not be anymore messages sent from a nudge in the fixed state.');
+
         $message = $sink->get_messages()[0];
 
         $this->assertEquals($sender->id,            $message->useridfrom);
@@ -134,6 +147,14 @@ class nudge_task_test extends advanced_testcase {
 
     /**
      * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_COURSE_END}
+     *
+     * @test
+     * @testdox nudge instances with a remind date that is relative to the end of course should send once before the course ends.
+     * @covers ::execute
+     * @covers ::send_emails_for_incomplete_users
+     * @covers ::get_incomplete_users_for_nudge
+     * @covers \local_nudge\local\nudge::trigger
+     * @covers \nudge_get_email_message
      */
     public function test_send_relative_courseend(): void
     {
@@ -169,11 +190,11 @@ class nudge_task_test extends advanced_testcase {
             'nudgenotificationid' => $notification->id
         ]));
         $nudge = nudge_db::create_or_refresh(new nudge([
-            'isenabled' => 1,
+            'isenabled' => true,
             'courseid' => $course->id,
             'linkedlearnernotificationid' => $notification->id,
             'remindertype' => nudge::REMINDER_DATE_RELATIVE_COURSE_END,
-            // Reminder 5 seconds before the course ends which is in 10 seconds from now.
+            // Reminder 5 seconds before the course ends which is in 10 seconds from now (see above).
             'remindertypeperiod' => 5
         ]));
 
@@ -223,9 +244,19 @@ class nudge_task_test extends advanced_testcase {
     }
 
     /**
-     * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_ENROLLMENT}
+     * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING}
+     *
+     * @test
+     * @testdox nudge instances with a recurring reminder date relative to enrollment should send when expected or only once.
+     * @covers ::execute
+     * @covers ::handle_recurring
+     * @covers ::get_user_enroltime_in_course
+     * @covers ::send_emails_for_incomplete_users
+     * @covers ::get_incomplete_users_for_nudge
+     * @covers \local_nudge\local\nudge::trigger
+     * @covers \nudge_get_email_message
      */
-    public function test_send_relative_enrollment(): void
+    public function test_send_relative_enrollment_recurring(): void
     {
         // -------------------------------
         //          SETUP TEST
@@ -245,9 +276,15 @@ class nudge_task_test extends advanced_testcase {
         $time = \time();
         $CFG->nudgemocktime = $time;
 
-        $course = $this->getDataGenerator()->create_course([]);
+        $course = $this->getDataGenerator()->create_course();
         $sender = $this->getDataGenerator()->create_user();
-        $user = $this->getDataGenerator()->create_and_enrol($course);
+        $user = $this->getDataGenerator()->create_and_enrol(
+            $course,
+            'student',
+            null,
+            'manual',
+            $time
+        );
 
         // TODO: dataGenerators for nudge, notification and contents.
         $notification = nudge_notification_db::create_or_refresh(
@@ -257,10 +294,10 @@ class nudge_task_test extends advanced_testcase {
             'nudgenotificationid' => $notification->id
         ]));
         nudge_db::create_or_refresh(new nudge([
-            'isenabled' => 1,
+            'isenabled' => true,
             'courseid' => $course->id,
             'linkedlearnernotificationid' => $notification->id,
-            'remindertype' => nudge::REMINDER_DATE_RELATIVE_ENROLLMENT,
+            'remindertype' => nudge::REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING,
             // Every 2 minutes after the user's enrolment. Note that the user recieves a message on the first run.
             'remindertypeperiod' => \MINSECS * 2
         ]));
@@ -282,23 +319,36 @@ class nudge_task_test extends advanced_testcase {
 
         (new nudge_task)->execute();
 
-        $this->assertEquals(1, $sink->count(), 'There should be an immediate message to the user.');
+        $this->assertEquals(0, $sink->count(), 'There should not yet be a message to the user.');
 
         $CFG->nudgemocktime += (\MINSECS * 2) - 1;
 
         (new nudge_task)->execute();
 
-        $this->assertEquals(1, $sink->count(), 'The message was sent early.');
+        $this->assertEquals(0, $sink->count(), 'The message was sent early.');
 
         $CFG->nudgemocktime += 1;
 
         (new nudge_task)->execute();
 
+        $this->assertEquals(1, $sink->count(), 'The user should now have a message.');
+
+        $CFG->nudgemocktime += \MINSECS * 2;
+
+        (new nudge_task)->execute();
+
         $this->assertEquals(2, $sink->count(), 'The user should now have a second message.');
 
-        // We don't care for the internal message id.
+        $CFG->nudgemocktime += \DAYSECS;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(3, $sink->count(), 'If the cron task misses a notification it should only send one.');
+
+        // We don't care for the internal message id or the time it was created.
         foreach ($sink->get_messages() as &$message) {
             unset($message->id);
+            unset($message->timecreated);
         }
 
         $this->assertEquals($sink->get_messages()[0], $sink->get_messages()[1], 'The messages should be the same.');
@@ -319,6 +369,157 @@ class nudge_task_test extends advanced_testcase {
         $this->assertNull($message->timeread);
         $this->assertNull($message->customdata);
         $this->assertEquals(1,                      $message->notification);
+    }
+
+    /**
+     * Send emails to all users for a {@see nudge} with a {@see nudge::REMINDER_DATE_RELATIVE_ENROLLMENT}
+     *
+     * @test
+     * @testdox nudge instances with a reminder date relative to enrolment should send once after enrolment.
+     * @covers ::execute
+     * @covers ::get_user_enroltime_in_course
+     * @covers ::get_incomplete_users_for_nudge
+     * @covers \local_nudge\local\nudge::trigger
+     * @covers \nudge_get_email_message
+     */
+    public function test_send_relative_enrollment(): void
+    {
+        // -------------------------------
+        //          SETUP TEST
+        // -------------------------------
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $sink = $this->redirectMessages();
+
+        // -------------------------------
+        //          SETUP DATA
+        // -------------------------------
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $course = $this->getDataGenerator()->create_course();
+        $sender = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_and_enrol(
+            $course,
+            'student',
+            null,
+            'manual',
+            $time
+        );
+
+        // TODO: dataGenerators for nudge, notification and contents.
+        $notification = nudge_notification_db::create_or_refresh(
+            new nudge_notification(['userfromid' => $sender->id])
+        );
+        $contents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id
+        ]));
+        nudge_db::create_or_refresh(new nudge([
+            'isenabled' => true,
+            'courseid' => $course->id,
+            'linkedlearnernotificationid' => $notification->id,
+            'remindertype' => nudge::REMINDER_DATE_RELATIVE_ENROLLMENT,
+            // Send reminder 2 minutes after enrollment.
+            'remindertypeperiod' => \MINSECS * 2
+        ]));
+
+        $courselink = $CFG->wwwroot . "/course/view.php?id=" . $course->id;
+
+        $vars = [
+            '{user_firstname}' => $user->firstname,
+            '{user_lastname}' => $user->lastname,
+            '{course_fullname}' => $course->fullname,
+            '{course_link}' => $courselink,
+            '{sender_email}' => $sender->email,
+        ];
+        $expectedbody = \strtr(nudge_notification_content::DEFAULTS['body'], $vars);
+
+        // -------------------------------
+        //      PERFORM ASSERTIONS
+        // -------------------------------
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(0, $sink->count(), 'There should be an no message to the user yet.');
+
+        $CFG->nudgemocktime += (\MINSECS * 2) - 1;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(0, $sink->count(), 'There should still be no message.');
+
+        $CFG->nudgemocktime += 1;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'The user should now have a message.');
+
+        $CFG->nudgemocktime += \DAYSECS;
+
+        (new nudge_task)->execute();
+
+        $this->assertEquals(1, $sink->count(), 'There should still only be one messsage.');
+
+        $message = $sink->get_messages()[0];
+
+        $this->assertEquals($sender->id,            $message->useridfrom);
+        $this->assertEquals($user->id,              $message->useridto);
+        $this->assertEquals($contents->subject,     $message->subject);
+        $this->assertNull($message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
+        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertNull($message->smallmessage);
+        $this->assertEquals('local_nudge',          $message->component);
+        $this->assertEquals('learneremail',         $message->eventtype);
+        $this->assertEquals($courselink,            $message->contexturl);
+        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertNull($message->timeread);
+        $this->assertNull($message->customdata);
+        $this->assertEquals(1,                      $message->notification);
+    }
+
+    /**
+     * @test
+     * @testdox respect the course's end date.
+     * @covers ::execute
+     */
+    public function test_nudge_task_respects_course_end(): void
+    {
+        /** @var \core_config $CFG */
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $sink = $this->redirectMessages();
+
+        $time = \time();
+        $CFG->nudgemocktime = $time;
+
+        $course = $this->getDataGenerator()->create_course([
+            'enddate' => $time - 10
+        ]);
+
+        $nudgeid = nudge_db::save(new nudge([
+            'courseid' => $course->id,
+            'isenabled' => true,
+        ]));
+
+        (new nudge_task)->execute();
+
+        $result = nudge_db::get_filtered([
+            'isenabled' => false
+        ]);
+
+        $this->assertEquals(0, $sink->count(), 'No messages should go out the course has ended.');
+        $this->assertNotNull($result);
+        $this->assertInstanceOf(nudge::class, $result);
+        $this->assertEquals($nudgeid, $result->id);
     }
 
     public function tearDown(): void

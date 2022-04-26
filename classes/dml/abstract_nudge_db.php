@@ -24,10 +24,11 @@ use stdClass;
 
 use function nudge_mockable_time as time;
 
+// @codeCoverageIgnoreStart
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../lib.php');
-
+// @codeCoverageIgnoreEnd
 /**
  * Abstract DML to wrap DB records returned as STDClass in more type hinted entity.
  *
@@ -38,7 +39,7 @@ require_once(__DIR__ . '/../../lib.php');
  * @package     local_nudge\dml
  * @author      Liam Kearney <liam@sproutlabs.com.au>
  * @copyright   (c) 2022, Sprout Labs { @see https://sproutlabs.com.au }
- *
+ * @copyright   GNU GPL v3 or later
  * @template T
  */
 abstract class abstract_nudge_db {
@@ -58,6 +59,8 @@ abstract class abstract_nudge_db {
      *
      * Some IDEs/editors (mine) make __construct public regardless of actual visibility so just call it public.
      * Runtime will fail with the actual visibility if really needed.
+     *
+     * @codeCoverageIgnore
      *
      * @deprecated Don't use this see comments above.
      * @access public
@@ -83,8 +86,8 @@ abstract class abstract_nudge_db {
      * @return T|null
      */
     public static function get_by_id(int $id): ?abstract_nudge_entity {
-        if (!\is_int($id) || ($id <= 0)) {
-            throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
+        if ($id <= 0) {
+            throw new coding_exception(\sprintf('You must supply a positive integer to %s', __METHOD__));
         }
 
         /** @var \moodle_database $DB */
@@ -121,10 +124,6 @@ abstract class abstract_nudge_db {
      * @return T|null
      */
     public static function get_filtered(array $filter): ?abstract_nudge_entity {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -140,10 +139,6 @@ abstract class abstract_nudge_db {
      * @return array<T>
      */
     public static function get_all_filtered(array $filter): array {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -163,15 +158,11 @@ abstract class abstract_nudge_db {
      * Be careful to ensure your SQL returns all the fields required to be wrapped in
      * an {@see T} or you will encounter a {@throws \UnexpectedValueException}.
      *
-     * @param string $sql MUST return a single instance. {@see static::get_all_sql()} for multiple.
+     * @param string $sql Should return a single instance. {@see static::get_all_sql()} for multiple.
      * @param array|null $params SQL Params.
      * @return T|null Returns a single wrapped instance of {@see T}.
      */
     public static function get_sql(string $sql, ?array $params = null): ?abstract_nudge_entity {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -193,10 +184,6 @@ abstract class abstract_nudge_db {
      * @return array<T>
      */
     public static function get_all_sql(string $sql, ?array $params = null): array {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -221,7 +208,8 @@ abstract class abstract_nudge_db {
         /** @var stdClass $USER */
         global $DB, $USER;
 
-        $instance = clone $instance;
+        // Immutability but more importantly handles re-casting if needed.
+        $instance = new static::$entityclass($instance);
 
         $instance->lastmodified = time();
         $instance->lastmodifiedby = $USER->id;
@@ -254,20 +242,22 @@ abstract class abstract_nudge_db {
     }
 
     // These delete functions don't actually wrap an entity so they are a pretty much pointless wrapper around $DB->delete etc.
-    // But it is nice to have everything consistant.
+    // But it is nice to have everything here for consistency.
 
     /**
      * Removes an {@see T} instance from the database.
      *
      * WARNING: May delete all {@see T} instances that use `id` as something other than the primary key.
      *
-     * @param int|null $id
+     * @codeCoverageIgnore Shallow wrapper.
+     *
+     * @param int $id
      * @throws coding_exception
      * @return void
      */
-    public static function delete(?int $id = null): void {
-        if (!\is_int($id) || ($id <= 0)) {
-            throw new coding_exception(\sprintf('You must supply an integer to %s', __METHOD__));
+    public static function delete(int $id): void {
+        if ($id <= 0) {
+            throw new coding_exception(\sprintf('You must supply a positive integer to %s', __METHOD__));
         }
 
         /** @var \moodle_database $DB */
@@ -283,15 +273,13 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} matching the filter.
      *
+     * @codeCoverageIgnore Shallow wrapper.
+     *
      * @todo Bulk hooks.
      * @param array $filter
      * @return void
      */
     public static function delete_all(array $filter): void {
-        if (!\is_array($filter)) {
-            throw new coding_exception(\sprintf('You must supply an array to %s as a filter', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -301,16 +289,14 @@ abstract class abstract_nudge_db {
     /**
      * Removes all instances of {@see T} filtered by SQL.
      *
+     * @codeCoverageIgnore Shallow wrapper.
+     *
      * @todo Bulk hooks.
      * @param string $sql
      * @param array|null $params
      * @return void
      */
     public static function delete_all_select(string $sql, ?array $params = null): void {
-        if (!\is_string($sql)) {
-            throw new coding_exception(\sprintf('You must supply a string to %s as SQL', __METHOD__));
-        }
-
         /** @var \moodle_database $DB */
         global $DB;
 
@@ -328,7 +314,7 @@ abstract class abstract_nudge_db {
      * @param T $instance
      * @return void
      */
-    public static function populate_defaults(abstract_nudge_entity $instance): void {
+    public static function populate_defaults(abstract_nudge_entity &$instance): void {
         foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
             if ($instance->{$defaultfield} === null ||
                 $instance->{$defaultfield} === '' ||

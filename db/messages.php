@@ -41,5 +41,11 @@ $messageproviders = [
             'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
             'popup' => \MESSAGE_DISALLOWED,
         ]
+    ],
+    'owneremail' => [
+        'defaults' => [
+            'email' => \MESSAGE_FORCED + \MESSAGE_DEFAULT_LOGGEDOFF + \MESSAGE_DEFAULT_LOGGEDIN,
+            'popup' => \MESSAGE_DISALLOWED,
+        ]
     ]
 ];

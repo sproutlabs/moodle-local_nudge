@@ -32,6 +32,8 @@ use local_nudge\event\nudge_updated;
 use local_nudge\local\nudge;
 
 /**
+ * DML for {@see nudge}
+ *
  * {@inheritDoc}
  * @extends abstract_nudge_db<nudge>
  */
@@ -45,6 +47,9 @@ class nudge_db extends abstract_nudge_db {
 
     /**
      * Returns an array of active instances.
+     *
+     * @codeCoverageIgnore
+     *
      * @return array<nudge>
      */
     public static function get_enabled() {
@@ -54,7 +59,7 @@ class nudge_db extends abstract_nudge_db {
     }
 
     public static function on_after_create($id): void {
-        $creatednudge = (array) self::get_by_id(\intval($id));
+        $creatednudge = (array) self::get_by_id($id);
         $event = nudge_created::create([
             'context' => ($creatednudge['courseid'] ?? false)
                 ? context_course::instance($creatednudge['courseid'])
@@ -68,7 +73,7 @@ class nudge_db extends abstract_nudge_db {
     }
 
     public static function on_after_save($id): void {
-        $updatednudge = (array) self::get_by_id(\intval($id));
+        $updatednudge = (array) self::get_by_id($id);
         $event = nudge_updated::create([
             'context' => ($updatednudge['courseid'] ?? false)
                 ? context_course::instance($updatednudge['courseid'])
@@ -83,7 +88,7 @@ class nudge_db extends abstract_nudge_db {
 
     // Ideally this would be after it succeeds.
     public static function on_before_delete($id): void {
-        $nudgetobedeleted = (array) self::get_by_id(\intval($id));
+        $nudgetobedeleted = (array) self::get_by_id($id);
         $event = nudge_deleted::create([
             'context' => ($nudgetobedeleted['courseid'] ?? false)
                 ? context_course::instance($nudgetobedeleted['courseid'])
