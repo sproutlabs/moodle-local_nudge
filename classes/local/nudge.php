@@ -18,10 +18,13 @@
 
 namespace local_nudge\local;
 
+use core\message\message;
+use core_user;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\local\nudge_notification;
 use moodle_exception;
 use stdClass;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -206,6 +209,41 @@ class nudge extends abstract_nudge_entity {
     }
 
     /**
+
+    /**
+     * Notifies both the user who created and last modified this nudge.
+     * This is especially handy if the nudge has encountered an exception case and needs to be corrected.
+     *
+     * @param string $subject
+     * @param string $body Can be rich html.
+     * @return void
+     */
+    public function notify_owners(string $subject, string $body): void {
+        $course = $this->get_course();
+
+        foreach ([$this->lastmodifiedby, $this->createdby] as $userid) {
+            $user = core_user::get_user($userid, '*', \IGNORE_MISSING & \IGNORE_MULTIPLE);
+
+            if (!$user) {
+                continue;
+            }
+
+            $message = new message();
+            $message->component = 'local_nudge';
+            $message->name = 'owneremail';
+            $message->userfrom = core_user::get_noreply_user();
+            $message->userto = $user;
+            $message->subject = $subject;
+            $message->fullmessageformat = \FORMAT_HTML;
+            $message->fullmessagehtml = $body;
+            $message->notification = 1;
+            $message->courseid = $course->id;
+            $message->contexturl = new moodle_url('/course/view.php', ['id' => $course->id]);
+            $message->contexturlname = 'Course Link';
+            \message_send($message);
+        }
+    }
+
      * @param \core\entity\user|stdClass $user
      */
     public function trigger($user): void {
