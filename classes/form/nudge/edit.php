@@ -329,6 +329,24 @@ class edit extends moodleform {
             }
         }
 
+        // Validate it: has no scheduling conflicts with the course's *current* end date.
+        if (
+            !empty($data['remindertype']) &&
+            $data['remindertype'] === nudge::REMINDER_DATE_INPUT_FIXED
+        ) {
+            $targetcourse = \get_course($data['courseid']);
+            $enddate = ((int) $targetcourse->enddate) ?: false;
+            if ($enddate) {
+                if ($data['remindertypefixeddate'] >= $enddate) {
+                    $errors['remindertypefixeddate'] = \get_string(
+                        'validation_nudge_timepastcourseend',
+                        'local_nudge',
+                        \date(nudge::DATE_FORMAT_NICE, $enddate)
+                    );
+                }
+            }
+        }
+
         return $errors;
     }
 
