@@ -277,6 +277,26 @@ function nudge_hydrate_notification_template(
 }
 
 /**
+ * Return current Unix timestamp, {@see time()} but mockable for tests.
+ *
+ * @access public
+ *
+ * @codeCoverageIgnore
+ *
+ * @return int
+ */
+function nudge_mockable_time(): int {
+    /** @var \core_config $CFG */
+    global $CFG;
+
+    if (!isset($CFG->nudgemocktime)) {
+        return time();
+    } else {
+        return $CFG->nudgemocktime;
+    }
+}
+
+/**
  * Gets a list of managers for a user. This calls the correct function based on the custommangerresolution setting.
  *
  * @access public
@@ -371,20 +391,4 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
 
     // Null if there is no manager.
     return $manager ?: null;
-}
-
-/**
- * Return current Unix timestamp, {@see time()} but mockable for tests.
- *
- * @return int
- */
-function nudge_mockable_time(): int {
-    /** @var \core_config $CFG */
-    global $CFG;
-
-    if (!isset($CFG->nudgemocktime)) {
-        return time();
-    } else {
-        return $CFG->nudgemocktime;
-    }
 }
