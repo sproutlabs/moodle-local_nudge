@@ -30,8 +30,10 @@
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\form\nudge_notification\delete;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+// @codeCoverageIgnoreEnd
 
 \admin_externalpage_setup('configurenudgenotifications');
 

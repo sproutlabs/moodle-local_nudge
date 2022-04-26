@@ -31,9 +31,11 @@
 
 use local_nudge\dml\nudge_db;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
+// @codeCoverageIgnoreEnd
 
 $courseid = \required_param('courseid', \PARAM_INT);
 

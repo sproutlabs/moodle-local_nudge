@@ -32,8 +32,10 @@ use local_nudge\dml\nudge_db;
 use local_nudge\form\nudge\edit;
 use local_nudge\local\nudge;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+// @codeCoverageIgnoreEnd
 
 $nudgeid = \required_param('id', \PARAM_INT);
 $courseid = \required_param('courseid', \PARAM_INT);

@@ -30,8 +30,10 @@
 use local_nudge\dml\nudge_db;
 use local_nudge\form\nudge\delete;
 
+// @codeCoverageIgnoreStart
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+// @codeCoverageIgnoreEnd
 
 $id = \required_param('id', \PARAM_INT);
 $courseid = \optional_param('courseid', null, \PARAM_INT);
