@@ -127,6 +127,8 @@ function local_nudge_pre_course_delete($course) {
  *
  * @access public
  *
+ * @throws ReflectionException Class doesn't exist for reflection
+ *
  * @param class-string $class Class to lookup consts on via reflection
  * @param string $filter Filter string the constant group of enums contain.
  *
@@ -136,11 +138,11 @@ function nudge_scaffold_select_from_constants($class, $filter): array {
     $rclass = new \ReflectionClass($class);
     $constants = $rclass->getConstants();
 
-    // Filter for constants containing: `REMINDER_DATE`
-    $constants = \array_filter($constants, function ($value, $name) use ($filter) {
+    // Filter for constants by prefix.
+    $constants = \array_filter($constants, function ($name) use ($filter) {
         $match = (\strpos($name, $filter) !== false);
         return $match;
-    }, \ARRAY_FILTER_USE_BOTH);
+    }, \ARRAY_FILTER_USE_KEY);
 
     // Convert constants to a sane reference to language strings.
     $constantfields = [];
