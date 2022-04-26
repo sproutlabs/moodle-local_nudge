@@ -7,6 +7,15 @@ If a file has `REQUIRED` you **MUST** take action to prevent unwanted data leaka
 
 If a file has `TODO` or is not present on this list please raise a GH issue.
 
+> Note that Nudge ships with some simple checks to help establish if *some* of these files are secure.
+> You can access these at:
+```php
+$url = "{$CFG->wwwroot}/report/security/index.php";
+```
+or:
+`https://subdomain.atdomain.tld/report/security/index.php`
+
+
 | File                                                                                                                             | Security Measure | Action Required                                             |
 | :------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----------------------------------------------------------- |
 | [.github/workflows/moodle-ci.yml](../../.github/workflows/moodle-ci.yml)                                                         | REQUIRED         | Deny dotfiles                                               |
@@ -35,7 +44,7 @@ If a file has `TODO` or is not present on this list please raise a GH issue.
 | [classes/task/nudge_task.php](../../classes/task/nudge_task.php)                                                                 | NONE             | Optional: Additionally covered by denying classes directory |
 | [composer.json](../../composer.json)                                                                                             | REQUIRED         | Deny composer.json files                                    |
 | [db/access.php](../../db/access.php)                                                                                             | NONE             | None                                                        |
-| [db/install.xml](../../db/install.xml)                                                                                           | REQUIRED         | Deny .xml files                                             |
+| [db/install.xml](../../db/install.xml)                                                                                           | REQUIRED         | Deny install.xml files                                      |
 | [db/messages.php](../../db/messages.php)                                                                                         | NONE             | None                                                        |
 | [db/tasks.php](../../db/tasks.php)                                                                                               | NONE             | None                                                        |
 | [delete_notification.php](../../delete_notification.php)                                                                         | PUBLIC           | None                                                        |
