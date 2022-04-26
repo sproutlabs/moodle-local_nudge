@@ -27,6 +27,7 @@
  * @var \core_renderer      $OUTPUT
  */
 
+use core\output\notification;
 use local_nudge\dml\nudge_notification_content_db;
 use local_nudge\dml\nudge_notification_db;
 use local_nudge\form\nudge_notification\edit;
@@ -49,7 +50,12 @@ if ($mform->is_cancelled()) {
     \redirect($manageurl);
 } else if ($editdata = $mform->get_data()) {
     if ($editdata === null) {
-        \redirect($manageurl);
+        \redirect(
+            $manageurl,
+            'Unable to save notification',
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
 
     $notificationid = nudge_notification_db::save($editdata->notification);
@@ -59,7 +65,12 @@ if ($mform->is_cancelled()) {
         nudge_notification_content_db::save($notificationcontent);
     }
 
-    \redirect($manageurl);
+    \redirect(
+        $manageurl,
+        "Edited notification '{$notification->title}' successfully",
+        null,
+        notification::NOTIFY_SUCCESS
+    );
 }
 
 if ($notificationid === 0) {

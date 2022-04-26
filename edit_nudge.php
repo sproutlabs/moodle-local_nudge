@@ -27,6 +27,7 @@
  * @var \core_renderer      $OUTPUT
  */
 
+use core\output\notification;
 use local_nudge\dml\nudge_db;
 use local_nudge\form\nudge\edit;
 use local_nudge\local\nudge;
@@ -51,11 +52,21 @@ if ($mform->is_cancelled()) {
     \redirect($manageurl);
 } else if ($editdata = $mform->get_data()) {
     if ($editdata === null) {
-        \redirect($manageurl);
+        \redirect(
+            $manageurl,
+            'Unable to save nudge',
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
 
-    nudge_db::save($editdata);
-    \redirect($manageurl);
+    $nudge = nudge_db::create_or_refresh($editdata);
+    \redirect(
+        $manageurl,
+        "Edited nudge '{$nudge->title}' successfully",
+        null,
+        notification::NOTIFY_SUCCESS
+    );
 }
 
 // We do this so cancelations of unsaved nudge forms know which course to return to.
