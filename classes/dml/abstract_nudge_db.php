@@ -328,7 +328,7 @@ abstract class abstract_nudge_db {
      * @param T $instance
      * @return void
      */
-    public static function populate_defaults(abstract_nudge_entity $instance): void {
+    public static function populate_defaults(abstract_nudge_entity &$instance): void {
         foreach (static::$entityclass::DEFAULTS as $defaultfield => $value) {
             if ($instance->{$defaultfield} === null ||
                 $instance->{$defaultfield} === '' ||
