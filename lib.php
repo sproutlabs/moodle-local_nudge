@@ -220,6 +220,7 @@ function nudge_get_email_message($nudge, $user, $manager = null): message {
     $message->userto = ($manager === null) ? $user : $manager;
     $message->subject = $subject;
     $message->fullmessageformat = \FORMAT_HTML;
+    $message->fullmessage = \html_to_text($body);
     $message->fullmessagehtml = $body;
     $message->notification = 1;
     $message->courseid = $course->id;
