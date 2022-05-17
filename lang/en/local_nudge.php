@@ -110,9 +110,9 @@ NOTE: This is highly experimental. You can configure a Nudge to remind every x p
 This will end with the course's enddate or a learner's completion.
 EOF;
 
-$string['form_nudge_reminderdatecoruseend']                         =       'Reminder x before course ends';
-$string['form_nudge_reminderdatecoruseend_help']                    =       <<<EOF
-TODO
+$string['form_nudge_reminderdatecourseend']                         =       'Reminder x before course ends';
+$string['form_nudge_reminderdatecourseend_help']                    =       <<<EOF
+You can configure a Nudge to reminder on a given period prior to course end.
 EOF;
 
 $string['form_nudge_deleteconfirm']                                 =       'Are you sure you want delete this nudge?';

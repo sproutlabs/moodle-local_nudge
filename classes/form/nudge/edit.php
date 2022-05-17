@@ -170,14 +170,14 @@ class edit extends moodleform {
         $mform->addElement(
             'duration',
             'reminderdaterelativecourseend',
-            get_string('form_nudge_reminderdatecoruseend', 'local_nudge'),
+            get_string('form_nudge_reminderdatecourseend', 'local_nudge'),
             [
                 // Default to days.
                 'defaultunit' => \DAYSECS
             ]
         );
         $mform->hideIf('reminderdaterelativecourseend', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_COURSE_END);
-        $mform->addHelpButton('reminderdaterelativecourseend', 'form_nudge_reminderdatecoruseend', 'local_nudge');
+        $mform->addHelpButton('reminderdaterelativecourseend', 'form_nudge_reminderdatecourseend', 'local_nudge');
 
         $mform->addElement('header', 'metahdr', get_string('form_metahdr', 'local_nudge'));
         $mform->addElement('static', 'createdby', 'Created by');
