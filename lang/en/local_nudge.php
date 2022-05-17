@@ -81,12 +81,12 @@ EOF;
 
 $string['form_nudge_learnernotification']                           =       'Notification for the Learner';
 $string['form_nudge_learnernotification_help']                      =       <<<EOF
-TODO
+You can select a notification from the Site's Nudge Notifications to be sent to the Learner when the nudge triggers.
 EOF;
 
 $string['form_nudge_managernotification']                           =       'Notification for the Managers';
 $string['form_nudge_managernotification_help']                      =       <<<EOF
-TODO
+You can select a notification from the Site's Nudge Notifications to be sent to the Learner's Managers when the nudge triggers.
 EOF;
 
 $string['form_nudge_remindertype']                                  =       'Reminder Timing';
@@ -96,17 +96,18 @@ EOF;
 
 $string['form_nudge_remindertypefixeddate']                         =       'Choose a fixed reminder date';
 $string['form_nudge_remindertypefixeddate_help']                    =       <<<EOF
-TODO
+Pick a fixed date for this Nudge to trigger on, The Nudge will then disable itself.
 EOF;
 
-$string['form_nudge_remindertyperelativedate']                      =       'Remind x after the user\s enrollment';
+$string['form_nudge_remindertyperelativedate']                      =       'Remind x after the Learner\'s enrollment';
 $string['form_nudge_remindertyperelativedate_help']                 =       <<<EOF
-TODO You can setup this notification to remind users relative to their enrollment date.
+You can setup this Nudge to remind Learners relative to their enrollment date. The Nudge will then disable itself.
 EOF;
 
-$string['form_nudge_remindertyperelativedaterecurring']             =       'Repeat every x after a user\'s enrollment';
+$string['form_nudge_remindertyperelativedaterecurring']             =       'Repeat every x after a Learner\'s enrollment';
 $string['form_nudge_remindertyperelativedaterecurring_help']        =       <<<EOF
-TODO make this minium 5 minutes to make it align with cron
+NOTE: This is highly experimental. You can configure a Nudge to remind every x period following their enrolment until they complete this course.
+This will end with the course's enddate or a learner's completion.
 EOF;
 
 $string['form_nudge_reminderdatecoruseend']                         =       'Reminder x before course ends';
@@ -174,7 +175,7 @@ EOF;
 $string['admin_manager_matchwith_field']                            =       'Manager match with field';
 $string['admin_manager_matchwith_field_desc']                       =       <<<EOF
 This field will be used to match managers with.
-This will be the field on a user's profile that matches the match on field on the Manager's profile
+This will be the field on a Learner's profile that matches the match on field on the Manager's profile
 EOF;
 
 $string['admin_manager_matchon_field']                              =       'Manager match on field';
