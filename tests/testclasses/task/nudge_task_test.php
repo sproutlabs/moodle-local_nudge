@@ -129,20 +129,20 @@ class nudge_task_test extends advanced_testcase {
 
         $message = $sink->get_messages()[0];
 
-        $this->assertEquals($sender->id,            $message->useridfrom);
-        $this->assertEquals($user->id,              $message->useridto);
-        $this->assertEquals($contents->subject,     $message->subject);
-        $this->assertNull($message->fullmessage);
-        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
-        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertEquals($sender->id,                    $message->useridfrom);
+        $this->assertEquals($user->id,                      $message->useridto);
+        $this->assertEquals($contents->subject,             $message->subject);
+        $this->assertEquals(\html_to_text($expectedbody),   $message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,                   $message->fullmessageformat);
+        $this->assertEquals($expectedbody,                  $message->fullmessagehtml);
         $this->assertNull($message->smallmessage);
-        $this->assertEquals('local_nudge',          $message->component);
-        $this->assertEquals('learneremail',         $message->eventtype);
-        $this->assertEquals($courselink,            $message->contexturl);
-        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertEquals('local_nudge',                  $message->component);
+        $this->assertEquals('learneremail',                 $message->eventtype);
+        $this->assertEquals($courselink,                    $message->contexturl);
+        $this->assertEquals('Course Link',                  $message->contexturlname);
         $this->assertNull($message->timeread);
         $this->assertNull($message->customdata);
-        $this->assertEquals(1,                      $message->notification);
+        $this->assertEquals(1,                              $message->notification);
     }
 
     /**
@@ -227,20 +227,20 @@ class nudge_task_test extends advanced_testcase {
 
         $message = $sink->get_messages()[0];
 
-        $this->assertEquals($sender->id,            $message->useridfrom);
-        $this->assertEquals($user->id,              $message->useridto);
-        $this->assertEquals($contents->subject,     $message->subject);
-        $this->assertNull($message->fullmessage);
-        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
-        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertEquals($sender->id,                    $message->useridfrom);
+        $this->assertEquals($user->id,                      $message->useridto);
+        $this->assertEquals($contents->subject,             $message->subject);
+        $this->assertEquals(\html_to_text($expectedbody),   $message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,                   $message->fullmessageformat);
+        $this->assertEquals($expectedbody,                  $message->fullmessagehtml);
         $this->assertNull($message->smallmessage);
-        $this->assertEquals('local_nudge',          $message->component);
-        $this->assertEquals('learneremail',         $message->eventtype);
-        $this->assertEquals($courselink,            $message->contexturl);
-        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertEquals('local_nudge',                  $message->component);
+        $this->assertEquals('learneremail',                 $message->eventtype);
+        $this->assertEquals($courselink,                    $message->contexturl);
+        $this->assertEquals('Course Link',                  $message->contexturlname);
         $this->assertNull($message->timeread);
         $this->assertNull($message->customdata);
-        $this->assertEquals(1,                      $message->notification);
+        $this->assertEquals(1,                              $message->notification);
     }
 
     /**
@@ -355,20 +355,20 @@ class nudge_task_test extends advanced_testcase {
 
         $message = $sink->get_messages()[0];
 
-        $this->assertEquals($sender->id,            $message->useridfrom);
-        $this->assertEquals($user->id,              $message->useridto);
-        $this->assertEquals($contents->subject,     $message->subject);
-        $this->assertNull($message->fullmessage);
-        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
-        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertEquals($sender->id,                    $message->useridfrom);
+        $this->assertEquals($user->id,                      $message->useridto);
+        $this->assertEquals($contents->subject,             $message->subject);
+        $this->assertEquals(\html_to_text($expectedbody),   $message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,                   $message->fullmessageformat);
+        $this->assertEquals($expectedbody,                  $message->fullmessagehtml);
         $this->assertNull($message->smallmessage);
-        $this->assertEquals('local_nudge',          $message->component);
-        $this->assertEquals('learneremail',         $message->eventtype);
-        $this->assertEquals($courselink,            $message->contexturl);
-        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertEquals('local_nudge',                  $message->component);
+        $this->assertEquals('learneremail',                 $message->eventtype);
+        $this->assertEquals($courselink,                    $message->contexturl);
+        $this->assertEquals('Course Link',                  $message->contexturlname);
         $this->assertNull($message->timeread);
         $this->assertNull($message->customdata);
-        $this->assertEquals(1,                      $message->notification);
+        $this->assertEquals(1,                              $message->notification);
     }
 
     /**
@@ -467,20 +467,20 @@ class nudge_task_test extends advanced_testcase {
 
         $message = $sink->get_messages()[0];
 
-        $this->assertEquals($sender->id,            $message->useridfrom);
-        $this->assertEquals($user->id,              $message->useridto);
-        $this->assertEquals($contents->subject,     $message->subject);
-        $this->assertNull($message->fullmessage);
-        $this->assertEquals(\FORMAT_HTML,           $message->fullmessageformat);
-        $this->assertEquals($expectedbody,          $message->fullmessagehtml);
+        $this->assertEquals($sender->id,                    $message->useridfrom);
+        $this->assertEquals($user->id,                      $message->useridto);
+        $this->assertEquals($contents->subject,             $message->subject);
+        $this->assertEquals(\html_to_text($expectedbody),   $message->fullmessage);
+        $this->assertEquals(\FORMAT_HTML,                   $message->fullmessageformat);
+        $this->assertEquals($expectedbody,                  $message->fullmessagehtml);
         $this->assertNull($message->smallmessage);
-        $this->assertEquals('local_nudge',          $message->component);
-        $this->assertEquals('learneremail',         $message->eventtype);
-        $this->assertEquals($courselink,            $message->contexturl);
-        $this->assertEquals('Course Link',          $message->contexturlname);
+        $this->assertEquals('local_nudge',                  $message->component);
+        $this->assertEquals('learneremail',                 $message->eventtype);
+        $this->assertEquals($courselink,                    $message->contexturl);
+        $this->assertEquals('Course Link',                  $message->contexturlname);
         $this->assertNull($message->timeread);
         $this->assertNull($message->customdata);
-        $this->assertEquals(1,                      $message->notification);
+        $this->assertEquals(1,                              $message->notification);
     }
 
     /**
