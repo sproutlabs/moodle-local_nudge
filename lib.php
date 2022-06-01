@@ -227,13 +227,6 @@ function nudge_get_email_message($nudge, $user, $manager = null): message {
     $message->contexturl = new moodle_url('/course/view.php', ['id' => $course->id]);
     $message->contexturlname = 'Course Link';
 
-    $content = ['*' => [
-        'header' => <<<HTML
-            <h1>{$notification->title}</h1>
-        HTML,
-    ]];
-    $message->set_additional_content('email', $content);
-
     return $message;
 }
 
