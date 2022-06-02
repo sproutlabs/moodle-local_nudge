@@ -249,6 +249,7 @@ $string['messageprovider:owneremail']                               =       'Nud
 // ---------------------------------------
 //               EXCEPTIONS
 // ---------------------------------------
+$string['cantmanagesitenudges']                                     =       'You can\'t attach nudge reminders to the site course.';
 $string['nudge_exception_unlinked_notification_subject']            =       '{$a} - Exception for a nudge you manage';
 $string['nudge_exception_unlinked_notification_body']               =       <<<'HTML'
 <h5>Hi There,</h5>
