@@ -102,6 +102,7 @@ class nudge extends abstract_nudge_entity {
         '{course_fullname}' => 'Unresolved',
         '{course_shortname}' => 'Unresolved',
         '{course_link}' => 'Unresolved',
+        '{course_enddate}' => 'Unresolved',
         '{sender_firstname}' => 'Unresolved',
         '{sender_lastname}' => 'Unresolved',
         '{sender_email}' => 'Unresolved',
