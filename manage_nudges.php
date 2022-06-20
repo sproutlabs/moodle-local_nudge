@@ -39,6 +39,13 @@ require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = \required_param('courseid', \PARAM_INT);
 
+if ($courseid === 1) {
+    throw new moodle_exception(
+        'cantmanagesitenudges',
+        'local_nudge'
+    );
+}
+
 // Require a login for this course for this course.
 $course = \get_course($courseid);
 \require_login($course);

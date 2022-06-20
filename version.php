@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 // phpcs:ignore
 // Requires 3.9.0.
-$plugin->version   = 2022022805;
+$plugin->version   = 2022022806;
 $plugin->requires  = 2020061500;
 $plugin->component = 'local_nudge';
 $plugin->release   = 'Release Candidate 1';
