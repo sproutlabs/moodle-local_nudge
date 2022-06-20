@@ -59,19 +59,27 @@ echo $OUTPUT->single_button(
 $table = new \flexible_table('nudge_notification_table');
 $table->define_baseurl(new \moodle_url('/local/nudge/manage_notifications.php'));
 $table->define_columns([
-    'id',
     'title',
     'count',
     'actions',
 ]);
 $table->define_headers([
-    'ID',
-    'Title',
-    'Linked Translation Count',
-    'Actions',
+    get_string('manage_notification_col_title', 'local_nudge'),
+    get_string('manage_notification_col_count', 'local_nudge'),
+    get_string('manage_notification_col_actions', 'local_nudge'),
 ]);
-$table->sortable(false);
+$table->sortable(true, 'title');
+$table->no_sorting('count');
+$table->no_sorting('actions');
 $table->setup();
+
+/** @var string Not SQL.. Poor type hint */
+$tablesort = $table->get_sql_sort();
+if (\strlen($tablesort) && \substr($tablesort, 0, 5) === 'title') {
+    $sqlsort = 'ORDER BY ' . $tablesort;
+} else {
+    $sqlsort = '';
+}
 
 $notificationtable = nudge_notification_db::$table;
 $selectsql = <<<SQL
@@ -79,6 +87,7 @@ $selectsql = <<<SQL
         *
     FROM
         {{$notificationtable}}
+    {$sqlsort}
 SQL;
 
 $notificationstomanage = nudge_notification_db::get_all_sql($selectsql);
