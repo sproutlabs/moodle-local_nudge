@@ -40,6 +40,8 @@ $string['configurenudgenotifications']                              =       'Con
 // This is here in case you wanted to clarify and prefix with `Edit: {$a}` (a is title) etc.
 $string['notification_edit_link']                                   =       '{$a}';
 $string['nudge_edit_link']                                          =       '{$a}';
+$string['nudge_status_text_enabled']                                =       'Enabled';
+$string['nudge_status_text_disabled']                               =       'Disabled';
 
 
 // ---------------------------------------

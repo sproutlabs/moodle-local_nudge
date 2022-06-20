@@ -227,6 +227,7 @@ class nudge extends abstract_nudge_entity {
 
         return [
             $this->get_nudge_edit_link(),
+            $this->get_status_badge(),
             ($learnernotification)
                 ? $learnernotification->get_notification_edit_link()
                 : 'None',
@@ -257,6 +258,26 @@ class nudge extends abstract_nudge_entity {
         HTML;
 
         return $linkhtml;
+    }
+
+    /**
+     * Gets a simple bootstrap badge showing the {@see self::$isenabled} status of this nudge.
+     *
+     * @return string
+     */
+    public function get_status_badge(): string {
+        $badgeclass = ($this->isenabled)
+            ? 'success'
+            : 'danger';
+        $badgetext = ($this->isenabled)
+            ? get_string('nudge_status_text_enabled', 'local_nudge')
+            : get_string('nudge_status_text_disabled', 'local_nudge');
+
+        return <<<HTML
+            <div class="badge badge-{$badgeclass}">
+                {$badgetext}
+            </div>
+        HTML;
     }
 
     /**
