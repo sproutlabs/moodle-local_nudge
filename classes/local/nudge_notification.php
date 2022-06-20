@@ -102,11 +102,12 @@ class nudge_notification extends abstract_nudge_entity {
      */
     public function get_summary_fields(): array {
         $notificationcount = count($this->get_contents());
+        $possibleplurals = ($notificationcount != 1) ? 's' : '';
+        $pluralreferer = ($notificationcount > 1) ? 'are' : 'is';
         return [
-            $this->id,
             $this->get_notification_edit_link(),
             <<<HTML
-                <p class="badge badge-primary">There are {$notificationcount} linked translations</p>
+                <p class="badge badge-primary">There {$pluralreferer} {$notificationcount} linked translation{$possibleplurals}</p>
             HTML
         ];
     }
