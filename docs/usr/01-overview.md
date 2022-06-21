@@ -34,7 +34,7 @@ Let's get started with a quick example.
 We have a "Work, Health and Safety" course that **must** be completed by Learners for compliance reasons. This course is part of the "Induction set"
 
 Learners have been reluctant to complete the course within past reporting cycles, as an L&D team you've decided that the root cause of the problem is Learner retention.
-The content is not the problem here (Ideally you should review this prior to indundating Learners), the issue is just that the course is long and Learners often forget to return after making progress.
+The content is not the problem here (Ideally you should review this prior to indundating Learners with emails), the issue is just that the course is long and Learners often forget to return after making progress.
 
 You want to use the nudge plugin to "nudge" (Literal meaning not the [L&D term](https://elearningindustry.com/nudge-learning-in-workplace)) Learners into completing the full course.
 #### Solution
@@ -110,6 +110,7 @@ If you have any questions feel free to reach out at: {sender_email}.
 <details>
 <summary>Two week reminder</summary>
 Subject:
+ 
 ```text
 You need to complete {course_fullname} on the Example LMS
 ```
@@ -255,12 +256,11 @@ If you do not wish to add more translations you can simply `Save changes`.
 You can now see that we have a few options here:
  - We can delete the notification, this will:
     - Remove the notification
-    - Deactive any nudges that make use of the notification
+    - Deactivate any nudges that make use of the notification
     - If any nudges made use of that notification it will send an email to the both the last person to edit that nudge and the creator letting them know that the nudge is broken.
-    - Remove all translations linked the nudge
+    - Remove all translations linked to the notification
  - We can edit the notification again via the cog icon or by clicking on the title.
  - We can sort notifications by title.
- - As just demonstrated you can continue to edit nudges.
 
 Lets go ahead and fill out the rest of the messages needed for "Work, Health and Safety" course as laid out [here](#message-design).
 
@@ -308,7 +308,7 @@ Once your happy for messages to start going out you can simply activate all nudg
 
 Some notes on enabled/disabled nudges:
 1. A disabled nudge cannot send messages.
-1. **All** nudges will disable when the course end date occurs.
+1. **All** nudges (with the exception of fixed date) will disable when the course end date occurs.
 1. Recurring nudges (experimental) and nudges relative to enrollment will disable only when the course ends.
 1. Nudges prior to course end will disable once they've fired once.
 1. Fixed date nudges will disable upon their set date.
