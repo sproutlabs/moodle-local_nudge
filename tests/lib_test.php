@@ -166,7 +166,7 @@ class lib_test extends advanced_testcase {
 
         $content = '1{user_firstname}{user_firstname}2{user_lastname}3{course_fullname}'
             . '4{course_shortname}5{course_link}6{sender_firstname}'
-            . '7{sender_lastname}8{sender_email}9{notification_title}';
+            . '7{sender_lastname}8{sender_email}9{notification_title}10{course_enddate}';
 
         $result = nudge_hydrate_notification_template(
             $content,
@@ -176,10 +176,11 @@ class lib_test extends advanced_testcase {
             $notification
         );
 
+        $formattedcourseenddate = date(nudge::DATE_FORMAT_NICE, $course->enddate);
         $this->assertSame(
             "1{$user->firstname}{$user->firstname}2{$user->lastname}3{$course->fullname}"
                 . "4{$course->shortname}5{$courselink}6{$userfrom->firstname}"
-                . "7{$userfrom->lastname}8{$userfrom->email}9{$notification->title}",
+                . "7{$userfrom->lastname}8{$userfrom->email}9{$notification->title}10{$formattedcourseenddate}",
             $result
         );
     }

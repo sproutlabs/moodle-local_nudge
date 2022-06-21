@@ -77,23 +77,39 @@ echo $OUTPUT->single_button(
 );
 
 $table = new \flexible_table('nudge_table');
-$table->define_baseurl(new moodle_url('/local/nudge/manage_nudges.php'));
+$table->define_baseurl(new moodle_url('/local/nudge/manage_nudges.php', ['courseid' => $courseid]));
 $table->define_columns([
     'title',
+    'status',
     'learnerreminder',
     'managerreminder',
     'type',
-    'actions'
+    'actions',
 ]);
 $table->define_headers([
-    'Title',
-    'Learner Reminder',
-    'Manager Reminder',
-    'Type',
-    'Actions'
+    get_string('manage_nudge_col_title', 'local_nudge'),
+    get_string('manage_nudge_col_status', 'local_nudge'),
+    get_string('manage_nudge_col_learnerreminder', 'local_nudge'),
+    get_string('manage_nudge_col_managerreminder', 'local_nudge'),
+    get_string('manage_nudge_col_type', 'local_nudge'),
+    get_string('manage_nudge_col_actions', 'local_nudge'),
 ]);
-$table->sortable(false);
+$table->sortable(true, 'title', SORT_ASC);
+$table->set_control_variables([\TABLE_VAR_SORT => 'ssort']);
+$table->no_sorting('type');
+$table->no_sorting('status');
+$table->no_sorting('learnerreminder');
+$table->no_sorting('managerreminder');
+$table->no_sorting('actions');
 $table->setup();
+
+/** @var string Not SQL.. Poor type hint */
+$tablesort = $table->get_sql_sort();
+if (\strlen($tablesort) && \substr($tablesort, 0, 5) === 'title') {
+    $sqlsort = 'ORDER BY ' . $tablesort;
+} else {
+    $sqlsort = '';
+}
 
 $nudgetable = nudge_db::$table;
 $selectsql = <<<SQL
@@ -103,6 +119,7 @@ $selectsql = <<<SQL
         {{$nudgetable}} as nudge
     WHERE
         nudge.courseid = :courseid
+    {$sqlsort}
 SQL;
 
 $nudgestomanage = nudge_db::get_all_sql($selectsql, ['courseid' => $courseid]);

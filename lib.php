@@ -258,6 +258,7 @@ function nudge_hydrate_notification_template(
     $templatevars['{course_fullname}'] = $course->fullname;
     $templatevars['{course_shortname}'] = $course->shortname;
     $templatevars['{course_link}'] = $CFG->wwwroot . '/course/view.php?id=' . $course->id;
+    $templatevars['{course_enddate}'] = \date(nudge::DATE_FORMAT_NICE, $course->enddate);
     $templatevars['{sender_firstname}'] = $userfrom->firstname;
     $templatevars['{sender_lastname}'] = $userfrom->lastname;
     $templatevars['{sender_email}'] = $userfrom->email;

@@ -40,6 +40,8 @@ $string['configurenudgenotifications']                              =       'Con
 // This is here in case you wanted to clarify and prefix with `Edit: {$a}` (a is title) etc.
 $string['notification_edit_link']                                   =       '{$a}';
 $string['nudge_edit_link']                                          =       '{$a}';
+$string['nudge_status_text_enabled']                                =       'Enabled';
+$string['nudge_status_text_disabled']                               =       'Disabled';
 
 
 // ---------------------------------------
@@ -48,9 +50,18 @@ $string['nudge_edit_link']                                          =       '{$a
 // Nudge
 $string['manage_nudge_add']                                         =       'Add a Nudge';
 $string['manage_nudge_notificationslink']                           =       'Manage Notifications';
+$string['manage_nudge_col_title']                                   =       'Title';
+$string['manage_nudge_col_status']                                  =       'Status';
+$string['manage_nudge_col_learnerreminder']                         =       'Learner Reminder';
+$string['manage_nudge_col_managerreminder']                         =       'Manager Reminder';
+$string['manage_nudge_col_type']                                    =       'Type';
+$string['manage_nudge_col_actions']                                 =       'Actions';
 
 // Nudge Notification
 $string['manage_notification_add']                                  =       'Add a Nudge Notification';
+$string['manage_notification_col_title']                            =       'Title';
+$string['manage_notification_col_count']                            =       'Linked Translation Count';
+$string['manage_notification_col_actions']                          =       'Actions';
 
 
 // ---------------------------------------
