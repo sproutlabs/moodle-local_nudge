@@ -22,12 +22,15 @@
  * @license     GNU GPL v3 or later
  */
 
+use core\event\course_completed;
+use local_nudge\event\course_completed_observer;
+
 defined('MOODLE_INTERNAL') || die();
 
-// phpcs:ignore
-// Requires 3.9.0.
-$plugin->version   = 2022022807;
-$plugin->requires  = 2020061500;
-$plugin->component = 'local_nudge';
-$plugin->release   = 'Release Candidate 1';
-$plugin->maturity  = MATURITY_RC;
+$observers = [
+    [
+        'eventname' => course_completed::class,
+        'callback' => course_completed_observer::class . '::trigger_course_completion_nudges',
+        'internal' => false, // Happy to run after transaction.
+    ]
+];
