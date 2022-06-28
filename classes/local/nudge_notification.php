@@ -127,13 +127,13 @@ class nudge_notification extends abstract_nudge_entity {
                     'local_nudge'
                 );
             }
+            $languagelist = \get_string_manager()->get_list_of_languages();
             $languagenotsupportedwarning = get_string(
                 'languagenotsupported',
                 'local_nudge',
                 [
                     'langcode' => $userslangcode,
-                    'language' => \get_string_manager()
-                        ->get_list_of_languages()[$userslangcode] ?? 'ERROR: We can\'t offer a language name for this language code',
+                    'language' => $languagelist[$userslangcode] ?? 'ERROR: We can\'t offer a language name for this language code',
                 ]
             );
             $notificationcontent->body .= <<<HTML
