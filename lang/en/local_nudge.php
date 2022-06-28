@@ -172,14 +172,14 @@ $string['reminderrecipientboth']                                    =       'Bot
 $string['configurenudge']                                           =       'Configure Nudge';
 $string['manage_settings']                                          =       'Configure Nudge Settings';
 
-// Managers settings
-$string['admin_manager_heading']                                    =       'Manager Settings';
+// Manager resolution settings.
+$string['admin_manager_heading']                                    =       'Manager resolution Settings';
 $string['admin_manager_heading_desc']                               =       <<<EOF
 These are just for emulation on MOODLE, Totara already has a system for this.
 EOF;
 
-$string['admin_custom_managerresolution']                           =       'Custom manager resolution enabled';
-$string['admin_custom_managerresolution_desc']                      =       <<<EOF
+$string['admin_manager_managerresolution']                          =       'Custom manager resolution enabled';
+$string['admin_manager_managerresolution_desc']                     =       <<<EOF
 If this is enabled the below two fields will be used for custom manager resolution.
 In Totara this is generally not a good idea however this is <em><strong>needed</strong> for MOODLE solutions</em>.
 EOF;
@@ -195,6 +195,30 @@ $string['admin_manager_matchon_field_desc']                         =       <<<E
 This field will be used to match managers on.
 This is the "unique" identifier for a manager
 EOF;
+
+// Language resolution settings.
+$string['admin_language_heading']                                   =       'Language resolution settings';
+$string['admin_language_heading_desc']                              =       <<<'HTML'
+<div class="alert alert-info p-3 pt-4 mt-4">
+    <p>By default this plugin uses the user's language preference in MOODLE however in some cases you may wish
+        to base the user's email message language on a custom profile field.</p>
+    <p>It is <strong>important to note</strong> that a custom field must exist before you can select it here.</p>
+</div>
+HTML;
+
+$string['admin_language_languageresolution']                        =       'Custom language resolution enabled';
+$string['admin_language_languageresolution_desc']                   =       <<<EOF
+If this is enabled language preference will be based on the below selected custom field rather than
+the inbuilt moodle system.
+EOF;
+
+$string['admin_language_field']                                     =       'Custom language field';
+$string['admin_language_field_desc']                                =       <<<'HTML'
+<p>This is the field that will be used as the user's preference language.</p>
+<p>You <strong>must ensure</strong> that this field is considered a valid MOODLE/Totara language code.</p>
+<center>See <a href="https://download.moodle.org/langpack/4.0/">here</a> for MOODLE language codes (the prefix before the zip file)
+    and <a href="https://download.totaralms.com/lang/T16/">here</a> for Totara ones.</center>
+HTML;
 
 // UX Settings
 $string['admin_ux_heading']                                         =       'User Experience Settings';
@@ -261,6 +285,11 @@ $string['messageprovider:owneremail']                               =       'Nud
 // ---------------------------------------
 //               EXCEPTIONS
 // ---------------------------------------
+$string['languagenotsupported']                                     =       <<<'HTML'
+<p>Your language is not supported, The primary translation has been offered for now.</p>
+<p>Please contact a Site Administrator and notify them that a translation for your
+    language: {$a->langcode} ({$a->language}) is not offered.</p>
+HTML;
 $string['cantmanagesitenudges']                                     =       'You can\'t attach nudge reminders to the site course.';
 $string['nudge_exception_unlinked_notification_subject']            =       '{$a} - Exception for a nudge you manage';
 $string['nudge_exception_unlinked_notification_body']               =       <<<'HTML'

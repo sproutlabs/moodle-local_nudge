@@ -345,6 +345,29 @@ class lib_test extends advanced_testcase {
 
     /**
      * @test
+     * @testdox When getting a user's language code it should conditionally use a user's custom profile field based on config.
+     * @covers ::nudge_get_user_language_code
+     */
+    public function test_nudge_get_user_language_code(): void
+    {
+        $this->resetAfterTest();
+
+        $this->create_profile_field('userlanguage');
+
+        $user = $this->getDataGenerator()->create_user([
+            'profile_field_userlanguage' => 'en_us',
+        ]);
+
+        $this->assertSame('en', nudge_get_user_language_code($user));
+
+        set_config('customlanguageresolution', '1', 'local_nudge');
+        set_config('customlanguagefield', 'userlanguage', 'local_nudge');
+
+        $this->assertSame('en_us', nudge_get_user_language_code($user));
+    }
+
+    /**
+     * @test
      * @testdox TODO totara testing?
      * @covers ::nudge_totara_get_managers_for_user
      *

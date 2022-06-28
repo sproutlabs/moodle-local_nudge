@@ -101,8 +101,8 @@ if ($hassiteconfig) {
             ),
             new admin_setting_configcheckbox(
                 'local_nudge/custommangerresolution',
-                get_string('admin_custom_managerresolution', 'local_nudge'),
-                get_string('admin_custom_managerresolution_desc', 'local_nudge'),
+                get_string('admin_manager_managerresolution', 'local_nudge'),
+                get_string('admin_manager_managerresolution_desc', 'local_nudge'),
                 '0',
             ),
             new admin_setting_configselect(
@@ -116,6 +116,25 @@ if ($hassiteconfig) {
                 'local_nudge/managermatchwithfield',
                 get_string('admin_manager_matchwith_field', 'local_nudge'),
                 get_string('admin_manager_matchwith_field_desc', 'local_nudge'),
+                '',
+                $customfieldsselect,
+            ),
+            // Custom language resolution section.
+            new admin_setting_heading(
+                'nudge_admin_language_heading',
+                get_string('admin_language_heading', 'local_nudge'),
+                get_string('admin_language_heading_desc', 'local_nudge'),
+            ),
+            new admin_setting_configcheckbox(
+                'local_nudge/customlanguageresolution',
+                get_string('admin_language_languageresolution', 'local_nudge'),
+                get_string('admin_language_languageresolution_desc', 'local_nudge'),
+                '0',
+            ),
+            new admin_setting_configselect(
+                'local_nudge/customlanguagefield',
+                get_string('admin_language_field', 'local_nudge'),
+                get_string('admin_language_field_desc', 'local_nudge'),
                 '',
                 $customfieldsselect,
             ),

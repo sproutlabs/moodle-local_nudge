@@ -30,6 +30,8 @@ use local_nudge\dml\nudge_notification_content_db;
 use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\abstract_nudge_entity;
 use local_nudge\local\nudge_notification_content;
+use moodle_exception;
+use stdClass;
 
 class nudge_notification extends abstract_nudge_entity {
 
@@ -49,10 +51,11 @@ class nudge_notification extends abstract_nudge_entity {
     public $userfromid = null;
 
     /**
-     * Returns the content for a language code.
+     * Returns the contents for this nudge notification.
+     * Filterable using a specific langcode (See MOODLE docs<https://docs.moodle.org/dev/Table_of_locales>).
      *
      * @param string $langcode
-     * @return array<nudge_notification_content|null>
+     * @return array<nudge_notification_content>
      */
     public function get_contents($langcode = null) {
         $filter = [
@@ -93,6 +96,53 @@ class nudge_notification extends abstract_nudge_entity {
             $this,
             $contents
         );
+    }
+
+    /**
+     * Gets the attached notification content for a specific user based on their language.
+     *
+     * @param \core\entity\user|stdClass $user
+     * @return nudge_notification_content
+     */
+    public function get_users_contents(stdClass $user) {
+        $userslangcode = nudge_get_user_language_code($user);
+        $notificationcontents = $this->get_contents($userslangcode);
+        $notificationcontent = array_shift($notificationcontents);
+
+        // This case happens when a user's prefered language is not present on the notification.
+        // In this case we just pick the first (Primary key based) contents to use and append a simple
+        // message informing the user that their language is not supported.
+        if ($notificationcontent === null) {
+            if (debugging()) {
+                mtrace("Failed to resolve language for user {$user->id} while sending notification {$this->id}");
+            }
+            $allpossiblecontents = $this->get_contents();
+            $notificationcontent = array_shift($allpossiblecontents);
+
+            // Form validation means this should be unreachable.
+            if ($notificationcontent === null) {
+                throw new moodle_exception(
+                    'expectedunreachable',
+                    'local_nudge'
+                );
+            }
+            $languagenotsupportedwarning = get_string(
+                'languagenotsupported',
+                'local_nudge',
+                [
+                    'langcode' => $userslangcode,
+                    'language' => \get_string_manager()
+                        ->get_list_of_languages()[$userslangcode] ?? 'ERROR: We can\'t offer a language name for this language code',
+                ]
+            );
+            $notificationcontent->body .= <<<HTML
+                <br/>
+                <br/>
+                {$languagenotsupportedwarning}
+            HTML;
+        }
+
+        return $notificationcontent;
     }
 
     /**

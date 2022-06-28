@@ -31,6 +31,8 @@ use local_nudge\dml\nudge_notification_db;
 use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\nudge_notification;
 use local_nudge\local\nudge_notification_content;
+use moodle_exception;
+use Throwable;
 
 // phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found
 // phpcs:disable Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine
@@ -157,6 +159,68 @@ class nudge_notification_test extends advanced_testcase {
 
         $DB->delete_records(nudge_notification_db::$table);
         $DB->delete_records(nudge_notification_content_db::$table);
+    }
+
+    /**
+     * @test
+     * @testdox getting a content for a user has sensible defaults when their language is not supported.
+     * @covers ::get_users_contents
+     */
+    public function test_get_users_contents() {
+        $this->resetAfterTest();
+
+        // Ignoring the mtrace warning about the failure to resolve language -> contents.
+        // phpcs:ignore
+        $this->setOutputCallback(function () {});
+
+        // Default lang is 'en'.
+        $user = $this->getDataGenerator()->create_user();
+
+        /** @var nudge_notification $notification */
+        $notification = nudge_notification_db::create_or_refresh(new nudge_notification(['title' => 'testing']));
+
+        // If a notification has no contents some form validation fails.
+        // Here we should fail fast and let the cron worker know with an exception.
+        try {
+            $result = $notification->get_users_contents($user);
+        // phpcs:ignore
+        } catch (Throwable $t) {
+        }
+        $this->assertInstanceOf(moodle_exception::class, $t);
+        $this->assertSame(get_string('expectedunreachable', 'local_nudge'), $t->getMessage());
+        $this->assertFalse(isset($result));
+
+        // Now we create two sets of content but neither for the user's language.
+        // The expected behaviour here is that `get_users_contents` returns the first (primary key)
+        // item.
+        $expectedcontents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id,
+            'lang' => 'br',
+            'body' => 'languagebr'
+        ]));
+        nudge_notification_content_db::save(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id,
+            'lang' => 'en_us',
+            'body' => 'languageen_us'
+        ]));
+        $resultcontents = $notification->get_users_contents($user);
+        $this->assertStringContainsString('our language is not supported', $resultcontents->body);
+
+        // Apart from body they should be the same.
+        unset($expectedcontents->body);
+        unset($resultcontents->body);
+        $this->assertEquals($expectedcontents, $resultcontents);
+
+        // Finally we create content for the user's actual language and despite it's higher primary key it should be choosen.
+        $userscontents = nudge_notification_content_db::create_or_refresh(new nudge_notification_content([
+            'nudgenotificationid' => $notification->id,
+            'lang' => 'en',
+            'body' => 'works!'
+        ]));
+
+        $resultuserscontents = $notification->get_users_contents($user);
+        $this->assertEquals($userscontents, $resultuserscontents);
+        $this->assertSame($userscontents->body, $resultuserscontents->body);
     }
 
     /**

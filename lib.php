@@ -190,8 +190,8 @@ function nudge_get_email_message($nudge, $user, $manager = null): message {
         $notification = $nudge->get_manager_notification();
     }
 
-    $notificationcontents = $notification->get_contents($user->lang);
-    $notificationcontent = array_pop($notificationcontents);
+    $notificationcontent = $notification->get_users_contents($user);
+
     /** @var \core\entity\user|stdClass|false */
     $userfrom = $DB->get_record('user', ['id' => $notification->userfromid]);
     $course = $nudge->get_course();
@@ -267,6 +267,26 @@ function nudge_hydrate_notification_template(
     $result = \strtr($contenttotemplate, $templatevars);
 
     return $result;
+}
+
+/**
+ * Get a user's language respecting the config option to use profile fields.
+ *
+ * @access public
+ *
+ * @param \core\entity\user|stdClass $user
+ *
+ * @return string
+ */
+function nudge_get_user_language_code(stdClass $user): ?string {
+    $userprofilefieldused = (bool) get_config('local_nudge', 'customlanguageresolution');
+    if (!$userprofilefieldused) {
+        return $user->lang;
+    } else {
+        $profilefield = get_config('local_nudge', 'customlanguagefield');
+        profile_load_data($user);
+        return $user->{"profile_field_{$profilefield}"};
+    }
 }
 
 /**
