@@ -329,6 +329,9 @@ function nudge_get_managers_for_user($user): array {
             get_config('local_nudge', 'managermatchonfield') == null ||
             get_config('local_nudge', 'managermatchwithfield') == null
         ) {
+            if (debugging()) {
+                mtrace("Failed to resolve manager for user {$user->id}, manager resolution is on but is not setup correctly.");
+            }
             throw new moodle_exception(
                 'cantmatchmanager',
                 'local_nudge',
@@ -403,6 +406,9 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
     // @codeCoverageIgnoreStart
     } catch (dml_exception $e) {
         // TODO: Log failed to find manager.
+        if (debugging()) {
+            mtrace("Failed to find manager for user {$user->id}, Match on: {$matchonfield}, Match with: {$matchwith}");
+        }
         return null;
     }
     // @codeCoverageIgnoreEnd
