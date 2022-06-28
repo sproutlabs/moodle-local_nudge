@@ -65,6 +65,11 @@ class nudge extends abstract_nudge_entity {
      * This Nudge instance's reminder timing recurrs based on the user's date of enrollment.
      */
     public const REMINDER_DATE_RELATIVE_ENROLLMENT_RECURRING = 'enrollmentrecurring';
+
+    /**
+     * This Nudge instance's reminder timing is based on course completion
+     */
+    public const REMINDER_DATE_COURSE_COMPLETION = 'coursecompletion';
     // END ENUM - REMINDER DATE    ////////////////////
 
     // BEGIN ENUM - REMINDER RECIPIENT    ////////////////////

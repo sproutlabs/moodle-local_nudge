@@ -111,10 +111,11 @@ class lib_test extends advanced_testcase {
                 nudge::class,
                 'REMINDER_DATE',
                 [
-                    'fixed' => 'Reminder Date Input Fixed',
-                    'courseend' => 'Reminder Date Relative Course End',
-                    'enrollment' => 'Reminder Date Relative Enrollment',
-                    'enrollmentrecurring' => 'Reminder Date Relative Enrollment Recurring',
+                    'fixed' => 'Reminder Date input fixed',
+                    'courseend' => 'Reminder Date relative Course end',
+                    'enrollment' => 'Reminder Date relative enrollment',
+                    'enrollmentrecurring' => 'Reminder Date relative enrollment recurring',
+                    'coursecompletion' => 'Remind on Course completion',
                 ]
             ],
             'Nudge\'s REMINDER_RECIPIENT' => [

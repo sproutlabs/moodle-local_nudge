@@ -153,10 +153,11 @@ $string['form_notification_deleteconfirm']                          =       'Are
 // See: local/nudge/lib.php::nudge_scaffold_select_from_constants()
 // ---------------------------------------
 // Reminder Date
-$string['reminderdateinputfixed']                                   =       'Reminder Date Input Fixed';
-$string['reminderdaterelativeenrollment']                           =       'Reminder Date Relative Enrollment';
-$string['reminderdaterelativeenrollmentrecurring']                  =       'Reminder Date Relative Enrollment Recurring';
-$string['reminderdaterelativecourseend']                            =       'Reminder Date Relative Course End';
+$string['reminderdateinputfixed']                                   =       'Reminder Date input fixed';
+$string['reminderdaterelativeenrollment']                           =       'Reminder Date relative enrollment';
+$string['reminderdaterelativeenrollmentrecurring']                  =       'Reminder Date relative enrollment recurring';
+$string['reminderdaterelativecourseend']                            =       'Reminder Date relative Course end';
+$string['reminderdatecoursecompletion']                             =       'Remind on Course completion';
 
 // Reminder Recipient
 $string['reminderrecipientlearner']                                 =       'The Learner';

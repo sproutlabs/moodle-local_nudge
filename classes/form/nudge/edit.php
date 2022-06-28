@@ -226,6 +226,8 @@ class edit extends moodleform {
             case (nudge::REMINDER_DATE_RELATIVE_COURSE_END):
                 $instancedata['remindertypeperiod'] = $data->reminderdaterelativecourseend;
                 break;
+            case (nudge::REMINDER_DATE_COURSE_COMPLETION):
+                break;
             default:
                 // UNREACHABLE!.
                 throw new moodle_exception(
