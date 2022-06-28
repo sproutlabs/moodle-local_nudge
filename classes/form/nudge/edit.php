@@ -138,7 +138,8 @@ class edit extends moodleform {
             get_string('form_nudge_remindertyperelativedate', 'local_nudge'),
             [
                 // Default to days.
-                'defaultunit' => \DAYSECS
+                'defaultunit' => \DAYSECS,
+                'units' => [\HOURSECS, \DAYSECS, \WEEKSECS]
             ]
         );
         $mform->setDefault('reminderdaterelativeenrollment', 86400);
@@ -151,7 +152,8 @@ class edit extends moodleform {
             get_string('form_nudge_remindertyperelativedaterecurring', 'local_nudge'),
             [
                 // Default to days.
-                'defaultunit' => \DAYSECS
+                'defaultunit' => \DAYSECS,
+                'units' => [\HOURSECS, \DAYSECS, \WEEKSECS]
             ]
         );
         $mform->setDefault('reminderdaterelativeenrollmentrecurring', 86400);
@@ -173,7 +175,8 @@ class edit extends moodleform {
             get_string('form_nudge_reminderdatecourseend', 'local_nudge'),
             [
                 // Default to days.
-                'defaultunit' => \DAYSECS
+                'defaultunit' => \DAYSECS,
+                'units' => [HOURSECS, DAYSECS, WEEKSECS]
             ]
         );
         $mform->hideIf('reminderdaterelativecourseend', 'remindertype', 'neq', nudge::REMINDER_DATE_RELATIVE_COURSE_END);
