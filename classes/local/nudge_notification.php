@@ -26,6 +26,7 @@
 
 namespace local_nudge\local;
 
+use local_nudge\dml\nudge_db;
 use local_nudge\dml\nudge_notification_content_db;
 use local_nudge\dto\nudge_notification_form_data;
 use local_nudge\local\abstract_nudge_entity;
@@ -151,13 +152,22 @@ class nudge_notification extends abstract_nudge_entity {
      * @return array<mixed>
      */
     public function get_summary_fields(): array {
+        /** @var \moodle_database $DB */
+        global $DB;
+
         $notificationcount = count($this->get_contents());
         $possibleplurals = ($notificationcount != 1) ? 's' : '';
         $pluralreferer = ($notificationcount > 1) ? 'are' : 'is';
+        $linkednudgecount = $DB->count_records_select(nudge_db::$table, <<<SQL
+        linkedlearnernotificationid = ? OR linkedmanagernotificationid = ?
+        SQL, [$this->id, $this->id]); // Yeah this is the best way todo multiple indentical params, moodle is great..
         return [
             $this->get_notification_edit_link(),
             <<<HTML
                 <p class="badge badge-primary">There {$pluralreferer} {$notificationcount} linked translation{$possibleplurals}</p>
+            HTML,
+            <<<HTML
+                <p class="badge badge-info">$linkednudgecount linked nudges</p>
             HTML
         ];
     }

@@ -61,6 +61,7 @@ $string['manage_nudge_col_actions']                                 =       'Act
 $string['manage_notification_add']                                  =       'Add a Nudge Notification';
 $string['manage_notification_col_title']                            =       'Title';
 $string['manage_notification_col_count']                            =       'Linked Translation Count';
+$string['manage_notification_col_nudge_count']                      =       'Linked Nudges';
 $string['manage_notification_col_actions']                          =       'Actions';
 
 
