@@ -232,9 +232,9 @@ $string['admin_ux_addtranslationcount_desc']                        =       <<<E
 The amount of translations to add each time when creating a Nudge Notification.
 EOF;
 
-$string['admin_ux_enddate']                                         =       'Start date';
+$string['admin_ux_enddate']                                         =       'End date';
 $string['admin_ux_enddate_desc']                                    =       <<<EOF
-You can select a start date here to limit date pickers.
+You can select a end date here to limit date pickers to something reasonable.
 EOF;
 
 // Performance Settings
