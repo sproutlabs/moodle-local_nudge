@@ -53,6 +53,7 @@ require_once(__DIR__ . '/../../lib.php');
  * should be recommended in the readme for serious use of the plugin.
  */
 class nudge_task extends scheduled_task {
+    /** @todo Account for enrol status. SEE comment at: lib/db/install.xml:266 */
     private const USER_COURSE_ENROLLMENT_TIME_SQL = <<<SQL
     SELECT
         timestart

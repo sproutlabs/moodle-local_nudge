@@ -1,12 +1,3 @@
-# NOTE
-This plugin is not yet stable.
-There is rename that is going to happen to avoid conflicts with the L&D nudge but we are yet to decide on naming.
-## Maybe:
-Plugin is local_completionreminder and models:
- - CourseTracker (nudge)
- - Notification (nudge_notification)
- - Translation (nudge_notification_content)
-
 # :point_right: Nudge
 > The Nudge plugin for MOODLE and Totara aims to provide a simple way to notify/remind users to revisit their course prior to course completion.
 >> The pugin supports multiple translation, templated messages, recurring remind dates, relative remind dates and the option to remind managers in both Totara *and MOODLE*.
@@ -15,8 +6,6 @@ Plugin is local_completionreminder and models:
 | :------------------------------------ |
 | [What this is not](#what-this-is-not) |
 | [Contributing](#contributing)         |
-| [TODOs](#todos)                       |
-| [IDEAs](#ideas)                       |
 | [Versioning](#versioning)             |
 | [Installation](#installation)         |
 | [Credits](#credits)                   |
@@ -37,16 +26,6 @@ Plugin is local_completionreminder and models:
 
 ## Contributing
 Welcomed :-)
-
-## TODOs
- 1. Migrate ideas and TODOs to GH issues.
- 1. TODO flesh out readme.
- 1. Installation process written up.
- 1. Initial user guide.
- 1. Initial developer guide.
-
-## IDEAs 
- 1. IDEA: Benchmark phpunit testsuite to run a different test suite that tests operations in bulk numerous 1000s then reports on time.
 
 ## Versioning
 | PHP Version |       LMS Version        |             Nudge Branch             |

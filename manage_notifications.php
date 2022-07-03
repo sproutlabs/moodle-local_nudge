@@ -61,15 +61,18 @@ $table->define_baseurl(new \moodle_url('/local/nudge/manage_notifications.php'))
 $table->define_columns([
     'title',
     'count',
+    'nudgecount',
     'actions',
 ]);
 $table->define_headers([
     get_string('manage_notification_col_title', 'local_nudge'),
     get_string('manage_notification_col_count', 'local_nudge'),
+    get_string('manage_notification_col_nudge_count', 'local_nudge'),
     get_string('manage_notification_col_actions', 'local_nudge'),
 ]);
 $table->sortable(true, 'title');
 $table->no_sorting('count');
+$table->no_sorting('nudgecount');
 $table->no_sorting('actions');
 $table->setup();
 

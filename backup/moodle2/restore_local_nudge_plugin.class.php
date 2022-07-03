@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use local_nudge\dml\nudge_db;
+use local_nudge\local\nudge;
+
 /**
  * @package     local_nudge
  * @author      Liam Kearney <liam@sproutlabs.com.au>
@@ -22,12 +25,25 @@
  * @license     GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+class restore_local_nudge_plugin extends restore_local_plugin {
 
-// phpcs:ignore
-// Requires 3.9.0.
-$plugin->version   = 2022022808;
-$plugin->requires  = 2020061500;
-$plugin->component = 'local_nudge';
-$plugin->release   = 'Release Candidate 1';
-$plugin->maturity  = MATURITY_RC;
+    protected function define_course_plugin_structure() {
+        return [
+            new restore_path_element('local_nudge_nudge', $this->get_pathfor('/nudges/nudge'))
+        ];
+    }
+
+    /**
+     * @param array $data
+     */
+    public function process_local_nudge_nudge($data) {
+        $nudge = new nudge($data);
+        // Nudges should always restore disabled. This is to prevent unexpected messages around relative timings.
+        $nudge->isenabled = false;
+        $nudge->courseid = $this->get_mappingid('course', $data['courseid']);
+
+        // Created by and timecreated will also be reset due to the id unset which is nice.
+        unset($nudge->id);
+        nudge_db::save($nudge);
+    }
+}

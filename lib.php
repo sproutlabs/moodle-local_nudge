@@ -190,8 +190,8 @@ function nudge_get_email_message($nudge, $user, $manager = null): message {
         $notification = $nudge->get_manager_notification();
     }
 
-    $notificationcontents = $notification->get_contents($user->lang);
-    $notificationcontent = array_pop($notificationcontents);
+    $notificationcontent = $notification->get_users_contents($user);
+
     /** @var \core\entity\user|stdClass|false */
     $userfrom = $DB->get_record('user', ['id' => $notification->userfromid]);
     $course = $nudge->get_course();
@@ -270,6 +270,26 @@ function nudge_hydrate_notification_template(
 }
 
 /**
+ * Get a user's language respecting the config option to use profile fields.
+ *
+ * @access public
+ *
+ * @param \core\entity\user|stdClass $user
+ *
+ * @return string
+ */
+function nudge_get_user_language_code(stdClass $user): ?string {
+    $userprofilefieldused = (bool) get_config('local_nudge', 'customlanguageresolution');
+    if (!$userprofilefieldused) {
+        return $user->lang;
+    } else {
+        $profilefield = get_config('local_nudge', 'customlanguagefield');
+        profile_load_data($user);
+        return $user->{"profile_field_{$profilefield}"};
+    }
+}
+
+/**
  * Return current Unix timestamp, {@see time()} but mockable for tests.
  *
  * @access public
@@ -309,6 +329,9 @@ function nudge_get_managers_for_user($user): array {
             get_config('local_nudge', 'managermatchonfield') == null ||
             get_config('local_nudge', 'managermatchwithfield') == null
         ) {
+            if (debugging()) {
+                mtrace("Failed to resolve manager for user {$user->id}, manager resolution is on but is not setup correctly.");
+            }
             throw new moodle_exception(
                 'cantmatchmanager',
                 'local_nudge',
@@ -383,6 +406,9 @@ function nudge_moodle_get_manager_for_user($user): ?stdClass {
     // @codeCoverageIgnoreStart
     } catch (dml_exception $e) {
         // TODO: Log failed to find manager.
+        if (debugging()) {
+            mtrace("Failed to find manager for user {$user->id}, Match on: {$matchonfield}, Match with: {$matchwith}");
+        }
         return null;
     }
     // @codeCoverageIgnoreEnd

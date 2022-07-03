@@ -78,7 +78,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
      * @test
      * @testdox Supplying a $_dataName constructs without issue.
      * @dataProvider provide_construct_with_valid_data
-     * @covers local_nudge\local\abstract_nudge_entity::__construct
+     * @covers \local_nudge\local\abstract_nudge_entity::__construct
      */
     public function test_contruct_with_valid_data($data): void
     {
@@ -112,7 +112,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
      * @test
      * @testdox Supplying $_dataName to an entities constructor fails gracefully.
      * @dataProvider provide_construct_with_invalid_data
-     * @covers local_nudge\local\abstract_nudge_entity::__construct
+     * @covers \local_nudge\local\abstract_nudge_entity::__construct
      */
     public function test_contruct_with_invalid_data($data, $exception): void
     {
@@ -124,7 +124,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox Constructing without data works fine.
-     * @covers local_nudge\local\abstract_nudge_entity::__construct
+     * @covers \local_nudge\local\abstract_nudge_entity::__construct
      */
     public function test_contruct_with_no_data(): void
     {
@@ -140,7 +140,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox Saving will result in createdby being set to the current user.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_set_and_update_createdby(): void
     {
@@ -167,7 +167,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox Createdby will not be changed.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_immutable_createdby(): void
     {
@@ -190,7 +190,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox Saving will result in timecreated being set to current time.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_set_and_update_timecreated(): void
     {
@@ -212,7 +212,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox Timecreated will not be changed.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_immutable_timecreated(): void
     {
@@ -238,7 +238,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox When saving lastmodifiedby will be set to the current user and change when updated.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_set_and_update_lastmodifedby(): void
     {
@@ -266,7 +266,7 @@ class abstract_nudge_entity_test extends advanced_testcase {
     /**
      * @test
      * @testdox When saving lastmodified will be set to the current time and changed when updated.
-     * @covers local_nudge\dml\nudge_db::save
+     * @covers \local_nudge\dml\nudge_db::save
      */
     public function test_set_and_update_lastmodifed(): void
     {
