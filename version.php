@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 // phpcs:ignore
-// Requires 3.9.0.
+// Requires v13 Totara. 
 $plugin->version   = 2022022808;
-$plugin->requires  = 2020061500;
+$plugin->requires  = 2017111309;
 $plugin->component = 'local_nudge';
 $plugin->release   = 'Release Candidate 1';
 $plugin->maturity  = MATURITY_RC;
