@@ -54,6 +54,9 @@ class edit extends moodleform {
      * @see moodleform::definition()
      */
     protected function definition() {
+        /** @var \core_config $CFG */
+        global $CFG;
+
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -66,6 +69,17 @@ class edit extends moodleform {
             $mform->createElement('text', 'title', get_string('form_nudge_title', 'local_nudge')),
             $mform->createElement('checkbox', 'isenabled', get_string('form_nudge_isenabled', 'local_nudge'))
         ];
+
+        // TOTARA: Checkboxes can't have a label if nested in a group. To counteract this just put some plain text label alongside.
+        if (isset($CFG->totara_version)) {
+            $headergroup[] = $mform->createElement(
+                'static',
+                'isenabledtotaralabel',
+                'isenabledtotaralabel',
+                get_string('form_nudge_isenabled', 'local_nudge')
+            );
+        }
+
         $mform->addGroup($headergroup, 'group_header', get_string('form_nudge_title', 'local_nudge'));
         $mform->setType('group_header[title]', \PARAM_TEXT);
         $mform->addGroupRule('group_header', [
