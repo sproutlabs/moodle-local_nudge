@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Commenting
+// phpcs:disable Squiz.WhiteSpace.OperatorSpacing.SpacingBefore
 
 namespace local_nudge\event;
 

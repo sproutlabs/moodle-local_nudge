@@ -25,9 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 // phpcs:ignore
-// Requires v13 Totara. 
+// phpcs:disable Squiz.WhiteSpace.OperatorSpacing.SpacingBefore
+// Requires v13 Totara.
 $plugin->version   = 2022022808;
 $plugin->requires  = 2017111309;
 $plugin->component = 'local_nudge';
 $plugin->release   = 'Release Candidate 1';
 $plugin->maturity  = MATURITY_RC;
+// phpcs:enable Squiz.WhiteSpace.OperatorSpacing.SpacingBefore

@@ -164,9 +164,9 @@ class edit_test extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course(['enddate' => $initaltimestamp]);
         $_POST['courseid'] = $course->id;
 
-        $_POST['remindertypefixeddate']['day']   = \date('j', $initaltimestamp);
-        $_POST['remindertypefixeddate']['month']   = \date('n', $initaltimestamp);
-        $_POST['remindertypefixeddate']['year']   = \date('Y', $initaltimestamp + \YEARSECS);
+        $_POST['remindertypefixeddate']['day'] = \date('j', $initaltimestamp);
+        $_POST['remindertypefixeddate']['month'] = \date('n', $initaltimestamp);
+        $_POST['remindertypefixeddate']['year'] = \date('Y', $initaltimestamp + \YEARSECS);
 
         $this->assertStringContainsString(
             \get_string(
