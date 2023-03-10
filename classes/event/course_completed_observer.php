@@ -46,9 +46,10 @@ class course_completed_observer {
             'courseid' => $event->courseid
         ]);
 
+        /** @var \core\entity\user|\stdClass */
+        $user = $DB->get_record('user', ['id' => $event->relateduserid], '*', \MUST_EXIST);
+
         foreach ($nudgestotrigger as $nudge) {
-            /** @var \core\entity\user|\stdClass */
-            $user = $DB->get_record('user', ['id' => $event->relateduserid], '*', \MUST_EXIST);
             $nudge->trigger($user);
         }
     }
