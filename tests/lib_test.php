@@ -116,6 +116,7 @@ class lib_test extends advanced_testcase {
                     'enrollment' => 'Reminder Date relative enrollment',
                     'enrollmentrecurring' => 'Reminder Date relative enrollment recurring',
                     'coursecompletion' => 'Remind on Course completion',
+                    'userenrolment' => 'Remind on User enrolment',
                 ]
             ],
             'Nudge\'s REMINDER_RECIPIENT' => [

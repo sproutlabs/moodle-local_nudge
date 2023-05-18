@@ -23,7 +23,9 @@
  */
 
 use core\event\course_completed;
+use core\event\user_enrolment_created;
 use local_nudge\event\course_completed_observer;
+use local_nudge\event\user_enrolment_created_observer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,6 +33,11 @@ $observers = [
     [
         'eventname' => course_completed::class,
         'callback' => course_completed_observer::class . '::trigger_course_completion_nudges',
+        'internal' => false, // Happy to run after transaction.
+    ],
+    [
+        'eventname' => user_enrolment_created::class,
+        'callback' => user_enrolment_created_observer::class . '::trigger_workspace_joined_nudges',
         'internal' => false, // Happy to run after transaction.
     ]
 ];

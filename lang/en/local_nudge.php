@@ -159,6 +159,7 @@ $string['reminderdaterelativeenrollment']                           =       'Rem
 $string['reminderdaterelativeenrollmentrecurring']                  =       'Reminder Date relative enrollment recurring';
 $string['reminderdaterelativecourseend']                            =       'Reminder Date relative Course end';
 $string['reminderdatecoursecompletion']                             =       'Remind on Course completion';
+$string['reminderdateuserenrolment']                                =       'Remind on User enrolment';
 
 // Reminder Recipient
 $string['reminderrecipientlearner']                                 =       'The Learner';
